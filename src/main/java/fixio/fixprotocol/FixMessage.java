@@ -1,7 +1,7 @@
 /*
  * Copyright 2013 The FIX.io Project
  *
- * The Netty Project licenses this file to you under the Apache License,
+ * The FIX.io Project licenses this file to you under the Apache License,
  * version 2.0 (the "License"); you may not use this file except in compliance
  * with the License. You may obtain a copy of the License at:
  *
@@ -22,7 +22,7 @@ public interface FixMessage {
 
     FixMessageHeader getHeader();
 
-    List<FixMessageFragment> getBodyFields();
+    List<FixMessageFragment> getBody();
 
     Integer getInt(int tagNum);
 

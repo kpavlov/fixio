@@ -2,7 +2,7 @@
 <!--
   ~ Copyright 2013 The FIX.io Project
   ~
-  ~ The Netty Project licenses this file to you under the Apache License,
+  ~ The FIX.io Project licenses this file to you under the Apache License,
   ~ version 2.0 (the "License"); you may not use this file except in compliance
   ~ with the License. You may obtain a copy of the License at:
   ~
@@ -23,12 +23,12 @@
     <artifactId>fixio</artifactId>
     <version>1.0-SNAPSHOT</version>
 
-    <name>Fix.io</name>
+    <name>fix.io</name>
     <description>FIX Protocol Support for Netty 4</description>
 
     <properties>
         <slf4j.version>1.7.5</slf4j.version>
-        <netty.version>4.0.4.Final</netty.version>
+        <netty.version>4.0.12.Final</netty.version>
     </properties>
 
     <dependencies>
@@ -93,6 +93,20 @@
                     <source>1.7</source>
                     <target>1.7</target>
                 </configuration>
+            </plugin>
+
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-failsafe-plugin</artifactId>
+                <version>2.16</version>
+                <executions>
+                    <execution>
+                        <goals>
+                            <goal>integration-test</goal>
+                            <goal>verify</goal>
+                        </goals>
+                    </execution>
+                </executions>
             </plugin>
         </plugins>
     </build>

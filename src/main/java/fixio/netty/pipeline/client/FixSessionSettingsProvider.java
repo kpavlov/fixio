@@ -13,17 +13,20 @@
  * License for the specific language governing permissions and limitations
  * under the License.
  */
-package fixio.fixprotocol;
 
-public final class MessageTypes {
+package fixio.netty.pipeline.client;
 
-    public static final String HEARTBEAT = "0";
-    public static final String TEST_REQUEST = "1";
-    public static final String RESEND_REQUEST = "2";
-    public static final String REJECT = "3";
-    public static final String LOGOUT = "5";
-    public static final String LOGON = "A";
 
-    private MessageTypes() {
-    }
+public interface FixSessionSettingsProvider {
+    String getSenderCompID();
+
+    String getSenderSubID();
+
+    String getTargetCompID();
+
+    String getTargetSubID();
+
+    String getBeginString();
+
+    int getMsgSeqNum();
 }

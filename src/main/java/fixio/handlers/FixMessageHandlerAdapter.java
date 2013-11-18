@@ -13,17 +13,19 @@
  * License for the specific language governing permissions and limitations
  * under the License.
  */
-package fixio.fixprotocol;
 
-public final class MessageTypes {
+package fixio.handlers;
 
-    public static final String HEARTBEAT = "0";
-    public static final String TEST_REQUEST = "1";
-    public static final String RESEND_REQUEST = "2";
-    public static final String REJECT = "3";
-    public static final String LOGOUT = "5";
-    public static final String LOGON = "A";
+import fixio.fixprotocol.FixMessage;
+import io.netty.channel.ChannelHandler;
+import io.netty.channel.ChannelHandlerContext;
+import io.netty.handler.codec.MessageToMessageDecoder;
 
-    private MessageTypes() {
+import java.util.List;
+
+@ChannelHandler.Sharable
+public class FixMessageHandlerAdapter extends MessageToMessageDecoder<FixMessage> implements FixMessageHandler {
+    @Override
+    protected void decode(ChannelHandlerContext ctx, FixMessage msg, List<Object> out) throws Exception {
     }
 }

@@ -1,7 +1,7 @@
 /*
  * Copyright 2013 The FIX.io Project
  *
- * The Netty Project licenses this file to you under the Apache License,
+ * The FIX.io Project licenses this file to you under the Apache License,
  * version 2.0 (the "License"); you may not use this file except in compliance
  * with the License. You may obtain a copy of the License at:
  *
@@ -26,10 +26,11 @@ public class SimpleFixMessage implements FixMessage {
     public static final String FIX_4_2 = "FIX.4.2";
     public static final String FIX_4_3 = "FIX.4.3";
     public static final String FIX_4_4 = "FIX.4.4";
+
     private final List<Field> rawFields = new ArrayList<>();
     private final FixMessageHeader header = new FixMessageHeader();
     private final FixMessageTrailer trailer = new FixMessageTrailer();
-    private final List<FixMessageFragment> bodyFields = new ArrayList<>();
+    private final List<FixMessageFragment> body = new ArrayList<>();
 
     public SimpleFixMessage() {
 
@@ -64,7 +65,7 @@ public class SimpleFixMessage implements FixMessage {
         assert (value != null) : "Value  must be specified.";
         switch (tagNum) {
             case 8:
-                header.setBeginString(value);
+                header.setBeginString(value.intern());
                 break;
             case 10:
                 trailer.setCheckSum(Integer.parseInt(value));
@@ -79,18 +80,18 @@ public class SimpleFixMessage implements FixMessage {
                 header.setMsgSeqNum(Integer.parseInt(value));
                 break;
             case 35:
-                header.setMessageType(value);
+                header.setMessageType(value.intern());
                 break;
             default:
-                bodyFields.add(new Field(tagNum, value));
+                body.add(new Field(tagNum, value));
                 break;
         }
         rawFields.add(new Field(tagNum, value));
     }
 
     @Override
-    public List<FixMessageFragment> getBodyFields() {
-        return bodyFields;
+    public List<FixMessageFragment> getBody() {
+        return body;
     }
 
     public List<Field> getRawFields() {
