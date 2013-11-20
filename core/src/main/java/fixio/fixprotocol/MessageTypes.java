@@ -17,12 +17,18 @@ package fixio.fixprotocol;
 
 public final class MessageTypes {
 
+    // Admin Messages
     public static final String HEARTBEAT = "0";
     public static final String TEST_REQUEST = "1";
     public static final String RESEND_REQUEST = "2";
     public static final String REJECT = "3";
     public static final String LOGOUT = "5";
     public static final String LOGON = "A";
+
+    // Applicaiton Messages
+    public static final String QUOTE_REQUEST = "R";
+    public static final String QUOTE = "S";
+    public static final String QUOTE_CANCEL = "Z";
 
     private MessageTypes() {
     }

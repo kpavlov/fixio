@@ -18,7 +18,7 @@ package fixio;
 import fixio.events.LogonEvent;
 import fixio.fixprotocol.FixMessage;
 import fixio.fixprotocol.SimpleFixMessage;
-import fixio.handlers.AdminEventHandlerAdapter;
+import fixio.handlers.FixApplicationAdapter;
 import fixio.handlers.FixMessageHandlerAdapter;
 import io.netty.channel.ChannelFuture;
 import io.netty.channel.ChannelHandlerContext;
@@ -68,7 +68,7 @@ public class FixConversationIT {
 
     @Before
     public void beforeMethod() throws InterruptedException {
-        client = new FixClient(new ClientLogonHandler(), new ClientLogicHandler());
+        client = new FixClient(new ClientApp());
         clientCloseFuture = client.connect(PORT);
         conversation.clear();
     }
@@ -104,18 +104,15 @@ public class FixConversationIT {
         }
     }
 
-    private class ClientLogicHandler extends FixMessageHandlerAdapter {
+    private class ClientApp extends FixApplicationAdapter {
 
         @Override
-        protected void decode(ChannelHandlerContext ctx, FixMessage msg, List<Object> out) throws Exception {
+        protected void onMessage(ChannelHandlerContext ctx, FixMessage msg, List<Object> out) throws Exception {
             if ("BF".equals(msg.getMessageType())) {
                 conversation.add(msg);
                 client.disconnect();
             }
         }
-    }
-
-    private static class ClientLogonHandler extends AdminEventHandlerAdapter {
 
         @Override
         protected void onLogon(ChannelHandlerContext ctx, LogonEvent msg) {

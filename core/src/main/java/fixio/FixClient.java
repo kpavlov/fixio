@@ -18,6 +18,7 @@ package fixio;
 
 import fixio.fixprotocol.FixMessage;
 import fixio.handlers.AdminEventHandler;
+import fixio.handlers.FixApplicationAdapter;
 import fixio.handlers.FixMessageHandler;
 import fixio.netty.pipeline.client.FixInitiatorChannelInitializer;
 import fixio.netty.pipeline.client.PropertyFixSessionSettingsProviderImpl;
@@ -38,8 +39,19 @@ public class FixClient extends AbstractFixConnector {
     private static final Logger LOGGER = LoggerFactory.getLogger(FixClient.class);
     private Channel channel;
 
+    private String settingsResource;
+
+    public FixClient(FixApplicationAdapter fixApplication) {
+        this(fixApplication, fixApplication);
+    }
+
     public FixClient(AdminEventHandler adminEventHandler, FixMessageHandler... appMessageHandlers) {
         super(adminEventHandler, appMessageHandlers);
+        settingsResource = "/fixClient.properties";
+    }
+
+    public void setSettingsResource(String settingsResource) {
+        this.settingsResource = settingsResource;
     }
 
     public ChannelFuture connect(int port) throws InterruptedException {
@@ -53,7 +65,7 @@ public class FixClient extends AbstractFixConnector {
                     .channel(NioSocketChannel.class)
                     .remoteAddress(serverAddress)
                     .handler(new FixInitiatorChannelInitializer<SocketChannel>(
-                            new PropertyFixSessionSettingsProviderImpl("/fixClient.properties"),
+                            new PropertyFixSessionSettingsProviderImpl(settingsResource),
                             getAdminHandler(),
                             getAppMessageHandlers()
                     ))

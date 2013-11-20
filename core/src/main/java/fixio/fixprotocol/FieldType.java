@@ -60,15 +60,9 @@ public enum FieldType {
     Username(553, String.class),
     EncryptMethod(98, Integer.class),
     Password(554, String.class),
-    NewPassword(925, String.class);
+    NewPassword(925, String.class),
 
-    public int tag() {
-        return tag;
-    }
-
-    public Class type() {
-        return type;
-    }
+    QuoteReqID(131, String.class);
 
     private final int tag;
     private final Class type;
@@ -76,5 +70,13 @@ public enum FieldType {
     private FieldType(int tag, Class cl) {
         this.tag = tag;
         this.type = cl;
+    }
+
+    public int tag() {
+        return tag;
+    }
+
+    public Class type() {
+        return type;
     }
 }

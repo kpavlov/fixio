@@ -16,11 +16,16 @@
 
 package fixio.netty.pipeline.client;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.Properties;
 
 public class PropertyFixSessionSettingsProviderImpl implements FixSessionSettingsProvider {
+
+    private static final Logger LOGGER = LoggerFactory.getLogger(PropertyFixSessionSettingsProviderImpl.class);
 
     private final Properties properties;
 
@@ -32,6 +37,10 @@ public class PropertyFixSessionSettingsProviderImpl implements FixSessionSetting
     private void load(String resource) {
         try {
             final InputStream inputStream = getClass().getResourceAsStream(resource);
+            if (inputStream == null) {
+                LOGGER.error("Can't read FixSessionSettings from {}", resource);
+                throw new IllegalArgumentException("Resource not found: " + resource);
+            }
             properties.load(inputStream);
         } catch (IOException e) {
             e.printStackTrace();

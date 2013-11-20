@@ -17,11 +17,13 @@
 package fixio;
 
 import fixio.handlers.AdminEventHandler;
+import fixio.handlers.FixApplicationAdapter;
 import fixio.handlers.FixMessageHandler;
 import fixio.netty.pipeline.server.FixAcceptorChannelInitializer;
 import io.netty.bootstrap.ServerBootstrap;
 import io.netty.channel.Channel;
 import io.netty.channel.ChannelFuture;
+import io.netty.channel.ChannelOption;
 import io.netty.channel.nio.NioEventLoopGroup;
 import io.netty.channel.socket.SocketChannel;
 import io.netty.channel.socket.nio.NioServerSocketChannel;
@@ -33,9 +35,12 @@ import java.net.InetSocketAddress;
 public class FixServer extends AbstractFixConnector {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(FixServer.class);
-
     private final int port;
     private Channel channel;
+
+    public FixServer(int port, FixApplicationAdapter fixApplication) {
+        this(port, (AdminEventHandler) fixApplication, fixApplication);
+    }
 
     public FixServer(int port, FixMessageHandler... appMessageHandlers) {
         this(port, null, appMessageHandlers);
@@ -50,6 +55,9 @@ public class FixServer extends AbstractFixConnector {
         ServerBootstrap bootstrap = new ServerBootstrap();
         bootstrap.group(new NioEventLoopGroup(), new NioEventLoopGroup())
                 .channel(NioServerSocketChannel.class)
+                .childOption(ChannelOption.TCP_NODELAY,
+                        Boolean.parseBoolean(System.getProperty(
+                                "nfs.rpc.tcp.nodelay", "true")))
                 .localAddress(new InetSocketAddress(port))
                 .childHandler(new FixAcceptorChannelInitializer<SocketChannel>(
                         getAdminHandler(),
@@ -58,12 +66,15 @@ public class FixServer extends AbstractFixConnector {
                 .validate();
 
         ChannelFuture f = bootstrap.bind().sync();
-        System.out.println(FixServer.class.getName() +
+        LOGGER.info(FixServer.class.getName() +
                 " started and listen on " + f.channel().localAddress());
         channel = f.channel();
     }
 
     public void stop() {
+        if (channel == null) {
+            throw new IllegalStateException("Server is not started.");
+        }
         LOGGER.info("Stopping FixServer");
         try {
             channel.close().sync();
