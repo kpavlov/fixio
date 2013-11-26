@@ -47,7 +47,7 @@ class PriceReadingApp extends FixApplicationAdapter {
     }
 
     private void onQuote(FixMessage quote) {
-        LOGGER.debug("quote = {}", quote);
+        LOGGER.trace("quote = {}", quote);
         counter++;
 
     }

@@ -21,14 +21,15 @@ import fixio.handlers.AdminEventHandler;
 import fixio.handlers.FixMessageHandler;
 import fixio.netty.pipeline.FixChannelInitializer;
 import io.netty.channel.Channel;
+import io.netty.channel.EventLoopGroup;
 import io.netty.handler.codec.MessageToMessageCodec;
 
 public class FixAcceptorChannelInitializer<C extends Channel> extends FixChannelInitializer<C> {
 
     private FixAuthenticator authenticator = new AcceptAllAuthenticator();
 
-    public FixAcceptorChannelInitializer(AdminEventHandler adminEventHandler, FixMessageHandler... appMessageHandlers) {
-        super(adminEventHandler, appMessageHandlers);
+    public FixAcceptorChannelInitializer(EventLoopGroup workerGroup, AdminEventHandler adminEventHandler, FixMessageHandler... appMessageHandlers) {
+        super(workerGroup, adminEventHandler, appMessageHandlers);
     }
 
     public void setAuthenticator(FixAuthenticator authenticator) {

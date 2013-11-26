@@ -21,6 +21,7 @@ import fixio.fixprotocol.FixMessage;
 import fixio.fixprotocol.FixMessageFragment;
 import fixio.fixprotocol.FixMessageHeader;
 import io.netty.buffer.ByteBuf;
+import io.netty.buffer.ByteBufAllocator;
 import io.netty.buffer.Unpooled;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.handler.codec.MessageToByteEncoder;
@@ -32,19 +33,19 @@ public class FixMessageEncoder extends MessageToByteEncoder<FixMessage> {
 
     final static Charset CHARSET = StandardCharsets.US_ASCII;
 
-    public FixMessageEncoder() {
-        super(FixMessage.class);
-    }
-
     @Override
     public void encode(ChannelHandlerContext ctx, FixMessage msg, ByteBuf out) throws Exception {
         final int initialOffset = out.writerIndex();
         final FixMessageHeader header = msg.getHeader();
 
+        ByteBufAllocator byteBufAllocator = ctx.alloc();
+
         final ByteBuf bodyBuf = createBodyBuf(msg, header);
 
         int bodyLength = bodyBuf.writerIndex();
-        final ByteBuf headBuf = Unpooled.buffer();
+
+        final ByteBuf headBuf = byteBufAllocator.buffer();
+
         // begin string
         writeField(8, header.getBeginString(), headBuf);
         // body length
@@ -89,8 +90,9 @@ public class FixMessageEncoder extends MessageToByteEncoder<FixMessage> {
         writeField(34, String.valueOf(header.getMsgSeqNum()), out);
     }
 
-    private void writeField(int fieldNum, String value, ByteBuf out) {
-        out.writeBytes((String.valueOf(fieldNum) + "=").getBytes(CHARSET));
+    private static void writeField(int fieldNum, String value, ByteBuf out) {
+        out.writeBytes(String.valueOf(fieldNum).getBytes(CHARSET));
+        out.writeByte('=');
         out.writeBytes(value.getBytes(CHARSET));
         out.writeByte(1);
     }

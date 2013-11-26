@@ -62,7 +62,7 @@ class PriceStreamingApp extends FixApplicationAdapter {
             @Override
             public void run() {
                 FixMessage quote = createQuote();
-                LOGGER.debug("Submit quote.");
+                LOGGER.trace("Submit quote.");
                 ctx.writeAndFlush(quote);
             }
         }, 5, 1, TimeUnit.MILLISECONDS);

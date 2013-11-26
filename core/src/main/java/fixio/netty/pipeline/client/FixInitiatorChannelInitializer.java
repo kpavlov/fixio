@@ -21,16 +21,18 @@ import fixio.handlers.AdminEventHandler;
 import fixio.handlers.FixMessageHandler;
 import fixio.netty.pipeline.FixChannelInitializer;
 import io.netty.channel.Channel;
+import io.netty.channel.EventLoopGroup;
 import io.netty.handler.codec.MessageToMessageCodec;
 
 public class FixInitiatorChannelInitializer<C extends Channel> extends FixChannelInitializer<C> {
 
     private final FixSessionSettingsProvider settingsProvider;
 
-    public FixInitiatorChannelInitializer(FixSessionSettingsProvider settingsProvider,
+    public FixInitiatorChannelInitializer(EventLoopGroup workerGroup,
+                                          FixSessionSettingsProvider settingsProvider,
                                           AdminEventHandler adminEventHandler,
                                           FixMessageHandler... appMessageHandlers) {
-        super(adminEventHandler, appMessageHandlers);
+        super(workerGroup, adminEventHandler, appMessageHandlers);
         this.settingsProvider = settingsProvider;
     }
 

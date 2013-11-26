@@ -25,6 +25,8 @@ import fixio.netty.pipeline.client.PropertyFixSessionSettingsProviderImpl;
 import io.netty.bootstrap.Bootstrap;
 import io.netty.channel.Channel;
 import io.netty.channel.ChannelFuture;
+import io.netty.channel.ChannelOption;
+import io.netty.channel.EventLoopGroup;
 import io.netty.channel.nio.NioEventLoopGroup;
 import io.netty.channel.socket.SocketChannel;
 import io.netty.channel.socket.nio.NioSocketChannel;
@@ -38,7 +40,6 @@ public class FixClient extends AbstractFixConnector {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(FixClient.class);
     private Channel channel;
-
     private String settingsResource;
 
     public FixClient(FixApplicationAdapter fixApplication) {
@@ -60,11 +61,16 @@ public class FixClient extends AbstractFixConnector {
 
     public ChannelFuture connect(SocketAddress serverAddress) throws InterruptedException {
         Bootstrap b = new Bootstrap();
+        EventLoopGroup workerGroup = new NioEventLoopGroup(50);
         try {
             b.group(new NioEventLoopGroup())
                     .channel(NioSocketChannel.class)
                     .remoteAddress(serverAddress)
+                    .option(ChannelOption.TCP_NODELAY,
+                            Boolean.parseBoolean(System.getProperty(
+                                    "nfs.rpc.tcp.nodelay", "true")))
                     .handler(new FixInitiatorChannelInitializer<SocketChannel>(
+                            workerGroup,
                             new PropertyFixSessionSettingsProviderImpl(settingsResource),
                             getAdminHandler(),
                             getAppMessageHandlers()
@@ -82,7 +88,6 @@ public class FixClient extends AbstractFixConnector {
     public void disconnect() throws InterruptedException {
         LOGGER.info("Closing connection to {}", channel.remoteAddress());
         channel.close().sync();
-
     }
 
     public void send(FixMessage fixMessage) throws InterruptedException {

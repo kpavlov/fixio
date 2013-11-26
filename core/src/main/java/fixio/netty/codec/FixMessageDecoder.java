@@ -33,13 +33,13 @@ public class FixMessageDecoder extends ByteToMessageDecoder {
         int num = -1;
         SimpleFixMessage result = new SimpleFixMessage();
 
-        StringBuilder buffer = new StringBuilder();
+        final StringBuilder buffer = new StringBuilder();
         while (in.isReadable()) {
             byte b = in.readByte();
             if (b == 1) {
                 result.add(num, buffer.toString());
                 buffer.setLength(0);
-            } else if (b == ((int) '=')) {
+            } else if (b == '=') {
                 num = Integer.parseInt(buffer.toString());
                 buffer.setLength(0);
             } else {

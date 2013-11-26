@@ -24,6 +24,7 @@ import fixio.netty.codec.FixMessageEncoder;
 import io.netty.channel.Channel;
 import io.netty.channel.ChannelInitializer;
 import io.netty.channel.ChannelPipeline;
+import io.netty.channel.EventLoopGroup;
 import io.netty.handler.codec.MessageToMessageCodec;
 import io.netty.handler.logging.LogLevel;
 import io.netty.handler.logging.LoggingHandler;
@@ -35,11 +36,13 @@ import io.netty.handler.logging.LoggingHandler;
  */
 public abstract class FixChannelInitializer<C extends Channel> extends ChannelInitializer<C> {
 
+    private final EventLoopGroup workerGroup;
     private final AdminEventHandler adminEventHandler;
     private final FixMessageHandler[] appMessageHandlers;
     private final TestRequestHandler testRequestHandler = new TestRequestHandler();
 
-    protected FixChannelInitializer(AdminEventHandler adminEventHandler, FixMessageHandler... appMessageHandlers) {
+    protected FixChannelInitializer(EventLoopGroup workerGroup, AdminEventHandler adminEventHandler, FixMessageHandler... appMessageHandlers) {
+        this.workerGroup = workerGroup;
         this.adminEventHandler = adminEventHandler;
         this.appMessageHandlers = appMessageHandlers;
     }
@@ -52,10 +55,10 @@ public abstract class FixChannelInitializer<C extends Channel> extends ChannelIn
         pipeline.addLast("session", createSessionHandler()); // handle fix session
         pipeline.addLast("testRequest", testRequestHandler); // process test requests
         if (adminEventHandler != null) {
-            pipeline.addLast("admin", adminEventHandler); // process admin events
+            pipeline.addLast(workerGroup, "admin", adminEventHandler); // process admin events
         }
         if (appMessageHandlers != null && appMessageHandlers.length > 0) {
-            pipeline.addLast(appMessageHandlers);
+            pipeline.addLast(workerGroup, appMessageHandlers);
         }
     }
 

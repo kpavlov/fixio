@@ -20,6 +20,7 @@ import fixio.fixprotocol.FixMessageHeader;
 import fixio.fixprotocol.MessageTypes;
 import fixio.fixprotocol.SimpleFixMessage;
 import io.netty.buffer.ByteBuf;
+import io.netty.buffer.ByteBufAllocator;
 import io.netty.buffer.Unpooled;
 import io.netty.channel.ChannelHandlerContext;
 import org.junit.Before;
@@ -33,6 +34,7 @@ import java.nio.charset.Charset;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
 
 @RunWith(MockitoJUnitRunner.class)
 public class FixMessageEncoderTest {
@@ -41,9 +43,14 @@ public class FixMessageEncoderTest {
     private FixMessage builder;
     @Mock
     private ChannelHandlerContext ctx;
+    @Mock
+    private ByteBufAllocator byteBufAllocator;
 
     @Before
     public void setUp() throws Exception {
+        when(ctx.alloc()).thenReturn(byteBufAllocator);
+        when(byteBufAllocator.buffer()).thenReturn(Unpooled.buffer());
+
         encoder = new FixMessageEncoder();
 
         SimpleFixMessage fixMessage = new SimpleFixMessage();
@@ -64,6 +71,8 @@ public class FixMessageEncoderTest {
 
     @Test
     public void testEncode() throws Exception {
+
+
         final ByteBuf out = Unpooled.buffer();
 
         encoder.encode(ctx, builder, out);

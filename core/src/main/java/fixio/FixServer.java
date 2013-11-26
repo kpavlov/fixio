@@ -24,6 +24,7 @@ import io.netty.bootstrap.ServerBootstrap;
 import io.netty.channel.Channel;
 import io.netty.channel.ChannelFuture;
 import io.netty.channel.ChannelOption;
+import io.netty.channel.EventLoopGroup;
 import io.netty.channel.nio.NioEventLoopGroup;
 import io.netty.channel.socket.SocketChannel;
 import io.netty.channel.socket.nio.NioServerSocketChannel;
@@ -37,6 +38,8 @@ public class FixServer extends AbstractFixConnector {
     private static final Logger LOGGER = LoggerFactory.getLogger(FixServer.class);
     private final int port;
     private Channel channel;
+    private EventLoopGroup bossGroup;
+    private EventLoopGroup workerGroup;
 
     public FixServer(int port, FixApplicationAdapter fixApplication) {
         this(port, (AdminEventHandler) fixApplication, fixApplication);
@@ -52,14 +55,17 @@ public class FixServer extends AbstractFixConnector {
     }
 
     public void start() throws InterruptedException {
+        bossGroup = new NioEventLoopGroup();
+        workerGroup = new NioEventLoopGroup();
         ServerBootstrap bootstrap = new ServerBootstrap();
-        bootstrap.group(new NioEventLoopGroup(), new NioEventLoopGroup())
+        bootstrap.group(bossGroup, workerGroup)
                 .channel(NioServerSocketChannel.class)
                 .childOption(ChannelOption.TCP_NODELAY,
                         Boolean.parseBoolean(System.getProperty(
                                 "nfs.rpc.tcp.nodelay", "true")))
                 .localAddress(new InetSocketAddress(port))
                 .childHandler(new FixAcceptorChannelInitializer<SocketChannel>(
+                        workerGroup,
                         getAdminHandler(),
                         getAppMessageHandlers()
                 ))
@@ -81,6 +87,11 @@ public class FixServer extends AbstractFixConnector {
             channel = null;
         } catch (InterruptedException e) {
             LOGGER.error("Error while stopping server", e);
+        } finally {
+            bossGroup.shutdownGracefully();
+            bossGroup = null;
+            workerGroup.shutdownGracefully();
+            workerGroup = null;
         }
     }
 }
