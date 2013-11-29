@@ -17,11 +17,11 @@ package fixio.netty.pipeline;
 
 import fixio.fixprotocol.FixMessageHeader;
 import fixio.fixprotocol.session.FixSession;
-import org.apache.commons.lang.RandomStringUtils;
+import org.apache.commons.lang3.RandomStringUtils;
 import org.junit.Before;
 import org.junit.Test;
 
-import static junit.framework.Assert.assertNotNull;
+import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertSame;
 
 public class SessionRepositoryTest {

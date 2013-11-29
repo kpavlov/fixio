@@ -21,8 +21,9 @@ import fixio.fixprotocol.SimpleFixMessage;
 import org.junit.Before;
 import org.junit.Test;
 
-import static org.apache.commons.lang.RandomStringUtils.randomAlphanumeric;
-import static org.apache.commons.lang.math.RandomUtils.nextInt;
+import java.util.Random;
+
+import static org.apache.commons.lang3.RandomStringUtils.randomAlphanumeric;
 import static org.junit.Assert.assertEquals;
 
 public class FixSessionTest {
@@ -33,6 +34,7 @@ public class FixSessionTest {
     private String senderSubId;
     private String targetCompId;
     private String targetSubId;
+
 
     @Before
     public void setUp() throws Exception {
@@ -54,7 +56,7 @@ public class FixSessionTest {
 
     @Test
     public void testPrepareOutgoing() throws Exception {
-        int nextOutgoingMsgSeqNum = nextInt(100);
+        int nextOutgoingMsgSeqNum = new Random().nextInt(100);
         session.setNextOutgoingMessageSeqNum(nextOutgoingMsgSeqNum);
 
         FixMessage messageBuilder = new SimpleFixMessage();

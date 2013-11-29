@@ -30,7 +30,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import static fixio.fixprotocol.FieldType.TestReqID;
-import static org.apache.commons.lang.RandomStringUtils.randomAlphanumeric;
+import static org.apache.commons.lang3.RandomStringUtils.randomAlphanumeric;
 import static org.junit.Assert.*;
 import static org.mockito.Mockito.*;
 

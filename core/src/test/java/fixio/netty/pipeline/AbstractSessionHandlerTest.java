@@ -31,9 +31,9 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.util.List;
+import java.util.Random;
 
-import static org.apache.commons.lang.RandomStringUtils.randomAlphanumeric;
-import static org.apache.commons.lang.math.RandomUtils.nextInt;
+import static org.apache.commons.lang3.RandomStringUtils.randomAlphanumeric;
 import static org.junit.Assert.assertEquals;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
@@ -42,6 +42,8 @@ import static org.mockito.Mockito.verify;
 public class AbstractSessionHandlerTest {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(AbstractSessionHandlerTest.class);
+    public static final Random RANDOM = new Random();
+
     private AbstractSessionHandler sessionHandler;
     @Mock
     private ChannelHandlerContext ctx;
@@ -70,7 +72,7 @@ public class AbstractSessionHandlerTest {
     public void testSendReject() throws Exception {
         String msgType = randomAlphanumeric(3);
         FixMessage originalMsg = new SimpleFixMessage(msgType);
-        int originalMsgSeqNum = nextInt();
+        int originalMsgSeqNum = RANDOM.nextInt();
         originalMsg.add(FieldType.MsgSeqNum, originalMsgSeqNum);
 
         sessionHandler.sendReject(ctx, originalMsg, false);

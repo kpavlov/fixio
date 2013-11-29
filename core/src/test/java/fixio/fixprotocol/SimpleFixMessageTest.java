@@ -18,7 +18,7 @@ package fixio.fixprotocol;
 import org.junit.Before;
 import org.junit.Test;
 
-import static org.apache.commons.lang.RandomStringUtils.randomAlphanumeric;
+import static org.apache.commons.lang3.RandomStringUtils.randomAlphanumeric;
 import static org.junit.Assert.assertEquals;
 
 public class SimpleFixMessageTest {
