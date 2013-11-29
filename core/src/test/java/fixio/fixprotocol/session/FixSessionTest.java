@@ -13,8 +13,11 @@
  * License for the specific language governing permissions and limitations
  * under the License.
  */
-package fixio.fixprotocol;
+package fixio.fixprotocol.session;
 
+import fixio.fixprotocol.FixMessage;
+import fixio.fixprotocol.FixMessageHeader;
+import fixio.fixprotocol.SimpleFixMessage;
 import org.junit.Before;
 import org.junit.Test;
 

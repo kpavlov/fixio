@@ -16,13 +16,11 @@
 package fixio.netty.pipeline.server;
 
 import fixio.events.LogonEvent;
-import fixio.fixprotocol.FieldType;
-import fixio.fixprotocol.FixMessage;
-import fixio.fixprotocol.MessageTypes;
-import fixio.fixprotocol.SimpleFixMessage;
+import fixio.fixprotocol.*;
 import io.netty.channel.ChannelFuture;
 import io.netty.channel.ChannelFutureListener;
 import io.netty.channel.ChannelHandlerContext;
+import org.apache.commons.lang.RandomStringUtils;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -56,7 +54,10 @@ public class ServerSessionHandlerTest {
         outgoingMessages = new ArrayList<>();
 
         logonMsg = new SimpleFixMessage(MessageTypes.LOGON);
-        logonMsg.getHeader().setMsgSeqNum(1);
+        FixMessageHeader header = logonMsg.getHeader();
+        header.setMsgSeqNum(1);
+        header.setSenderCompID(RandomStringUtils.random(3));
+        header.setTargetCompID(RandomStringUtils.random(4));
     }
 
     @Test

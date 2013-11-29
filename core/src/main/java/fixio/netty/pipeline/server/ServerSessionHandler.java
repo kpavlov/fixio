@@ -18,7 +18,9 @@ package fixio.netty.pipeline.server;
 
 import fixio.events.LogonEvent;
 import fixio.fixprotocol.*;
+import fixio.fixprotocol.session.FixSession;
 import fixio.netty.pipeline.AbstractSessionHandler;
+import fixio.netty.pipeline.SessionRepository;
 import io.netty.channel.ChannelFutureListener;
 import io.netty.channel.ChannelHandlerContext;
 import org.slf4j.Logger;
@@ -59,18 +61,25 @@ public class ServerSessionHandler extends AbstractSessionHandler {
 
         final FixMessageHeader header = msg.getHeader();
         if (MessageTypes.LOGON.equals(header.getMessageType())) {
+
             LOGGER.debug("Logon request: {}", msg);
             if (sessionHolder.get() != null) {
                 throw new IllegalStateException("Duplicate Logon Request. Session Already Established.");
             } else {
                 if (authenticator.authenticate(header)) {
-                    initSession(header);
+                    FixSession fixSession = initSession(header);
 
-                    int msgSeqNum = header.getMsgSeqNum();
-                    final int expectedMsgSeqNum = incomingSeqNum.getAndIncrement();
-                    if (msgSeqNum < expectedMsgSeqNum) {
-                        sendLogoutAndClose(ctx, "Incoming Sequence Number < Expected = " + expectedMsgSeqNum);
-                        return;
+                    final int msgSeqNum = header.getMsgSeqNum();
+
+                    boolean seqTooHigh = false;
+                    if (!fixSession.checkIncomingSeqNum(msgSeqNum)) {
+                        final int expectedMsgSeqNum = fixSession.getNextIncomingMessageSeqNum();
+                        if (msgSeqNum < expectedMsgSeqNum) {
+                            sendLogoutAndClose(ctx, "Sequence Number Too Low. Expected = " + expectedMsgSeqNum);
+                            return;
+                        } else {
+                            seqTooHigh = true;
+                        }
                     }
 
                     final FixMessage logonResponse = createLogonResponse();
@@ -78,7 +87,7 @@ public class ServerSessionHandler extends AbstractSessionHandler {
                     LOGGER.info("Sending Logon Response: {}", logonResponse);
                     ctx.write(logonResponse);
 
-                    if (msgSeqNum > expectedMsgSeqNum) {
+                    if (seqTooHigh) {
                         FixMessage resendRequest = new SimpleFixMessage(MessageTypes.RESEND_REQUEST);
                         updateFixMessageHeader(resendRequest);
                         ctx.write(resendRequest);
@@ -97,25 +106,23 @@ public class ServerSessionHandler extends AbstractSessionHandler {
         }
     }
 
-    private void initSession(FixMessageHeader header) {
-        FixSession session = FixSession.newBuilder()
-                .beginString(header.getBeginString())
-                .senderCompId(header.getTargetCompID())
-                .senderSubId(header.getTargetSubID())
-                .targetCompId(header.getSenderCompID())
-                .targetSubId(header.getTargetSubID())
-                .build();
+    private FixSession initSession(FixMessageHeader header) {
+        FixSession session = SessionRepository.getInstance().createSession(header);
+
         session.setNextOutgoingMessageSeqNum(1);
 
         sessionHolder.compareAndSet(null, session);
         LOGGER.info("Fix Session Established.");
+        return session;
     }
 
     private void sendLogoutAndClose(ChannelHandlerContext ctx, String text) {
         //rejected logon
 
         SimpleFixMessage logout = new SimpleFixMessage(MessageTypes.LOGOUT);
-
+        if (text != null) {
+            logout.getBody().add(new Field(58, text));
+        }
         ctx.writeAndFlush(logout).addListener(ChannelFutureListener.CLOSE);
     }
 }

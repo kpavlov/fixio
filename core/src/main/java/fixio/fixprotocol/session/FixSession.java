@@ -14,26 +14,38 @@
  * under the License.
  */
 
-package fixio.fixprotocol;
+package fixio.fixprotocol.session;
+
+import fixio.fixprotocol.FixMessage;
+import fixio.fixprotocol.FixMessageHeader;
 
 import java.util.concurrent.atomic.AtomicInteger;
+import java.util.concurrent.atomic.AtomicIntegerFieldUpdater;
 
 public class FixSession {
 
+    private static final AtomicIntegerFieldUpdater<FixSession> INCOMING_SEQ_NUM_UPDATER = AtomicIntegerFieldUpdater.newUpdater
+            (FixSession.class, "nextIncomingMessageSeqNum");
     private final AtomicInteger nextOutgoingMessageSeqNum = new AtomicInteger();
-    private final AtomicInteger lastIncomingMessageSeqNum = new AtomicInteger();
     private final String beginString;
     private final String senderCompId;
     private final String senderSubId;
     private final String targetCompId;
     private final String targetSubId;
+    private volatile int nextIncomingMessageSeqNum;
 
-    private FixSession(String beginString, String senderCompId, String senderSubId, String targetCompId, String targetSubId) {
+    private FixSession(String beginString,
+                       String senderCompId,
+                       String senderSubId,
+                       String targetCompId,
+                       String targetSubId,
+                       int nextIncomingSeqNum) {
         this.beginString = beginString;
         this.senderCompId = senderCompId;
         this.senderSubId = senderSubId;
         this.targetCompId = targetCompId;
         this.targetSubId = targetSubId;
+        this.nextIncomingMessageSeqNum = nextIncomingSeqNum;
     }
 
     public static Builder newBuilder() {
@@ -64,12 +76,16 @@ public class FixSession {
         this.nextOutgoingMessageSeqNum.set(nextOutgoingMessageSeqNum);
     }
 
-    public int getLastIncomingMessageSeqNum() {
-        return lastIncomingMessageSeqNum.get();
+    public int getNextIncomingMessageSeqNum() {
+        return nextIncomingMessageSeqNum;
     }
 
     public int getNextOutgoingMsgSeqNum() {
         return nextOutgoingMessageSeqNum.get();
+    }
+
+    public boolean checkIncomingSeqNum(final int num) {
+        return INCOMING_SEQ_NUM_UPDATER.compareAndSet(this, num, num + 1);
     }
 
     public void prepareOutgoing(FixMessage fixMessage) {
@@ -90,6 +106,7 @@ public class FixSession {
         private String senderSubId;
         private String targetCompId;
         private String targetSubId;
+        private int nextIncomingSeqNum;
 
         private Builder() {
         }
@@ -119,13 +136,19 @@ public class FixSession {
             return this;
         }
 
+        public Builder nextIncomingSeqNum(int seqNum) {
+            this.nextIncomingSeqNum = seqNum;
+            return this;
+        }
+
         public FixSession build() {
             return new FixSession(
                     beginString,
                     senderCompId,
                     senderSubId,
                     targetCompId,
-                    targetSubId
+                    targetSubId,
+                    nextIncomingSeqNum
             );
         }
 

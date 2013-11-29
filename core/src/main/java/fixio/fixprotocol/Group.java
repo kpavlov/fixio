@@ -13,22 +13,24 @@
  * License for the specific language governing permissions and limitations
  * under the License.
  */
+package fixio.fixprotocol;
 
-package fixio.netty.pipeline.client;
+import java.util.LinkedList;
+import java.util.List;
 
+public class Group extends FixMessageFragment {
 
-public interface FixSessionSettingsProvider {
-    String getSenderCompID();
+    private final List<FixMessageFragment> contents = new LinkedList<>();
 
-    String getSenderSubID();
+    protected Group(int tagNum) {
+        super(tagNum);
+    }
 
-    String getTargetCompID();
+    public String getValue() {
+        return String.valueOf(contents.size());
+    }
 
-    String getTargetSubID();
-
-    String getBeginString();
-
-    int getMsgSeqNum();
-
-    boolean resetMsgSeqNum();
+    public void add(FixMessageFragment element) {
+        contents.add(element);
+    }
 }

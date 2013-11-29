@@ -17,24 +17,19 @@
 package fixio.netty.pipeline;
 
 import fixio.fixprotocol.*;
+import fixio.fixprotocol.session.FixSession;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.handler.codec.MessageToMessageCodec;
 import org.slf4j.Logger;
 
 import java.util.List;
-import java.util.concurrent.atomic.AtomicInteger;
 import java.util.concurrent.atomic.AtomicReference;
 
 public abstract class AbstractSessionHandler extends MessageToMessageCodec<FixMessage, FixMessage> {
 
-    protected final AtomicInteger incomingSeqNum = new AtomicInteger(1);
-    protected final AtomicInteger outgoingSeqNum = new AtomicInteger(1);
     protected AtomicReference<FixSession> sessionHolder = new AtomicReference<>();
 
     protected void updateFixMessageHeader(FixMessage response) {
-        FixMessageHeader responseHeader = response.getHeader();
-        responseHeader.setMsgSeqNum(outgoingSeqNum.getAndIncrement());
-
         sessionHolder.get().prepareOutgoing(response);
     }
 
@@ -55,14 +50,16 @@ public abstract class AbstractSessionHandler extends MessageToMessageCodec<FixMe
     protected void decode(ChannelHandlerContext ctx, FixMessage msg, List<Object> out) throws Exception {
         if (sessionHolder.get() == null) {
             getLogger().error("Session not established. Skipping message: {}", msg);
-            ctx.channel().close().await();
+            ctx.channel().closeFuture().await();
         }
-        final int msgSeqNum = msg.getHeader().getMsgSeqNum();
-        final int expected = incomingSeqNum.get();
-        if (msgSeqNum != expected) {
-            getLogger().error("MessageSeqNum={} != expected {}.", msgSeqNum, expected);
+
+        FixMessageHeader header = msg.getHeader();
+
+        FixSession session = SessionRepository.getInstance().getSession(header);
+        final int msgSeqNum = header.getMsgSeqNum();
+        if (!session.checkIncomingSeqNum(msgSeqNum)) {
+            getLogger().error("MessageSeqNum={} != expected {}.", msgSeqNum, session.getNextIncomingMessageSeqNum());
         }
-        incomingSeqNum.incrementAndGet();
         out.add(msg);
     }
 

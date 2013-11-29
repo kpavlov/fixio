@@ -17,7 +17,11 @@
 package fixio.netty.pipeline.client;
 
 import fixio.events.LogonEvent;
-import fixio.fixprotocol.*;
+import fixio.fixprotocol.FixMessage;
+import fixio.fixprotocol.FixMessageHeader;
+import fixio.fixprotocol.MessageTypes;
+import fixio.fixprotocol.SimpleFixMessage;
+import fixio.fixprotocol.session.FixSession;
 import fixio.netty.pipeline.AbstractSessionHandler;
 import io.netty.channel.ChannelHandlerContext;
 import org.slf4j.Logger;
@@ -41,10 +45,14 @@ public class ClientSessionHandler extends AbstractSessionHandler {
         if (MessageTypes.LOGON.equals(header.getMessageType())) {
             if (sessionHolder.compareAndSet(null, pendingSession)) {
                 getLogger().info("Fix Session Established.");
-                incomingSeqNum.compareAndSet(1, header.getMsgSeqNum() + 1);
-                LogonEvent logonEvent = new LogonEvent();
-                out.add(logonEvent);
-                return;
+                if (pendingSession.checkIncomingSeqNum(header.getMsgSeqNum())) {
+                    LogonEvent logonEvent = new LogonEvent();
+                    out.add(logonEvent);
+                    return;
+                } else {
+                    throw new IllegalStateException("Duplicate Logon Request. Session Already Established.");
+                }
+
             } else {
                 throw new IllegalStateException("Duplicate Logon Request. Session Already Established.");
             }
@@ -67,8 +75,11 @@ public class ClientSessionHandler extends AbstractSessionHandler {
     }
 
     private FixSession createSession(FixSessionSettingsProvider settingsProvider) {
-        outgoingSeqNum.set(settingsProvider.getMsgSeqNum());
-        incomingSeqNum.set(1);
+
+        int nextIncomingSeqNum = 0;
+        if (settingsProvider.resetMsgSeqNum()) {
+            nextIncomingSeqNum = 1;
+        }
 
         FixSession session = FixSession.newBuilder()
                 .beginString(settingsProvider.getBeginString())
@@ -76,6 +87,7 @@ public class ClientSessionHandler extends AbstractSessionHandler {
                 .senderSubId(settingsProvider.getSenderSubID())
                 .targetCompId(settingsProvider.getTargetCompID())
                 .targetSubId(settingsProvider.getTargetSubID())
+                .nextIncomingSeqNum(nextIncomingSeqNum)
                 .build();
         session.setNextOutgoingMessageSeqNum(settingsProvider.getMsgSeqNum());
         return session;
