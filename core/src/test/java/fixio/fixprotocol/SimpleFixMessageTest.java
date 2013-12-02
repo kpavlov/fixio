@@ -18,7 +18,7 @@ package fixio.fixprotocol;
 import org.junit.Before;
 import org.junit.Test;
 
-import static org.apache.commons.lang3.RandomStringUtils.randomAlphanumeric;
+import static org.apache.commons.lang3.RandomStringUtils.randomAscii;
 import static org.junit.Assert.assertEquals;
 
 public class SimpleFixMessageTest {
@@ -32,10 +32,10 @@ public class SimpleFixMessageTest {
 
     @Test
     public void headerFields() {
-        String beginString = randomAlphanumeric(5);
-        String senderCompID = randomAlphanumeric(5);
-        String targetCompID = randomAlphanumeric(5);
-        String msgType = randomAlphanumeric(5);
+        String beginString = randomAscii(2);
+        String senderCompID = randomAscii(3);
+        String targetCompID = randomAscii(4);
+        String msgType = randomAscii(5);
 
         fixMessage.getHeader().setBeginString(beginString);
         fixMessage.setMessageType(msgType);

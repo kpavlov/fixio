@@ -38,6 +38,8 @@ public class FixMessageEncoder extends MessageToByteEncoder<FixMessage> {
         final int initialOffset = out.writerIndex();
         final FixMessageHeader header = msg.getHeader();
 
+        validateRequiredFields(header);
+
         ByteBufAllocator byteBufAllocator = ctx.alloc();
 
         final ByteBuf bodyBuf = createBodyBuf(msg, header);
@@ -75,7 +77,22 @@ public class FixMessageEncoder extends MessageToByteEncoder<FixMessage> {
         return payloadBuf;
     }
 
-    private void encodeHeader(FixMessageHeader header, ByteBuf out) {
+    private static void validateRequiredFields(FixMessageHeader header) {
+        if (header.getBeginString() == null) {
+            throw new IllegalArgumentException("BeginString is required.");
+        }
+        if (header.getMessageType() == null) {
+            throw new IllegalArgumentException("MessageType is required.");
+        }
+        if (header.getSenderCompID() == null) {
+            throw new IllegalArgumentException("SenderCompID is required.");
+        }
+        if (header.getTargetCompID() == null) {
+            throw new IllegalArgumentException("TargetCompID is required.");
+        }
+    }
+
+    private static void encodeHeader(FixMessageHeader header, ByteBuf out) {
 
         // message type
         writeField(35, header.getMessageType(), out);

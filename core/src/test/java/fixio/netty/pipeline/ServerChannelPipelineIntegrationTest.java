@@ -36,7 +36,7 @@ import org.junit.runner.RunWith;
 import org.mockito.Mock;
 import org.mockito.runners.MockitoJUnitRunner;
 
-import static org.apache.commons.lang3.RandomStringUtils.randomAlphanumeric;
+import static org.apache.commons.lang3.RandomStringUtils.randomAscii;
 import static org.mockito.Matchers.any;
 import static org.mockito.Mockito.when;
 
@@ -54,15 +54,9 @@ public class ServerChannelPipelineIntegrationTest {
     public void setUp() throws Exception {
         ServerBootstrap b = new ServerBootstrap();
 
-//        b.channel(serverChannel)
-
-
         LocalAddress address = LocalAddress.ANY;
 
-//        address = serverChannel.localAddress();
-
         EventLoopGroup workerGroup = new LocalEventLoopGroup();
-//        channel = new EmbeddedChannel(new ChannelOutboundHandlerAdapter());
         final FixAcceptorChannelInitializer<Channel> channelInitializer = new FixAcceptorChannelInitializer<>(workerGroup, null);
         channelInitializer.setAuthenticator(authenticator);
 
@@ -88,31 +82,22 @@ public class ServerChannelPipelineIntegrationTest {
     @Test
     public void processLogonSuccess() {
         final SimpleFixMessage logon = new SimpleFixMessage(MessageTypes.LOGON);
+        logon.getHeader().setSenderCompID(randomAscii(3));
+        logon.getHeader().setTargetCompID(randomAscii(4));
 
         pipeline.fireChannelRead(logon);
         pipeline.flush();
-//        pipeline.fireChannelRead(logon);
-
     }
 
     @Test
     public void processHeartbeat() {
-        pipeline.flush();
-        //pipeline.fireChannelActive();
-        //serverChannel.eventLoop();
-
-//        channel.writeInbound(new SimpleFixMessage(MessageTypes.LOGON));
         final SimpleFixMessage testRequest = new SimpleFixMessage(MessageTypes.TEST_REQUEST);
-        testRequest.add(FieldType.TestReqID, randomAlphanumeric(5));
+        testRequest.getHeader().setSenderCompID(randomAscii(3));
+        testRequest.getHeader().setTargetCompID(randomAscii(4));
+
+        testRequest.add(FieldType.TestReqID, randomAscii(5));
 
         pipeline.fireChannelRead(testRequest);
-//        pipeline.fireChannelReadComplete();
         pipeline.flush();
-
-//        pipeline.flush();
-//        serverChannel.writeInbound(testRequest);
-
-//        final Object o = channel.readOutbound();
-
     }
 }

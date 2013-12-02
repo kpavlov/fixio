@@ -33,7 +33,7 @@ import org.slf4j.LoggerFactory;
 import java.util.List;
 import java.util.Random;
 
-import static org.apache.commons.lang3.RandomStringUtils.randomAlphanumeric;
+import static org.apache.commons.lang3.RandomStringUtils.randomAscii;
 import static org.junit.Assert.assertEquals;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
@@ -70,7 +70,7 @@ public class AbstractSessionHandlerTest {
 
     @Test
     public void testSendReject() throws Exception {
-        String msgType = randomAlphanumeric(3);
+        String msgType = randomAscii(3);
         FixMessage originalMsg = new SimpleFixMessage(msgType);
         int originalMsgSeqNum = RANDOM.nextInt();
         originalMsg.add(FieldType.MsgSeqNum, originalMsgSeqNum);

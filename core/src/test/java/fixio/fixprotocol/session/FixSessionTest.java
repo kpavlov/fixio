@@ -23,7 +23,7 @@ import org.junit.Test;
 
 import java.util.Random;
 
-import static org.apache.commons.lang3.RandomStringUtils.randomAlphanumeric;
+import static org.apache.commons.lang3.RandomStringUtils.randomAscii;
 import static org.junit.Assert.assertEquals;
 
 public class FixSessionTest {
@@ -35,15 +35,14 @@ public class FixSessionTest {
     private String targetCompId;
     private String targetSubId;
 
-
     @Before
     public void setUp() throws Exception {
 
-        beginString = randomAlphanumeric(5);
-        senderCompId = randomAlphanumeric(5);
-        senderSubId = randomAlphanumeric(5);
-        targetCompId = randomAlphanumeric(5);
-        targetSubId = randomAlphanumeric(5);
+        beginString = randomAscii(2);
+        senderCompId = randomAscii(3);
+        senderSubId = randomAscii(4);
+        targetCompId = randomAscii(5);
+        targetSubId = randomAscii(6);
 
         session = FixSession.newBuilder()
                 .beginString(beginString)

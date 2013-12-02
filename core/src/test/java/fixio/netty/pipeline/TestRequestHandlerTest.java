@@ -30,7 +30,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import static fixio.fixprotocol.FieldType.TestReqID;
-import static org.apache.commons.lang3.RandomStringUtils.randomAlphanumeric;
+import static org.apache.commons.lang3.RandomStringUtils.randomAscii;
 import static org.junit.Assert.*;
 import static org.mockito.Mockito.*;
 
@@ -38,7 +38,6 @@ import static org.mockito.Mockito.*;
 public class TestRequestHandlerTest {
 
     private TestRequestHandler handler;
-
     @Mock
     private SimpleFixMessage fixMessage;
     @Mock
@@ -74,7 +73,7 @@ public class TestRequestHandlerTest {
 
     @Test
     public void testHandleTestRequest() throws Exception {
-        String testReqId = randomAlphanumeric(10);
+        String testReqId = randomAscii(10);
         when(fixMessage.getMessageType()).thenReturn(MessageTypes.TEST_REQUEST);
         when(fixMessage.getString(TestReqID.tag())).thenReturn(testReqId);
 

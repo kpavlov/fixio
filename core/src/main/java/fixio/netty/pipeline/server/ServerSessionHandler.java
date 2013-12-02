@@ -59,15 +59,16 @@ public class ServerSessionHandler extends AbstractSessionHandler {
     protected void decode(ChannelHandlerContext ctx, FixMessage msg, List<Object> out) throws Exception {
         LOGGER.debug("Message Received: {}", msg);
 
+        FixSession fixSession = getSession(ctx);
         final FixMessageHeader header = msg.getHeader();
         if (MessageTypes.LOGON.equals(header.getMessageType())) {
 
             LOGGER.debug("Logon request: {}", msg);
-            if (sessionHolder.get() != null) {
+            if (fixSession != null) {
                 throw new IllegalStateException("Duplicate Logon Request. Session Already Established.");
             } else {
                 if (authenticator.authenticate(header)) {
-                    FixSession fixSession = initSession(header);
+                    fixSession = initSession(ctx, header);
 
                     final int msgSeqNum = header.getMsgSeqNum();
 
@@ -83,13 +84,13 @@ public class ServerSessionHandler extends AbstractSessionHandler {
                     }
 
                     final FixMessage logonResponse = createLogonResponse();
-                    updateFixMessageHeader(logonResponse);
+                    updateFixMessageHeader(ctx, logonResponse);
                     LOGGER.info("Sending Logon Response: {}", logonResponse);
                     ctx.write(logonResponse);
 
                     if (seqTooHigh) {
                         FixMessage resendRequest = new SimpleFixMessage(MessageTypes.RESEND_REQUEST);
-                        updateFixMessageHeader(resendRequest);
+                        updateFixMessageHeader(ctx, resendRequest);
                         ctx.write(resendRequest);
                     }
                     ctx.flush();
@@ -106,12 +107,12 @@ public class ServerSessionHandler extends AbstractSessionHandler {
         }
     }
 
-    private FixSession initSession(FixMessageHeader header) {
+    private FixSession initSession(ChannelHandlerContext ctx, FixMessageHeader header) {
         FixSession session = SessionRepository.getInstance().createSession(header);
 
         session.setNextOutgoingMessageSeqNum(1);
 
-        sessionHolder.compareAndSet(null, session);
+        setSession(ctx, session);
         LOGGER.info("Fix Session Established.");
         return session;
     }

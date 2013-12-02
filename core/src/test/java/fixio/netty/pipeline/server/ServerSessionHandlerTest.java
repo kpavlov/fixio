@@ -17,10 +17,14 @@ package fixio.netty.pipeline.server;
 
 import fixio.events.LogonEvent;
 import fixio.fixprotocol.*;
+import fixio.fixprotocol.session.FixSession;
+import fixio.netty.AttributeMock;
+import fixio.netty.pipeline.AbstractSessionHandler;
 import io.netty.channel.ChannelFuture;
 import io.netty.channel.ChannelFutureListener;
 import io.netty.channel.ChannelHandlerContext;
-import org.apache.commons.lang3.RandomStringUtils;
+import io.netty.util.Attribute;
+import io.netty.util.AttributeKey;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -32,6 +36,7 @@ import org.mockito.runners.MockitoJUnitRunner;
 import java.util.ArrayList;
 import java.util.List;
 
+import static org.apache.commons.lang3.RandomStringUtils.randomAscii;
 import static org.junit.Assert.*;
 import static org.mockito.Mockito.*;
 
@@ -43,10 +48,11 @@ public class ServerSessionHandlerTest {
     private FixAuthenticator authenticator;
     @Mock
     private ChannelHandlerContext ctx;
-    private List<Object> outgoingMessages;
-    private FixMessage logonMsg;
     @Captor
     private ArgumentCaptor<FixMessage> messageCaptor;
+    private Attribute<FixSession> sessionAttribute;
+    private FixMessage logonMsg;
+    private List<Object> outgoingMessages;
 
     @Before
     public void setUp() {
@@ -56,8 +62,12 @@ public class ServerSessionHandlerTest {
         logonMsg = new SimpleFixMessage(MessageTypes.LOGON);
         FixMessageHeader header = logonMsg.getHeader();
         header.setMsgSeqNum(1);
-        header.setSenderCompID(RandomStringUtils.random(3));
-        header.setTargetCompID(RandomStringUtils.random(4));
+        header.setSenderCompID(randomAscii(3));
+        header.setTargetCompID(randomAscii(4));
+
+        AttributeKey<FixSession> fixSessionKey = AbstractSessionHandler.FIX_SESSION_KEY;
+        sessionAttribute = new AttributeMock<>();
+        when(ctx.attr(fixSessionKey)).thenReturn((Attribute) sessionAttribute);
     }
 
     @Test
@@ -69,6 +79,7 @@ public class ServerSessionHandlerTest {
         assertEquals(1, outgoingMessages.size());
         assertTrue(outgoingMessages.get(0) instanceof LogonEvent);
 
+        verify(ctx, atLeastOnce()).attr(AbstractSessionHandler.FIX_SESSION_KEY);
         verify(ctx).write(messageCaptor.capture());
         verify(ctx).flush();
         verifyNoMoreInteractions(ctx);
@@ -83,6 +94,7 @@ public class ServerSessionHandlerTest {
 
         handler.decode(ctx, logonMsg, outgoingMessages);
 
+        verify(ctx).attr(AbstractSessionHandler.FIX_SESSION_KEY);
         verify(ctx).close();
         verifyNoMoreInteractions(ctx);
     }
@@ -97,6 +109,7 @@ public class ServerSessionHandlerTest {
         assertEquals(1, outgoingMessages.size());
         assertTrue(outgoingMessages.get(0) instanceof LogonEvent);
 
+        verify(ctx, atLeastOnce()).attr(AbstractSessionHandler.FIX_SESSION_KEY);
         verify(ctx, times(2)).write(messageCaptor.capture());
         verify(ctx).flush();
         verifyNoMoreInteractions(ctx);
@@ -113,10 +126,12 @@ public class ServerSessionHandlerTest {
         ChannelFuture channelFeature = mock(ChannelFuture.class);
         when(ctx.writeAndFlush(any())).thenReturn(channelFeature);
 
+
         handler.decode(ctx, logonMsg, outgoingMessages);
 
         assertEquals(0, outgoingMessages.size());
 
+        verify(ctx, atLeastOnce()).attr(AbstractSessionHandler.FIX_SESSION_KEY);
         verify(ctx).writeAndFlush(messageCaptor.capture());
         verify(channelFeature).addListener(ChannelFutureListener.CLOSE);
         verifyNoMoreInteractions(ctx);

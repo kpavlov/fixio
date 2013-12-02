@@ -25,6 +25,8 @@ public class SessionId {
     private final int hash;
 
     public SessionId(String senderCompID, String targetCompID, String senderSubID, String targetSubID) {
+        assert (senderCompID != null) : "SenderCompID is required.";
+        assert (targetCompID != null) : "TargetCompID is required.";
         this.senderCompID = senderCompID;
         this.targetCompID = targetCompID;
         this.senderSubID = senderSubID;

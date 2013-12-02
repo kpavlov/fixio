@@ -20,42 +20,61 @@ import fixio.fixprotocol.*;
 import fixio.fixprotocol.session.FixSession;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.handler.codec.MessageToMessageCodec;
+import io.netty.util.Attribute;
+import io.netty.util.AttributeKey;
 import org.slf4j.Logger;
 
 import java.util.List;
-import java.util.concurrent.atomic.AtomicReference;
 
 public abstract class AbstractSessionHandler extends MessageToMessageCodec<FixMessage, FixMessage> {
 
-    protected AtomicReference<FixSession> sessionHolder = new AtomicReference<>();
+    public static final AttributeKey<FixSession> FIX_SESSION_KEY = AttributeKey.valueOf("fixSession");
 
-    protected void updateFixMessageHeader(FixMessage response) {
-        sessionHolder.get().prepareOutgoing(response);
+    protected void updateFixMessageHeader(ChannelHandlerContext ctx, FixMessage response) {
+        getSession(ctx).prepareOutgoing(response);
     }
 
     @Override
     public void channelInactive(ChannelHandlerContext ctx) throws Exception {
-        sessionHolder.set(null);
-        getLogger().info("Fix Session Closed.");
+        Attribute<FixSession> fixSessionAttribute = ctx.attr(FIX_SESSION_KEY);
+        FixSession session = fixSessionAttribute.getAndRemove();
+        getLogger().info("Fix Session Closed. {}", session);
+    }
+
+    /**
+     * Retrieves {@link FixSession} from context.
+     *
+     * @return null if session not established.
+     */
+    protected FixSession getSession(ChannelHandlerContext ctx) {
+        Attribute<FixSession> fixSessionAttribute = ctx.attr(FIX_SESSION_KEY);
+        return fixSessionAttribute.get();
+    }
+
+    protected boolean setSession(ChannelHandlerContext ctx, FixSession fixSession) {
+        assert (fixSession != null) : "Parameter 'fixSession' expected.";
+        Attribute<FixSession> fixSessionAttribute = ctx.attr(FIX_SESSION_KEY);
+        return fixSessionAttribute.compareAndSet(null, fixSession);
     }
 
     @Override
     protected void encode(ChannelHandlerContext ctx, FixMessage msg, List<Object> out) throws Exception {
-        updateFixMessageHeader(msg);
+        updateFixMessageHeader(ctx, msg);
         getLogger().debug("Sending outbound: {}", msg);
         out.add(msg);
     }
 
     @Override
     protected void decode(ChannelHandlerContext ctx, FixMessage msg, List<Object> out) throws Exception {
-        if (sessionHolder.get() == null) {
+        FixSession session = getSession(ctx);
+        if (session == null) {
             getLogger().error("Session not established. Skipping message: {}", msg);
-            ctx.channel().closeFuture().await();
+            ctx.channel().close();
+            return;
         }
 
         FixMessageHeader header = msg.getHeader();
 
-        FixSession session = SessionRepository.getInstance().getSession(header);
         final int msgSeqNum = header.getMsgSeqNum();
         if (!session.checkIncomingSeqNum(msgSeqNum)) {
             getLogger().error("MessageSeqNum={} != expected {}.", msgSeqNum, session.getNextIncomingMessageSeqNum());

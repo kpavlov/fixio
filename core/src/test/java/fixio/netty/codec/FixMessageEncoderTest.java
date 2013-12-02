@@ -40,11 +40,12 @@ import static org.mockito.Mockito.when;
 public class FixMessageEncoderTest {
 
     private FixMessageEncoder encoder;
-    private FixMessage builder;
+    private FixMessage messageBuilder;
     @Mock
     private ChannelHandlerContext ctx;
     @Mock
     private ByteBufAllocator byteBufAllocator;
+    private ByteBuf out;
 
     @Before
     public void setUp() throws Exception {
@@ -66,16 +67,43 @@ public class FixMessageEncoderTest {
         fixMessage.add(1001, "test2");
         fixMessage.add(1000, "test1");
 
-        builder = fixMessage;
+        messageBuilder = fixMessage;
+
+        out = Unpooled.buffer();
+    }
+
+    @Test(expected = IllegalArgumentException.class)
+    public void testFailIfNoBeginStringCompID() throws Exception {
+        messageBuilder.getHeader().setBeginString(null);
+
+        encoder.encode(ctx, messageBuilder, out);
+    }
+
+    @Test(expected = IllegalArgumentException.class)
+    public void testFailIfNoMsgType() throws Exception {
+        messageBuilder.getHeader().setMessageType(null);
+
+        encoder.encode(ctx, messageBuilder, out);
+    }
+
+    @Test(expected = IllegalArgumentException.class)
+    public void testFailIfNoSenderCompID() throws Exception {
+        messageBuilder.getHeader().setSenderCompID(null);
+
+        encoder.encode(ctx, messageBuilder, out);
+    }
+
+    @Test(expected = IllegalArgumentException.class)
+    public void testFailIfNoTargetCompID() throws Exception {
+        messageBuilder.getHeader().setTargetCompID(null);
+
+        encoder.encode(ctx, messageBuilder, out);
     }
 
     @Test
     public void testEncode() throws Exception {
 
-
-        final ByteBuf out = Unpooled.buffer();
-
-        encoder.encode(ctx, builder, out);
+        encoder.encode(ctx, messageBuilder, out);
 
         verify(ctx).flush();
 

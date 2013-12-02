@@ -33,7 +33,6 @@ public class ClientSessionHandler extends AbstractSessionHandler {
 
     private final static Logger LOGGER = LoggerFactory.getLogger(ClientSessionHandler.class);
     private final FixSessionSettingsProvider sessionSettingsProvider;
-    private volatile FixSession pendingSession;
 
     public ClientSessionHandler(FixSessionSettingsProvider settingsProvider) {
         sessionSettingsProvider = settingsProvider;
@@ -42,10 +41,11 @@ public class ClientSessionHandler extends AbstractSessionHandler {
     @Override
     protected void decode(ChannelHandlerContext ctx, FixMessage msg, List<Object> out) throws Exception {
         final FixMessageHeader header = msg.getHeader();
+        FixSession session = getSession(ctx);
         if (MessageTypes.LOGON.equals(header.getMessageType())) {
-            if (sessionHolder.compareAndSet(null, pendingSession)) {
+            if (session != null) {
                 getLogger().info("Fix Session Established.");
-                if (pendingSession.checkIncomingSeqNum(header.getMsgSeqNum())) {
+                if (session.checkIncomingSeqNum(header.getMsgSeqNum())) {
                     LogonEvent logonEvent = new LogonEvent();
                     out.add(logonEvent);
                     return;
@@ -66,7 +66,8 @@ public class ClientSessionHandler extends AbstractSessionHandler {
 
         SimpleFixMessage logonRequest = new SimpleFixMessage(MessageTypes.LOGON);
 
-        pendingSession = createSession(sessionSettingsProvider);
+        FixSession pendingSession = createSession(sessionSettingsProvider);
+        setSession(ctx, pendingSession);
         pendingSession.prepareOutgoing(logonRequest);
         //updateFixMessageHeader(logonRequest);
         getLogger().info("Sending Logon: {}", logonRequest);

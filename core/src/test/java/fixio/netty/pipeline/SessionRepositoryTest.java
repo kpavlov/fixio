@@ -17,29 +17,28 @@ package fixio.netty.pipeline;
 
 import fixio.fixprotocol.FixMessageHeader;
 import fixio.fixprotocol.session.FixSession;
-import org.apache.commons.lang3.RandomStringUtils;
 import org.junit.Before;
 import org.junit.Test;
 
+import static org.apache.commons.lang3.RandomStringUtils.randomAscii;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertSame;
 
 public class SessionRepositoryTest {
 
     private SessionRepository sessionRepository;
-
-    String senderCompID;
-    String senderSubID;
-    String targetCompID;
-    String targetSubID;
+    private String senderCompID;
+    private String senderSubID;
+    private String targetCompID;
+    private String targetSubID;
     private FixMessageHeader header;
 
     @Before
     public void setUp() throws Exception {
-        senderCompID = RandomStringUtils.random(2);
-        senderSubID = RandomStringUtils.random(3);
-        targetCompID = RandomStringUtils.random(4);
-        targetSubID = RandomStringUtils.random(5);
+        senderCompID = randomAscii(2);
+        senderSubID = randomAscii(3);
+        targetCompID = randomAscii(4);
+        targetSubID = randomAscii(5);
 
         header = new FixMessageHeader();
         header.setSenderCompID(senderCompID);
