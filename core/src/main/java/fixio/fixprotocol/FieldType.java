@@ -24,6 +24,7 @@ import java.util.Calendar;
 public enum FieldType {
 
     //header fields
+    BeginString(8, String.class),
     MsgType(35, String.class),
     SenderCompID(49, String.class),
     TargetCompID(56, String.class),

@@ -20,10 +20,11 @@ public class FixMessageHeader {
 
     private String beginString;
     private String messageType;
-    private String senderCompID;
-    private String targetCompID;
     private int msgSeqNum;
+    private long sendingTime;
+    private String senderCompID;
     private String senderSubID;
+    private String targetCompID;
     private String targetSubID;
 
     public String getBeginString() {
@@ -82,18 +83,28 @@ public class FixMessageHeader {
         this.targetSubID = targetSubID;
     }
 
+    public long getSendingTime() {
+        return sendingTime;
+    }
+
+    public void setSendingTime(long sendingTime) {
+        this.sendingTime = sendingTime;
+    }
 
     @Override
     public String toString() {
-        final StringBuilder sb = new StringBuilder("FixMessageHeader{");
+        StringBuilder sb = new StringBuilder("FixMessageHeader{");
         sb.append("beginString='").append(beginString).append('\'');
-//        sb.append(", bodyLength=").append(bodyLength);
         sb.append(", messageType='").append(messageType).append('\'');
         sb.append(", senderCompID='").append(senderCompID).append('\'');
         sb.append(", targetCompID='").append(targetCompID).append('\'');
         sb.append(", msgSeqNum=").append(msgSeqNum);
-        sb.append(", senderSubID='").append(senderSubID).append('\'');
-        sb.append(", targetSubID='").append(targetSubID).append('\'');
+        if (senderSubID != null) {
+            sb.append(", senderSubID='").append(senderSubID).append('\'');
+        }
+        if (targetSubID != null) {
+            sb.append(", targetSubID='").append(targetSubID).append('\'');
+        }
         sb.append('}');
         return sb.toString();
     }

@@ -21,9 +21,8 @@ class PriceStreamingApp extends FixApplicationAdapter {
     private final ThreadLocal<ScheduledFuture> streamingFutureRef = new ThreadLocal<>();
 
     private static FixMessage createQuote() {
-        SimpleFixMessage quoteRequest = new SimpleFixMessage(MessageTypes.QUOTE);
-
-        return quoteRequest;
+        SimpleFixMessage quote = new SimpleFixMessage(MessageTypes.QUOTE);
+        return quote;
     }
 
     @Override

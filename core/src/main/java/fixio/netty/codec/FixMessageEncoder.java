@@ -28,10 +28,58 @@ import io.netty.handler.codec.MessageToByteEncoder;
 
 import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;
+import java.text.DateFormat;
+import java.text.DateFormatSymbols;
+import java.text.SimpleDateFormat;
+import java.util.Date;
+import java.util.Locale;
+import java.util.TimeZone;
 
 public class FixMessageEncoder extends MessageToByteEncoder<FixMessage> {
 
-    final static Charset CHARSET = StandardCharsets.US_ASCII;
+    static final TimeZone UTC = TimeZone.getTimeZone("UTC");
+    static final Charset CHARSET = StandardCharsets.US_ASCII;
+    private static final String UTC_TIMESTAMP_WITH_MILLIS_PATTERN = "yyyyMMdd-HH:mm:ss.SSS";
+    private static final ThreadLocal<DateFormat> sdf = new ThreadLocal<DateFormat>() {
+        @Override
+        protected DateFormat initialValue() {
+            SimpleDateFormat sdf = new SimpleDateFormat(UTC_TIMESTAMP_WITH_MILLIS_PATTERN);
+            sdf.setTimeZone(UTC);
+            sdf.setDateFormatSymbols(new DateFormatSymbols(Locale.US));
+            return sdf;
+        }
+    };
+    private Clock clock = Clock.systemUTC();
+
+    private static void validateRequiredFields(FixMessageHeader header) {
+        if (header.getBeginString() == null) {
+            throw new IllegalArgumentException("BeginString is required.");
+        }
+        if (header.getMessageType() == null) {
+            throw new IllegalArgumentException("MessageType is required.");
+        }
+        if (header.getSenderCompID() == null) {
+            throw new IllegalArgumentException("SenderCompID is required.");
+        }
+        if (header.getTargetCompID() == null) {
+            throw new IllegalArgumentException("TargetCompID is required.");
+        }
+    }
+
+    private static void writeField(int fieldNum, String value, ByteBuf out) {
+        out.writeBytes(String.valueOf(fieldNum).getBytes(CHARSET));
+        out.writeByte('=');
+        out.writeBytes(value.getBytes(CHARSET));
+        out.writeByte(1);
+    }
+
+    static int calculateChecksum(ByteBuf buf, int offset) {
+        int sum = 0;
+        for (int i = offset; i < buf.writerIndex(); i++) {
+            sum += buf.getByte(i);
+        }
+        return sum % 256;
+    }
 
     @Override
     public void encode(ChannelHandlerContext ctx, FixMessage msg, ByteBuf out) throws Exception {
@@ -63,6 +111,25 @@ public class FixMessageEncoder extends MessageToByteEncoder<FixMessage> {
         ctx.flush();
     }
 
+    private void encodeHeader(FixMessageHeader header, ByteBuf out) {
+
+        // message type
+        writeField(35, header.getMessageType(), out);
+
+        // SenderCompID
+        writeField(49, header.getSenderCompID(), out);
+
+        // TargetCompID
+        writeField(56, header.getTargetCompID(), out);
+
+        // MsgSeqNum
+        writeField(34, String.valueOf(header.getMsgSeqNum()), out);
+
+        // SendingTime
+        String timeStr = sdf.get().format(new Date(clock.millis()));
+        writeField(52, timeStr, out);
+    }
+
     private ByteBuf createBodyBuf(FixMessage msg, FixMessageHeader header) {
         final ByteBuf payloadBuf = Unpooled.buffer();
 
@@ -77,48 +144,7 @@ public class FixMessageEncoder extends MessageToByteEncoder<FixMessage> {
         return payloadBuf;
     }
 
-    private static void validateRequiredFields(FixMessageHeader header) {
-        if (header.getBeginString() == null) {
-            throw new IllegalArgumentException("BeginString is required.");
-        }
-        if (header.getMessageType() == null) {
-            throw new IllegalArgumentException("MessageType is required.");
-        }
-        if (header.getSenderCompID() == null) {
-            throw new IllegalArgumentException("SenderCompID is required.");
-        }
-        if (header.getTargetCompID() == null) {
-            throw new IllegalArgumentException("TargetCompID is required.");
-        }
-    }
-
-    private static void encodeHeader(FixMessageHeader header, ByteBuf out) {
-
-        // message type
-        writeField(35, header.getMessageType(), out);
-
-        // SenderCompID
-        writeField(49, header.getSenderCompID(), out);
-
-        // TargetCompID
-        writeField(56, header.getTargetCompID(), out);
-
-        // MsgSeqNum
-        writeField(34, String.valueOf(header.getMsgSeqNum()), out);
-    }
-
-    private static void writeField(int fieldNum, String value, ByteBuf out) {
-        out.writeBytes(String.valueOf(fieldNum).getBytes(CHARSET));
-        out.writeByte('=');
-        out.writeBytes(value.getBytes(CHARSET));
-        out.writeByte(1);
-    }
-
-    static int calculateChecksum(ByteBuf buf, int offset) {
-        int sum = 0;
-        for (int i = offset; i < buf.writerIndex(); i++) {
-            sum += buf.getByte(i);
-        }
-        return sum % 256;
+    protected void setClock(Clock clock) {
+        this.clock = clock;
     }
 }

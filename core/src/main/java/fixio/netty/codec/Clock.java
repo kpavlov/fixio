@@ -13,31 +13,24 @@
  * License for the specific language governing permissions and limitations
  * under the License.
  */
+package fixio.netty.codec;
 
-package fixio.fixprotocol;
 
-import java.util.List;
+/**
+ * JDK 8 compatible API.
+ */
+class Clock {
 
-public interface FixMessage {
+    private static final Clock INSTANCE = new Clock();
 
-    String FIX_4_0 = "FIX.4.0";
-    String FIX_4_1 = "FIX.4.1";
-    String FIX_4_2 = "FIX.4.2";
-    String FIX_4_3 = "FIX.4.3";
-    String FIX_4_4 = "FIX.4.4";
+    private Clock() {
+    }
 
-    FixMessageHeader getHeader();
+    public static Clock systemUTC() {
+        return INSTANCE;
+    }
 
-    List<FixMessageFragment> getBody();
-
-    Integer getInt(int tagNum);
-
-    Integer getInt(FieldType field);
-
-    String getString(int tagNum);
-
-    String getString(FieldType field);
-
-    String getMessageType();
-
+    public long millis() {
+        return System.currentTimeMillis();
+    }
 }

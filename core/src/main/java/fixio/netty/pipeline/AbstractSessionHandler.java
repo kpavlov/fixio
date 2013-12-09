@@ -18,6 +18,8 @@ package fixio.netty.pipeline;
 
 import fixio.fixprotocol.*;
 import fixio.fixprotocol.session.FixSession;
+import io.netty.channel.ChannelFuture;
+import io.netty.channel.ChannelFutureListener;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.handler.codec.MessageToMessageCodec;
 import io.netty.util.Attribute;
@@ -87,7 +89,10 @@ public abstract class AbstractSessionHandler extends MessageToMessageCodec<FixMe
     protected void sendReject(ChannelHandlerContext ctx, FixMessage originalMsg, boolean closeConnection) {
         final SimpleFixMessage reject = createReject(originalMsg);
 
-        ctx.writeAndFlush(reject);
+        ChannelFuture channelFuture = ctx.writeAndFlush(reject);
+        if (closeConnection) {
+            channelFuture.addListener(ChannelFutureListener.CLOSE);
+        }
     }
 
     protected SimpleFixMessage createReject(FixMessage originalMsg) {

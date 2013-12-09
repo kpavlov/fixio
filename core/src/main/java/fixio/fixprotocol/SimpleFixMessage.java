@@ -21,46 +21,35 @@ import java.util.List;
 
 public class SimpleFixMessage implements FixMessage {
 
-    public static final String FIX_4_0 = "FIX.4.0";
-    public static final String FIX_4_1 = "FIX.4.1";
-    public static final String FIX_4_2 = "FIX.4.2";
-    public static final String FIX_4_3 = "FIX.4.3";
-    public static final String FIX_4_4 = "FIX.4.4";
-
     private final List<Field> rawFields = new ArrayList<>();
     private final FixMessageHeader header = new FixMessageHeader();
     private final FixMessageTrailer trailer = new FixMessageTrailer();
     private final List<FixMessageFragment> body = new ArrayList<>();
 
     public SimpleFixMessage() {
-
     }
 
     public SimpleFixMessage(String messageType) {
         header.setMessageType(messageType);
     }
 
-    @Override
-    public void add(FieldType field, int value) {
+    public SimpleFixMessage add(FieldType field, int value) {
         assert (field != null) : "Tag must be specified.";
-        add(field, String.valueOf(value));
+        return add(field, String.valueOf(value));
     }
 
-    @Override
-    public void add(int tagNum, int value) {
+    public SimpleFixMessage add(int tagNum, int value) {
         assert (tagNum > 0) : "Tag must be positive.";
-        add(tagNum, String.valueOf(value));
+        return add(tagNum, String.valueOf(value));
     }
 
-    @Override
-    public void add(FieldType field, String value) {
+    public SimpleFixMessage add(FieldType field, String value) {
         assert (field != null) : "Tag must be specified.";
         assert (value != null) : "Value must be specified.";
-        add(field.tag(), value);
+        return add(field.tag(), value);
     }
 
-    @Override
-    public void add(int tagNum, String value) {
+    public SimpleFixMessage add(int tagNum, String value) {
         assert (tagNum > 0) : "Tag must be positive.";
         assert (value != null) : "Value  must be specified.";
         switch (tagNum) {
@@ -87,6 +76,7 @@ public class SimpleFixMessage implements FixMessage {
                 break;
         }
         rawFields.add(new Field(tagNum, value));
+        return this;
     }
 
     @Override

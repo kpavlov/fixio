@@ -40,25 +40,32 @@ import static org.mockito.Mockito.when;
 public class FixMessageEncoderTest {
 
     private FixMessageEncoder encoder;
-    private FixMessage messageBuilder;
+    private FixMessage fixMessage;
     @Mock
     private ChannelHandlerContext ctx;
     @Mock
     private ByteBufAllocator byteBufAllocator;
     private ByteBuf out;
+    private long timestamp;
+    @Mock
+    private Clock clock;
 
     @Before
     public void setUp() throws Exception {
+
+        timestamp = 123456789;
         when(ctx.alloc()).thenReturn(byteBufAllocator);
         when(byteBufAllocator.buffer()).thenReturn(Unpooled.buffer());
+        when(clock.millis()).thenReturn(timestamp);
 
         encoder = new FixMessageEncoder();
+        encoder.setClock(clock);
 
         SimpleFixMessage fixMessage = new SimpleFixMessage();
 
         FixMessageHeader header = fixMessage.getHeader();
 
-        header.setBeginString(SimpleFixMessage.FIX_4_2);
+        header.setBeginString(FixMessage.FIX_4_2);
         header.setMessageType(MessageTypes.HEARTBEAT);
         header.setSenderCompID("SenderCompID");
         header.setTargetCompID("TargetCompID");
@@ -67,43 +74,43 @@ public class FixMessageEncoderTest {
         fixMessage.add(1001, "test2");
         fixMessage.add(1000, "test1");
 
-        messageBuilder = fixMessage;
+        this.fixMessage = fixMessage;
 
         out = Unpooled.buffer();
     }
 
     @Test(expected = IllegalArgumentException.class)
     public void testFailIfNoBeginStringCompID() throws Exception {
-        messageBuilder.getHeader().setBeginString(null);
+        fixMessage.getHeader().setBeginString(null);
 
-        encoder.encode(ctx, messageBuilder, out);
+        encoder.encode(ctx, fixMessage, out);
     }
 
     @Test(expected = IllegalArgumentException.class)
     public void testFailIfNoMsgType() throws Exception {
-        messageBuilder.getHeader().setMessageType(null);
+        fixMessage.getHeader().setMessageType(null);
 
-        encoder.encode(ctx, messageBuilder, out);
+        encoder.encode(ctx, fixMessage, out);
     }
 
     @Test(expected = IllegalArgumentException.class)
     public void testFailIfNoSenderCompID() throws Exception {
-        messageBuilder.getHeader().setSenderCompID(null);
+        fixMessage.getHeader().setSenderCompID(null);
 
-        encoder.encode(ctx, messageBuilder, out);
+        encoder.encode(ctx, fixMessage, out);
     }
 
     @Test(expected = IllegalArgumentException.class)
     public void testFailIfNoTargetCompID() throws Exception {
-        messageBuilder.getHeader().setTargetCompID(null);
+        fixMessage.getHeader().setTargetCompID(null);
 
-        encoder.encode(ctx, messageBuilder, out);
+        encoder.encode(ctx, fixMessage, out);
     }
 
     @Test
     public void testEncode() throws Exception {
 
-        encoder.encode(ctx, messageBuilder, out);
+        encoder.encode(ctx, fixMessage, out);
 
         verify(ctx).flush();
 
@@ -111,7 +118,8 @@ public class FixMessageEncoderTest {
         assertTrue(out.array().length > 0);
         assertTrue(string.length() > 0);
 
-        String expectedString = "8=FIX.4.2\u00019=64\u000135=0\u000149=SenderCompID\u000156=TargetCompID\u000134=2\u00011001=test2\u00011000=test1\u000110=227\u0001";
+        String expectedString = "8=FIX.4.2\u00019=89\u000135=0\u000149=SenderCompID\u000156=TargetCompID\u000134=2\u000152=19700102-10:17:36.789\u00011001=test2\u00011000=test1\u000110=204\u0001";
+
         assertEquals(expectedString, string);
     }
 }

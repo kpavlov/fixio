@@ -50,7 +50,7 @@ public class FixConversationIT {
     }
 
     private static FixMessage createUserStatusRequest() {
-        FixMessage userRequest = new SimpleFixMessage("BE");
+        SimpleFixMessage userRequest = new SimpleFixMessage("BE");
         userRequest.add(923, "UserRequestID");//UserRequestID
         userRequest.add(924, 4);//UserRequestType=RequestIndividualUserStatus
         userRequest.add(553, "user");//553 Username
@@ -58,7 +58,7 @@ public class FixConversationIT {
     }
 
     private static FixMessage createUserStatusReport() {
-        FixMessage userRequest = new SimpleFixMessage("BF");
+        SimpleFixMessage userRequest = new SimpleFixMessage("BF");
         userRequest.add(923, "UserRequestID");//UserRequestID
         userRequest.add(553, "user");//553 Username
         userRequest.add(926, 1);

@@ -18,7 +18,6 @@ package fixio.netty.pipeline;
 import fixio.fixprotocol.FieldType;
 import fixio.fixprotocol.FixMessage;
 import fixio.fixprotocol.MessageTypes;
-import fixio.fixprotocol.SimpleFixMessage;
 import io.netty.channel.ChannelHandlerContext;
 import org.junit.Before;
 import org.junit.Test;
@@ -35,8 +34,7 @@ import java.util.Random;
 
 import static org.apache.commons.lang3.RandomStringUtils.randomAscii;
 import static org.junit.Assert.assertEquals;
-import static org.mockito.Mockito.times;
-import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.*;
 
 @RunWith(MockitoJUnitRunner.class)
 public class AbstractSessionHandlerTest {
@@ -71,9 +69,10 @@ public class AbstractSessionHandlerTest {
     @Test
     public void testSendReject() throws Exception {
         String msgType = randomAscii(3);
-        FixMessage originalMsg = new SimpleFixMessage(msgType);
+        FixMessage originalMsg = mock(FixMessage.class);
         int originalMsgSeqNum = RANDOM.nextInt();
-        originalMsg.add(FieldType.MsgSeqNum, originalMsgSeqNum);
+        when(originalMsg.getMessageType()).thenReturn(msgType);
+        when(originalMsg.getInt(FieldType.MsgSeqNum.tag())).thenReturn(originalMsgSeqNum);
 
         sessionHandler.sendReject(ctx, originalMsg, false);
 
