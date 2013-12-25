@@ -13,13 +13,13 @@
  * License for the specific language governing permissions and limitations
  * under the License.
  */
-package fixio.netty.codec;
+package fixio.netty.pipeline;
 
 
 /**
  * JDK 8 compatible API.
  */
-class Clock {
+public class Clock {
 
     private static final Clock INSTANCE = new Clock();
 

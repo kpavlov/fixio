@@ -2,9 +2,11 @@ package fixio.examples.priceclient;
 
 import fixio.events.LogonEvent;
 import fixio.fixprotocol.FixMessage;
+import fixio.fixprotocol.Group;
 import fixio.fixprotocol.MessageTypes;
 import fixio.fixprotocol.SimpleFixMessage;
 import fixio.handlers.FixApplicationAdapter;
+import io.netty.channel.ChannelFutureListener;
 import io.netty.channel.ChannelHandlerContext;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -24,6 +26,20 @@ class PriceReadingApp extends FixApplicationAdapter {
 
     private FixMessage createQuoteRequest() {
         SimpleFixMessage quoteRequest = new SimpleFixMessage(MessageTypes.QUOTE_REQUEST);
+        String quoteRequestId = Long.toHexString(System.currentTimeMillis());
+        quoteRequest.add(131, quoteRequestId); //quoteReqId
+        String clientReqId = quoteRequestId + counter;
+        quoteRequest.add(11, clientReqId);
+
+
+        Group instrument1 = quoteRequest.newGroup(146);//noRelatedSym
+        instrument1.add(55, "EUR/USD");
+        instrument1.add(167, "CURRENCY");
+
+        Group instrument2 = quoteRequest.newGroup(146);//noRelatedSym
+        instrument2.add(55, "EUR/CHF");
+        instrument2.add(167, "CURRENCY");
+
         quoteRequest.add(303, 2); //QuoteRequestType=AUTOMATIC
         return quoteRequest;
     }
@@ -36,13 +52,14 @@ class PriceReadingApp extends FixApplicationAdapter {
 
     @Override
     protected void onMessage(ChannelHandlerContext ctx, FixMessage msg, List<Object> out) throws Exception {
+        assert (msg != null) : "Message can't be null";
         switch (msg.getMessageType()) {
             case MessageTypes.QUOTE:
                 onQuote(msg);
                 break;
         }
-        if (counter > 10000) {
-            ctx.writeAndFlush(createQuoteCancel());
+        if (counter > 100_000) {
+            ctx.writeAndFlush(createQuoteCancel()).addListener(ChannelFutureListener.CLOSE);
         }
     }
 

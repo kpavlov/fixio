@@ -20,8 +20,10 @@ class PriceStreamingApp extends FixApplicationAdapter {
     private static final Logger LOGGER = LoggerFactory.getLogger(PriceStreamingApp.class);
     private final ThreadLocal<ScheduledFuture> streamingFutureRef = new ThreadLocal<>();
 
-    private static FixMessage createQuote() {
+    private static FixMessage createQuote(String reqId) {
         SimpleFixMessage quote = new SimpleFixMessage(MessageTypes.QUOTE);
+        quote.add(FieldType.QuoteReqID, reqId);
+
         return quote;
     }
 
@@ -37,7 +39,11 @@ class PriceStreamingApp extends FixApplicationAdapter {
     }
 
     private void stopStreaming() {
-        streamingFutureRef.get().cancel(true);
+        ScheduledFuture scheduledFuture = streamingFutureRef.get();
+        if (scheduledFuture == null) {
+            return;
+        }
+        scheduledFuture.cancel(true);
         streamingFutureRef.remove();
         LOGGER.info("Stoped Streaming.");
     }
@@ -55,16 +61,16 @@ class PriceStreamingApp extends FixApplicationAdapter {
     }
 
     private void startStreaming(final ChannelHandlerContext ctx, FixMessage msg) {
-        String reqId = msg.getString(FieldType.QuoteReqID);
+        final String reqId = msg.getString(FieldType.QuoteReqID);
 
         ScheduledFuture<?> streamingFuture = ctx.executor().scheduleAtFixedRate(new Runnable() {
             @Override
             public void run() {
-                FixMessage quote = createQuote();
+                FixMessage quote = createQuote(reqId);
                 LOGGER.trace("Submit quote.");
                 ctx.writeAndFlush(quote);
             }
-        }, 5, 1, TimeUnit.MILLISECONDS);
+        }, 5, 10, TimeUnit.NANOSECONDS);
 
         streamingFutureRef.set(streamingFuture);
         LOGGER.info("Started Streaming.");

@@ -15,19 +15,22 @@
  */
 package fixio.netty.codec;
 
+import fixio.fixprotocol.FixMessageHeader;
 import fixio.fixprotocol.MessageTypes;
 import fixio.fixprotocol.SimpleFixMessage;
-import io.netty.buffer.ByteBuf;
 import io.netty.buffer.Unpooled;
-import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 
-import java.nio.charset.Charset;
+import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.List;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
+
 public class FixMessageDecoderTest {
+
     private FixMessageDecoder decoder;
 
     @Before
@@ -37,21 +40,25 @@ public class FixMessageDecoderTest {
 
     @Test
     public void testDecode() throws Exception {
-        String fixString = "8=FIX.4.1\u00019=90\u000135=0\u000149=INVMGR\u000156=BRKR\u000134=240\u000152=19980604-08:03:31\u000110=220\u0001";
-        byte[] fixBytes = fixString.getBytes(Charset.forName("ASCII"));
-        ByteBuf byteBuf = Unpooled.wrappedBuffer(fixBytes);
+        String[] tags = "8=FIX.4.1\u00019=90\u000135=0\u000149=INVMGR\u000156=BRKR\u000134=240\u000152=19980604-08:03:31\u000110=220\u0001".split("\u0001");
 
         List<Object> result = new ArrayList<>();
-        decoder.decode(null, byteBuf, result);
-        Assert.assertEquals(1, result.size());
+        for (String tag : tags) {
+            decoder.decode(null, Unpooled.wrappedBuffer(tag.getBytes(StandardCharsets.US_ASCII)), result);
+        }
+
+        assertEquals(1, result.size());
+        assertTrue(result.get(0) instanceof SimpleFixMessage);
         final SimpleFixMessage fixMessage = (SimpleFixMessage) result.get(0);
 
-        Assert.assertEquals("FIX.4.1", fixMessage.getBeginString());
-        Assert.assertEquals(MessageTypes.HEARTBEAT, fixMessage.getMessageType());
-        Assert.assertEquals("INVMGR", fixMessage.getString(49));
-        Assert.assertEquals("BRKR", fixMessage.getString(56));
-        Assert.assertEquals(240, (long) fixMessage.getInt(34));
-        Assert.assertEquals("19980604-08:03:31", fixMessage.getString(52));
-        Assert.assertEquals(220, fixMessage.getChecksum());
+        FixMessageHeader header = fixMessage.getHeader();
+
+        assertEquals("FIX.4.1", fixMessage.getBeginString());
+        assertEquals(MessageTypes.HEARTBEAT, fixMessage.getMessageType());
+        assertEquals("INVMGR", header.getSenderCompID());
+        assertEquals("BRKR", header.getTargetCompID());
+        assertEquals(240, header.getMsgSeqNum());
+        assertEquals("19980604-08:03:31", fixMessage.getString(52));
+        assertEquals(220, fixMessage.getChecksum());
     }
 }

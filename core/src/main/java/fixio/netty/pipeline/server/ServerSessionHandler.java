@@ -122,7 +122,7 @@ public class ServerSessionHandler extends AbstractSessionHandler {
 
         SimpleFixMessage logout = new SimpleFixMessage(MessageTypes.LOGOUT);
         if (text != null) {
-            logout.getBody().add(new Field(58, text));
+            logout.add(58, text);
         }
         ctx.writeAndFlush(logout).addListener(ChannelFutureListener.CLOSE);
     }

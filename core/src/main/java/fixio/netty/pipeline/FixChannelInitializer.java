@@ -21,10 +21,12 @@ import fixio.handlers.AdminEventHandler;
 import fixio.handlers.FixMessageHandler;
 import fixio.netty.codec.FixMessageDecoder;
 import fixio.netty.codec.FixMessageEncoder;
+import io.netty.buffer.Unpooled;
 import io.netty.channel.Channel;
 import io.netty.channel.ChannelInitializer;
 import io.netty.channel.ChannelPipeline;
 import io.netty.channel.EventLoopGroup;
+import io.netty.handler.codec.DelimiterBasedFrameDecoder;
 import io.netty.handler.codec.MessageToMessageCodec;
 import io.netty.handler.logging.LogLevel;
 import io.netty.handler.logging.LoggingHandler;
@@ -50,8 +52,10 @@ public abstract class FixChannelInitializer<C extends Channel> extends ChannelIn
     @Override
     public void initChannel(C ch) throws Exception {
         final ChannelPipeline pipeline = ch.pipeline();
-        pipeline.addLast(new FixMessageDecoder(), new FixMessageEncoder()); // codec
-        pipeline.addLast("logging", new LoggingHandler("fix", LogLevel.DEBUG));//logging
+        pipeline.addLast("tagDecoder", new DelimiterBasedFrameDecoder(1024, Unpooled.wrappedBuffer(new byte[]{1})));
+        pipeline.addLast("fixMessageDecoder", new FixMessageDecoder());
+        pipeline.addLast("fixMessageEncoder", new FixMessageEncoder());
+        pipeline.addLast("logging", new LoggingHandler("fix", LogLevel.DEBUG));
         pipeline.addLast("session", createSessionHandler()); // handle fix session
         pipeline.addLast("testRequest", testRequestHandler); // process test requests
         if (adminEventHandler != null) {

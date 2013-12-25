@@ -11,10 +11,8 @@
 
     <artifactId>core</artifactId>
 
-
     <name>fix.io core</name>
     <description>FIX Protocol Support for Netty 4</description>
-
 
     <dependencies>
         <!-- production dependencies -->

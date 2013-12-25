@@ -16,15 +16,14 @@
 
 package fixio.fixprotocol;
 
-import java.util.ArrayList;
+import java.util.LinkedList;
 import java.util.List;
 
 public class SimpleFixMessage implements FixMessage {
 
-    private final List<Field> rawFields = new ArrayList<>();
     private final FixMessageHeader header = new FixMessageHeader();
     private final FixMessageTrailer trailer = new FixMessageTrailer();
-    private final List<FixMessageFragment> body = new ArrayList<>();
+    private final List<FixMessageFragment> body = new LinkedList<>();
 
     public SimpleFixMessage() {
     }
@@ -50,8 +49,8 @@ public class SimpleFixMessage implements FixMessage {
     }
 
     public SimpleFixMessage add(int tagNum, String value) {
-        assert (tagNum > 0) : "Tag must be positive.";
-        assert (value != null) : "Value  must be specified.";
+        assert (tagNum > 0) : "TagNum must be positive. Got " + tagNum;
+        assert (value != null) : "Value must be specified.";
         switch (tagNum) {
             case 8:
                 header.setBeginString(value.intern());
@@ -75,8 +74,18 @@ public class SimpleFixMessage implements FixMessage {
                 body.add(new Field(tagNum, value));
                 break;
         }
-        rawFields.add(new Field(tagNum, value));
         return this;
+    }
+
+    public Group newGroup(int tagNum) {
+        Group group = new Group(tagNum);
+        GroupField g = (GroupField) getFirst(tagNum);
+        if (g == null) {
+            g = new GroupField(tagNum);
+            body.add(g);
+        }
+        g.add(group);
+        return group;
     }
 
     @Override
@@ -84,18 +93,18 @@ public class SimpleFixMessage implements FixMessage {
         return body;
     }
 
-    public List<Field> getRawFields() {
-        return rawFields;
-    }
-
     @Override
     public String getString(int tagNum) {
-        for (Field field : rawFields) {
-            if (field.getTagNum() == tagNum) {
-                return (field).getValue();
-            }
+        FixMessageFragment item = getFirst(tagNum);
+        if (item == null) {
+            return null;
         }
-        return null;
+        if (item instanceof Field) {
+            return ((Field) item).getValue();
+        } else {
+            throw new IllegalArgumentException("Tag " + tagNum + " is not a Field.");
+        }
+
     }
 
     @Override
@@ -105,11 +114,9 @@ public class SimpleFixMessage implements FixMessage {
 
     @Override
     public Integer getInt(int tagNum) {
-        for (Field field : rawFields) {
-            if (field.getTagNum() == tagNum) {
-                return Integer.parseInt(field.getValue());
-            }
-
+        String s = getString(tagNum);
+        if (s != null) {
+            return Integer.parseInt(s);
         }
         return null;
     }
@@ -157,9 +164,26 @@ public class SimpleFixMessage implements FixMessage {
     public String toString() {
         final StringBuilder sb = new StringBuilder("SimpleFixMessage{");
         sb.append("header=").append(header);
-        sb.append(", rawFields=").append(rawFields);
+        sb.append(", body=").append(body);
         sb.append(", trailer=").append(trailer);
         sb.append('}');
         return sb.toString();
+    }
+
+    public List<Group> getGroups(int tagNum) {
+        FixMessageFragment fragment = getFirst(tagNum);
+        if (fragment instanceof GroupField) {
+            return ((GroupField) fragment).getGroups();
+        }
+        return null;
+    }
+
+    private FixMessageFragment getFirst(int tagNum) {
+        for (FixMessageFragment item : body) {
+            if (item.getTagNum() == tagNum) {
+                return item;
+            }
+        }
+        return null;
     }
 }

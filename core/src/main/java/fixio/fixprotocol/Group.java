@@ -15,14 +15,13 @@
  */
 package fixio.fixprotocol;
 
-import java.util.LinkedList;
-import java.util.List;
+import java.util.LinkedHashMap;
 
 public class Group extends FixMessageFragment {
 
-    private final List<FixMessageFragment> contents = new LinkedList<>();
+    private final LinkedHashMap<Integer, FixMessageFragment> contents = new LinkedHashMap<>();
 
-    protected Group(int tagNum) {
+    public Group(int tagNum) {
         super(tagNum);
     }
 
@@ -31,6 +30,16 @@ public class Group extends FixMessageFragment {
     }
 
     public void add(FixMessageFragment element) {
-        contents.add(element);
+        contents.put(element.getTagNum(), element);
     }
+
+    public Group add(int tagNum, String value) {
+        assert (tagNum > 0) : "Tag must be positive.";
+        assert (value != null) : "Value  must be specified.";
+
+        contents.put(tagNum, new Field(tagNum, value));
+
+        return this;
+    }
+
 }

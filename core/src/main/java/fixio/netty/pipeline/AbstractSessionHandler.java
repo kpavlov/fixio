@@ -32,8 +32,11 @@ public abstract class AbstractSessionHandler extends MessageToMessageCodec<FixMe
 
     public static final AttributeKey<FixSession> FIX_SESSION_KEY = AttributeKey.valueOf("fixSession");
 
+    private Clock clock = Clock.systemUTC();
+
     protected void updateFixMessageHeader(ChannelHandlerContext ctx, FixMessage response) {
         getSession(ctx).prepareOutgoing(response);
+        response.getHeader().setSendingTime(clock.millis());
     }
 
     @Override
@@ -62,7 +65,7 @@ public abstract class AbstractSessionHandler extends MessageToMessageCodec<FixMe
     @Override
     protected void encode(ChannelHandlerContext ctx, FixMessage msg, List<Object> out) throws Exception {
         updateFixMessageHeader(ctx, msg);
-        getLogger().debug("Sending outbound: {}", msg);
+        getLogger().trace("Sending outbound: {}", msg);
         out.add(msg);
     }
 
@@ -102,4 +105,7 @@ public abstract class AbstractSessionHandler extends MessageToMessageCodec<FixMe
         return reject;
     }
 
+    public void setClock(Clock clock) {
+        this.clock = clock;
+    }
 }

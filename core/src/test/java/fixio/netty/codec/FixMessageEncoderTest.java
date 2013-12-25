@@ -47,8 +47,6 @@ public class FixMessageEncoderTest {
     private ByteBufAllocator byteBufAllocator;
     private ByteBuf out;
     private long timestamp;
-    @Mock
-    private Clock clock;
 
     @Before
     public void setUp() throws Exception {
@@ -56,10 +54,8 @@ public class FixMessageEncoderTest {
         timestamp = 123456789;
         when(ctx.alloc()).thenReturn(byteBufAllocator);
         when(byteBufAllocator.buffer()).thenReturn(Unpooled.buffer());
-        when(clock.millis()).thenReturn(timestamp);
 
         encoder = new FixMessageEncoder();
-        encoder.setClock(clock);
 
         SimpleFixMessage fixMessage = new SimpleFixMessage();
 
@@ -75,6 +71,7 @@ public class FixMessageEncoderTest {
         fixMessage.add(1000, "test1");
 
         this.fixMessage = fixMessage;
+        fixMessage.getHeader().setSendingTime(timestamp);
 
         out = Unpooled.buffer();
     }

@@ -49,7 +49,6 @@ public class FixMessageEncoder extends MessageToByteEncoder<FixMessage> {
             return sdf;
         }
     };
-    private Clock clock = Clock.systemUTC();
 
     private static void validateRequiredFields(FixMessageHeader header) {
         if (header.getBeginString() == null) {
@@ -109,6 +108,9 @@ public class FixMessageEncoder extends MessageToByteEncoder<FixMessage> {
         // Checksum
         writeField(10, String.format("%1$03d", checksum), out);
         ctx.flush();
+
+        headBuf.release();
+        bodyBuf.release();
     }
 
     private void encodeHeader(FixMessageHeader header, ByteBuf out) {
@@ -126,7 +128,7 @@ public class FixMessageEncoder extends MessageToByteEncoder<FixMessage> {
         writeField(34, String.valueOf(header.getMsgSeqNum()), out);
 
         // SendingTime
-        String timeStr = sdf.get().format(new Date(clock.millis()));
+        String timeStr = sdf.get().format(new Date(header.getSendingTime()));
         writeField(52, timeStr, out);
     }
 
@@ -142,9 +144,5 @@ public class FixMessageEncoder extends MessageToByteEncoder<FixMessage> {
             }
         }
         return payloadBuf;
-    }
-
-    protected void setClock(Clock clock) {
-        this.clock = clock;
     }
 }

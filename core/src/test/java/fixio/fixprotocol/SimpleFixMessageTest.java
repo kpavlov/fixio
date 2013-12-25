@@ -18,8 +18,11 @@ package fixio.fixprotocol;
 import org.junit.Before;
 import org.junit.Test;
 
+import java.util.List;
+
 import static org.apache.commons.lang3.RandomStringUtils.randomAscii;
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertSame;
 
 public class SimpleFixMessageTest {
 
@@ -31,7 +34,7 @@ public class SimpleFixMessageTest {
     }
 
     @Test
-    public void headerFields() {
+    public void testHeaderFields() {
         String beginString = randomAscii(2);
         String senderCompID = randomAscii(3);
         String targetCompID = randomAscii(4);
@@ -48,7 +51,33 @@ public class SimpleFixMessageTest {
         assertEquals("msgType", msgType, fixMessage.getMessageType());
         assertEquals("senderCompID", senderCompID, fixMessage.getHeader().getSenderCompID());
         assertEquals("targetCompID", targetCompID, fixMessage.getHeader().getTargetCompID());
+    }
+
+    @Test
+    public void testWithGroups() {
+        SimpleFixMessage quoteRequest = new SimpleFixMessage(MessageTypes.QUOTE_REQUEST);
+        String quoteRequestId = randomAscii(3);
+        quoteRequest.add(131, quoteRequestId); //quoteReqId
+        String clientReqId = randomAscii(4);
+        quoteRequest.add(11, clientReqId);
 
 
+        Group instrument1 = quoteRequest.newGroup(146);//noRelatedSym
+        instrument1.add(55, "EUR/USD");
+        instrument1.add(167, "CURRENCY");
+
+        Group instrument2 = quoteRequest.newGroup(146);//noRelatedSym
+        instrument2.add(55, "EUR/CHF");
+        instrument2.add(167, "CURRENCY");
+
+        quoteRequest.add(303, 2); //QuoteRequestType=AUTOMATIC
+
+        // read
+
+        List<Group> instruments = quoteRequest.getGroups(146);
+        assertEquals(2, instruments.size());
+
+        assertSame(instrument1, instruments.get(0));
+        assertSame(instrument2, instruments.get(1));
     }
 }

@@ -19,36 +19,63 @@ package fixio.netty.codec;
 import fixio.fixprotocol.SimpleFixMessage;
 import io.netty.buffer.ByteBuf;
 import io.netty.channel.ChannelHandlerContext;
-import io.netty.handler.codec.ByteToMessageDecoder;
+import io.netty.handler.codec.DecoderException;
+import io.netty.handler.codec.MessageToMessageDecoder;
 
+import java.nio.charset.StandardCharsets;
 import java.util.List;
 
-public class FixMessageDecoder extends ByteToMessageDecoder {
+public class FixMessageDecoder extends MessageToMessageDecoder<ByteBuf> {
+
+    private SimpleFixMessage message;
 
     @Override
     protected void decode(ChannelHandlerContext ctx, ByteBuf in, List<Object> out) throws Exception {
-        if (!in.isReadable()) {
+
+        assert (in != null) : "No Buffer";
+        assert (in.readableBytes() > 3) : "Buffer too small";
+
+        int tag = readTagNum(in);
+        if (tag == -1) {
             return;
         }
-        int num = -1;
-        SimpleFixMessage result = new SimpleFixMessage();
-
-        final StringBuilder buffer = new StringBuilder();
-        while (in.isReadable()) {
-            byte b = in.readByte();
-            if (b == 1) {
-                result.add(num, buffer.toString());
-                buffer.setLength(0);
-            } else if (b == '=') {
-                num = Integer.parseInt(buffer.toString());
-                buffer.setLength(0);
-            } else {
-                buffer.append((char) b);
-            }
-
+        String value = in.toString(StandardCharsets.US_ASCII);
+        in.skipBytes(in.readableBytes());
+        switch (tag) {
+            case 8:
+                if (message != null) {
+                    throw new DecoderException("Unexpected BeginString tag.");
+                }
+                message = new SimpleFixMessage();
+                message.add(tag, value);
+                break;
+            case 10:
+                appendField(tag, value);
+                out.add(message);
+                message = null;
+                break;
+            default:
+                appendField(tag, value);
         }
-        out.add(result);
     }
 
+    private void appendField(int tag, String value) {
+        if (message == null) {
+            throw new DecoderException("BeginString tag expected, but got: " + tag + "=" + value);
+        }
+        message.add(tag, value);
+    }
 
+    private int readTagNum(ByteBuf in) {
+        int result = 0;
+
+        while (in.isReadable()) {
+            byte b = in.readByte();
+            if (b == '=') {
+                return result;
+            }
+            result = result * 10 + (b - '0');
+        }
+        return -1;
+    }
 }
