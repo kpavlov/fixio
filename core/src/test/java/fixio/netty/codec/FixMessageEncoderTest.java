@@ -24,6 +24,7 @@ import io.netty.buffer.ByteBufAllocator;
 import io.netty.buffer.Unpooled;
 import io.netty.channel.ChannelHandlerContext;
 import org.junit.Before;
+import org.junit.BeforeClass;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.Mock;
@@ -39,23 +40,25 @@ import static org.mockito.Mockito.when;
 @RunWith(MockitoJUnitRunner.class)
 public class FixMessageEncoderTest {
 
-    private FixMessageEncoder encoder;
-    private FixMessage fixMessage;
+    private static FixMessageEncoder encoder;
     @Mock
     private ChannelHandlerContext ctx;
     @Mock
     private ByteBufAllocator byteBufAllocator;
+    private FixMessage fixMessage;
     private ByteBuf out;
-    private long timestamp;
+    private long timestamp = 123456789;
+
+    @BeforeClass
+    public static void beforeClass() {
+        encoder = new FixMessageEncoder();
+    }
 
     @Before
     public void setUp() throws Exception {
-
-        timestamp = 123456789;
         when(ctx.alloc()).thenReturn(byteBufAllocator);
         when(byteBufAllocator.buffer()).thenReturn(Unpooled.buffer());
 
-        encoder = new FixMessageEncoder();
 
         SimpleFixMessage fixMessage = new SimpleFixMessage();
 

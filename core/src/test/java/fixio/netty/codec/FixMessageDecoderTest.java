@@ -19,7 +19,7 @@ import fixio.fixprotocol.FixMessageHeader;
 import fixio.fixprotocol.MessageTypes;
 import fixio.fixprotocol.SimpleFixMessage;
 import io.netty.buffer.Unpooled;
-import org.junit.Before;
+import org.junit.BeforeClass;
 import org.junit.Test;
 
 import java.nio.charset.StandardCharsets;
@@ -31,21 +31,16 @@ import static org.junit.Assert.assertTrue;
 
 public class FixMessageDecoderTest {
 
-    private FixMessageDecoder decoder;
+    private static FixMessageDecoder decoder;
 
-    @Before
-    public void setUp() throws Exception {
+    @BeforeClass
+    public static void setUp() throws Exception {
         decoder = new FixMessageDecoder();
     }
 
     @Test
     public void testDecode() throws Exception {
-        String[] tags = "8=FIX.4.1\u00019=90\u000135=0\u000149=INVMGR\u000156=BRKR\u000134=240\u000152=19980604-08:03:31\u000110=220\u0001".split("\u0001");
-
-        List<Object> result = new ArrayList<>();
-        for (String tag : tags) {
-            decoder.decode(null, Unpooled.wrappedBuffer(tag.getBytes(StandardCharsets.US_ASCII)), result);
-        }
+        List<Object> result = decode("8=FIX.4.1\u00019=90\u000135=0\u000149=INVMGR\u000156=BRKR\u000134=240\u000152=19980604-08:03:31\u000110=129\u0001");
 
         assertEquals(1, result.size());
         assertTrue(result.get(0) instanceof SimpleFixMessage);
@@ -59,6 +54,16 @@ public class FixMessageDecoderTest {
         assertEquals("BRKR", header.getTargetCompID());
         assertEquals(240, header.getMsgSeqNum());
         assertEquals("19980604-08:03:31", fixMessage.getString(52));
-        assertEquals(220, fixMessage.getChecksum());
+        assertEquals(129, fixMessage.getChecksum());
+    }
+
+    private List<Object> decode(String message) throws Exception {
+        String[] tags = message.split("\u0001");
+
+        List<Object> result = new ArrayList<>();
+        for (String tag : tags) {
+            decoder.decode(null, Unpooled.wrappedBuffer(tag.getBytes(StandardCharsets.US_ASCII)), result);
+        }
+        return result;
     }
 }

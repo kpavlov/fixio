@@ -1,3 +1,18 @@
+/*
+ * Copyright 2013 The FIX.io Project
+ *
+ * The FIX.io Project licenses this file to you under the Apache License,
+ * version 2.0 (the "License"); you may not use this file except in compliance
+ * with the License. You may obtain a copy of the License at:
+ *
+ *   http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS, WITHOUT
+ * WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the
+ * License for the specific language governing permissions and limitations
+ * under the License.
+ */
 package fixio.examples.priceclient;
 
 import fixio.events.LogonEvent;
@@ -17,11 +32,43 @@ class PriceReadingApp extends FixApplicationAdapter {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(PriceReadingApp.class);
     private int counter;
+    private long startTimeNanos;
+    private boolean finished;
 
     @Override
     protected void onLogon(ChannelHandlerContext ctx, LogonEvent msg) {
         counter = 0;
         ctx.writeAndFlush(createQuoteRequest());
+        startTimeNanos = System.nanoTime();
+    }
+
+    @Override
+    protected void onMessage(ChannelHandlerContext ctx, FixMessage msg, List<Object> out) throws Exception {
+        assert (msg != null) : "Message can't be null";
+        switch (msg.getMessageType()) {
+            case MessageTypes.QUOTE:
+                onQuote(msg);
+                break;
+        }
+        if (counter > 100_000 && !finished) {
+            finished = true;
+
+            long timeMillis = (System.nanoTime() - startTimeNanos) / 1000000;
+            LOGGER.info("Read {} Quotes in {} ms, ~{} Quote/sec", counter, timeMillis, counter * 1000 / timeMillis);
+
+            ctx.writeAndFlush(createQuoteCancel()).addListener(ChannelFutureListener.CLOSE);
+        }
+    }
+
+    private void onQuote(FixMessage quote) {
+        LOGGER.trace("quote = {}", quote);
+        counter++;
+    }
+
+    private FixMessage createQuoteCancel() {
+        SimpleFixMessage quoteCancel = new SimpleFixMessage(MessageTypes.QUOTE_CANCEL);//QuoteCancel
+        quoteCancel.add(298, 4); //QuoteRequestType=AUTOMATIC
+        return quoteCancel;
     }
 
     private FixMessage createQuoteRequest() {
@@ -42,30 +89,5 @@ class PriceReadingApp extends FixApplicationAdapter {
 
         quoteRequest.add(303, 2); //QuoteRequestType=AUTOMATIC
         return quoteRequest;
-    }
-
-    private FixMessage createQuoteCancel() {
-        SimpleFixMessage quoteCancel = new SimpleFixMessage(MessageTypes.QUOTE_CANCEL);//QuoteCancel
-        quoteCancel.add(298, 4); //QuoteRequestType=AUTOMATIC
-        return quoteCancel;
-    }
-
-    @Override
-    protected void onMessage(ChannelHandlerContext ctx, FixMessage msg, List<Object> out) throws Exception {
-        assert (msg != null) : "Message can't be null";
-        switch (msg.getMessageType()) {
-            case MessageTypes.QUOTE:
-                onQuote(msg);
-                break;
-        }
-        if (counter > 100_000) {
-            ctx.writeAndFlush(createQuoteCancel()).addListener(ChannelFutureListener.CLOSE);
-        }
-    }
-
-    private void onQuote(FixMessage quote) {
-        LOGGER.trace("quote = {}", quote);
-        counter++;
-
     }
 }

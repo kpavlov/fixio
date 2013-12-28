@@ -27,7 +27,7 @@ import java.util.Arrays;
 import static org.junit.Assert.assertEquals;
 
 @RunWith(Parameterized.class)
-public class ChecksumCalculationTest {
+public class FixMessageEncoderChecksumTest {
 
     private ByteBuf byteBuf;
     private int offset;
@@ -41,7 +41,7 @@ public class ChecksumCalculationTest {
         });
     }
 
-    public ChecksumCalculationTest(String str, int offset, int expectedChecksum) {
+    public FixMessageEncoderChecksumTest(String str, int offset, int expectedChecksum) {
         this.byteBuf = Unpooled.wrappedBuffer(str.replaceAll("\\|", "\u0001").getBytes(StandardCharsets.US_ASCII));
         this.offset = offset;
         this.expectedChecksum = expectedChecksum;
