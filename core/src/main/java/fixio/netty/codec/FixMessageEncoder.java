@@ -16,10 +16,7 @@
 
 package fixio.netty.codec;
 
-import fixio.fixprotocol.Field;
-import fixio.fixprotocol.FixMessage;
-import fixio.fixprotocol.FixMessageFragment;
-import fixio.fixprotocol.FixMessageHeader;
+import fixio.fixprotocol.*;
 import io.netty.buffer.ByteBuf;
 import io.netty.buffer.ByteBufAllocator;
 import io.netty.buffer.Unpooled;
@@ -139,10 +136,25 @@ public class FixMessageEncoder extends MessageToByteEncoder<FixMessage> {
 
         // message body
         for (FixMessageFragment component : msg.getBody()) {
-            if (component instanceof Field) {
-                writeField(component.getTagNum(), ((Field) component).getValue(), payloadBuf);
-            }
+            encodeComponent(payloadBuf, component);
         }
         return payloadBuf;
+    }
+
+    private void encodeComponent(ByteBuf payloadBuf, FixMessageFragment component) {
+        if (component instanceof Field) {
+            writeField(component.getTagNum(), ((Field) component).getValue(), payloadBuf);
+        } else if (component instanceof Group) {
+            Group group = (Group) component;
+            for (FixMessageFragment fixMessageFragment : group.getContents()) {
+                encodeComponent(payloadBuf, fixMessageFragment);
+            }
+        } else if (component instanceof GroupField) {
+            GroupField groupField = (GroupField) component;
+            writeField(groupField.getTagNum(), String.valueOf(groupField.getGroupCount()), payloadBuf);
+            for (Group group : groupField.getGroups()) {
+                encodeComponent(payloadBuf, group);
+            }
+        }
     }
 }

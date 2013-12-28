@@ -31,6 +31,7 @@ import java.util.List;
 class PriceReadingApp extends FixApplicationAdapter {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(PriceReadingApp.class);
+    public static final int MAX_QUOTE_COUNT = 100_000;
     private int counter;
     private long startTimeNanos;
     private boolean finished;
@@ -50,7 +51,7 @@ class PriceReadingApp extends FixApplicationAdapter {
                 onQuote(msg);
                 break;
         }
-        if (counter > 100_000 && !finished) {
+        if (counter > MAX_QUOTE_COUNT && !finished) {
             finished = true;
 
             long timeMillis = (System.nanoTime() - startTimeNanos) / 1000000;

@@ -15,10 +15,7 @@
  */
 package fixio.netty.codec;
 
-import fixio.fixprotocol.FixMessage;
-import fixio.fixprotocol.FixMessageHeader;
-import fixio.fixprotocol.MessageTypes;
-import fixio.fixprotocol.SimpleFixMessage;
+import fixio.fixprotocol.*;
 import io.netty.buffer.ByteBuf;
 import io.netty.buffer.ByteBufAllocator;
 import io.netty.buffer.Unpooled;
@@ -30,10 +27,8 @@ import org.junit.runner.RunWith;
 import org.mockito.Mock;
 import org.mockito.runners.MockitoJUnitRunner;
 
-import java.nio.charset.Charset;
-
+import static java.nio.charset.StandardCharsets.US_ASCII;
 import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertTrue;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
@@ -45,7 +40,7 @@ public class FixMessageEncoderTest {
     private ChannelHandlerContext ctx;
     @Mock
     private ByteBufAllocator byteBufAllocator;
-    private FixMessage fixMessage;
+    private SimpleFixMessage fixMessage;
     private ByteBuf out;
     private long timestamp = 123456789;
 
@@ -114,11 +109,34 @@ public class FixMessageEncoderTest {
 
         verify(ctx).flush();
 
-        final String string = new String(out.array(), out.arrayOffset(), out.readableBytes(), Charset.forName("ISO-8859-1"));
-        assertTrue(out.array().length > 0);
-        assertTrue(string.length() > 0);
-
         String expectedString = "8=FIX.4.2\u00019=89\u000135=0\u000149=SenderCompID\u000156=TargetCompID\u000134=2\u000152=19700102-10:17:36.789\u00011001=test2\u00011000=test1\u000110=204\u0001";
+
+        assertResult(expectedString);
+    }
+
+    @Test
+    public void testEncodeWithGroup() throws Exception {
+
+        Group group1 = fixMessage.newGroup(1002);
+        group1.add(1003, "g1-1");
+        group1.add(1004, "g1-2");
+
+        Group group2 = fixMessage.newGroup(1002);
+        group2.add(1003, "g2-1");
+        group2.add(1004, "g2-2");
+
+        encoder.encode(ctx, fixMessage, out);
+
+        verify(ctx).flush();
+
+        String expectedString = "8=FIX.4.2\u00019=136\u000135=0\u000149=SenderCompID\u000156=TargetCompID\u000134=2\u000152=19700102-10:17:36.789\u00011001=test2\u00011000=test1\u00011002=2\u00011003=g1-1\u00011004=g1-2\u00011003=g2-1\u00011004=g2-2\u000110=014\u0001";
+
+        assertResult(expectedString);
+    }
+
+    private void assertResult(String expectedString) {
+        final String string = new String(out.array(), out.arrayOffset(), out.readableBytes(), US_ASCII);
+        assertEquals(expectedString.length(), string.length());
 
         assertEquals(expectedString, string);
     }

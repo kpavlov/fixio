@@ -15,6 +15,7 @@
  */
 package fixio.fixprotocol;
 
+import java.util.Collection;
 import java.util.LinkedHashMap;
 
 public class Group extends FixMessageFragment {
@@ -40,6 +41,10 @@ public class Group extends FixMessageFragment {
         contents.put(tagNum, new Field(tagNum, value));
 
         return this;
+    }
+
+    public Collection<FixMessageFragment> getContents() {
+        return contents.values();
     }
 
 }
