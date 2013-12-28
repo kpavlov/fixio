@@ -20,6 +20,7 @@ import fixio.fixprotocol.*;
 import io.netty.buffer.ByteBuf;
 import io.netty.buffer.ByteBufAllocator;
 import io.netty.buffer.Unpooled;
+import io.netty.channel.ChannelHandler;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.handler.codec.MessageToByteEncoder;
 
@@ -32,11 +33,13 @@ import java.util.Date;
 import java.util.Locale;
 import java.util.TimeZone;
 
+@ChannelHandler.Sharable
 public class FixMessageEncoder extends MessageToByteEncoder<FixMessage> {
 
-    static final TimeZone UTC = TimeZone.getTimeZone("UTC");
-    static final Charset CHARSET = StandardCharsets.US_ASCII;
+    private static final TimeZone UTC = TimeZone.getTimeZone("UTC");
+    private static final Charset CHARSET = StandardCharsets.US_ASCII;
     private static final String UTC_TIMESTAMP_WITH_MILLIS_PATTERN = "yyyyMMdd-HH:mm:ss.SSS";
+
     private static final ThreadLocal<DateFormat> sdf = new ThreadLocal<DateFormat>() {
         @Override
         protected DateFormat initialValue() {
@@ -108,6 +111,8 @@ public class FixMessageEncoder extends MessageToByteEncoder<FixMessage> {
 
         headBuf.release();
         bodyBuf.release();
+        assert (headBuf.refCnt() == 0);
+        assert (bodyBuf.refCnt() == 0);
     }
 
     private void encodeHeader(FixMessageHeader header, ByteBuf out) {

@@ -38,6 +38,8 @@ import io.netty.handler.logging.LoggingHandler;
  */
 public abstract class FixChannelInitializer<C extends Channel> extends ChannelInitializer<C> {
 
+    private static final FixMessageEncoder ENCODER = new FixMessageEncoder();
+
     private final EventLoopGroup workerGroup;
     private final AdminEventHandler adminEventHandler;
     private final FixMessageHandler[] appMessageHandlers;
@@ -54,7 +56,7 @@ public abstract class FixChannelInitializer<C extends Channel> extends ChannelIn
         final ChannelPipeline pipeline = ch.pipeline();
         pipeline.addLast("tagDecoder", new DelimiterBasedFrameDecoder(1024, Unpooled.wrappedBuffer(new byte[]{1})));
         pipeline.addLast("fixMessageDecoder", new FixMessageDecoder());
-        pipeline.addLast("fixMessageEncoder", new FixMessageEncoder());
+        pipeline.addLast("fixMessageEncoder", ENCODER);
         pipeline.addLast("logging", new LoggingHandler("fix", LogLevel.DEBUG));
         pipeline.addLast("session", createSessionHandler()); // handle fix session
         pipeline.addLast("testRequest", testRequestHandler); // process test requests
