@@ -1,5 +1,5 @@
 /*
- * Copyright 2013 The FIX.io Project
+ * Copyright 2014 The FIX.io Project
  *
  * The FIX.io Project licenses this file to you under the Apache License,
  * version 2.0 (the "License"); you may not use this file except in compliance
@@ -23,23 +23,43 @@ import fixio.fixprotocol.MessageTypes;
 import fixio.fixprotocol.SimpleFixMessage;
 import fixio.handlers.FixApplicationAdapter;
 import io.netty.channel.ChannelHandlerContext;
-import io.netty.util.concurrent.ScheduledFuture;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.util.ArrayList;
 import java.util.List;
-import java.util.concurrent.TimeUnit;
+import java.util.Map;
+import java.util.concurrent.BlockingDeque;
+import java.util.concurrent.ConcurrentHashMap;
 
 class PriceStreamingApp extends FixApplicationAdapter {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(PriceStreamingApp.class);
-    private final ThreadLocal<ScheduledFuture> streamingFutureRef = new ThreadLocal<>();
+    private final BlockingDeque<Quote> quoteQueue;
+    private final Map<String, ChannelHandlerContext> subscriptions = new ConcurrentHashMap<>();
 
-    private static FixMessage createQuote(String reqId) {
-        SimpleFixMessage quote = new SimpleFixMessage(MessageTypes.QUOTE);
-        quote.add(FieldType.QuoteReqID, reqId);
+    public PriceStreamingApp(BlockingDeque<Quote> quoteQueue) {
+        this.quoteQueue = quoteQueue;
+        StreamingWorker streamingWorker = new StreamingWorker();
+        new Thread(streamingWorker, "StreamingWorker").start();
+    }
 
-        return quote;
+    ;
+
+    private static FixMessage createQuoteMessage(String reqId, Quote quote) {
+        SimpleFixMessage message = new SimpleFixMessage(MessageTypes.QUOTE);
+        message.add(FieldType.QuoteReqID, reqId);
+
+        message.add(645, String.format("%1$.5f", quote.getBid()));// MktBidPx
+        message.add(646, String.format("%1$.5f", quote.getOffer()));//MktOfferPx
+
+        return message;
+    }
+
+    private static void publish(final ChannelHandlerContext ctx, String reqId, Quote quote) {
+        FixMessage message = createQuoteMessage(reqId, quote);
+        LOGGER.trace("Submit quote.");
+        ctx.writeAndFlush(message);
     }
 
     @Override
@@ -50,45 +70,60 @@ class PriceStreamingApp extends FixApplicationAdapter {
     @Override
     protected void onLogout(ChannelHandlerContext ctx, LogoutEvent msg) {
         LOGGER.info("Logout.");
-        stopStreaming();
+        stopStreaming(ctx);
     }
 
-    private void stopStreaming() {
-        ScheduledFuture scheduledFuture = streamingFutureRef.get();
-        if (scheduledFuture == null) {
-            return;
+    private void stopStreaming(ChannelHandlerContext ctx) {
+        ArrayList<String> requestsToCancel = new ArrayList<>();
+        for (Map.Entry<String, ChannelHandlerContext> entry : subscriptions.entrySet()) {
+            if (entry.getValue() == ctx) {
+                requestsToCancel.add(entry.getKey());
+            }
         }
-        scheduledFuture.cancel(true);
-        streamingFutureRef.remove();
-        LOGGER.info("Streaming Stopped.");
+        for (String reqId : requestsToCancel) {
+            subscriptions.remove(reqId);
+        }
+        LOGGER.info("Streaming Stopped for {}", ctx);
     }
 
     @Override
     protected void onMessage(ChannelHandlerContext ctx, FixMessage msg, List<Object> out) throws Exception {
+        String reqId;
         switch (msg.getMessageType()) {
             case MessageTypes.QUOTE_REQUEST:
-                startStreaming(ctx, msg);
+                reqId = msg.getString(FieldType.QuoteReqID);
+                subscriptions.put(reqId, ctx);
+                LOGGER.debug("Subscribed with QuoteReqID={}", reqId);
                 break;
             case MessageTypes.QUOTE_CANCEL:
-                stopStreaming();
+                reqId = msg.getString(FieldType.QuoteReqID);
+                subscriptions.remove(reqId);
+                LOGGER.debug("Unsubscribed with QuoteReqID={}", reqId);
                 break;
         }
     }
 
-    private void startStreaming(final ChannelHandlerContext ctx, FixMessage msg) {
-        final String reqId = msg.getString(FieldType.QuoteReqID);
+    private class StreamingWorker implements Runnable {
 
-        ScheduledFuture<?> streamingFuture = ctx.executor().scheduleAtFixedRate(new Runnable() {
-            @Override
-            public void run() {
-                FixMessage quote = createQuote(reqId);
-                LOGGER.trace("Submit quote.");
-                ctx.writeAndFlush(quote);
+        private volatile boolean stopping;
+
+        @Override
+        public void run() {
+            Quote quote = null;
+            while (!stopping) {
+                try {
+                    quote = quoteQueue.takeFirst();
+                } catch (InterruptedException e) {
+
+                }
+                for (Map.Entry<String, ChannelHandlerContext> subscriptionEntry : subscriptions.entrySet()) {
+                    publish(subscriptionEntry.getValue(), subscriptionEntry.getKey(), quote);
+                }
             }
-        }, 5, 10, TimeUnit.NANOSECONDS);
+        }
 
-        streamingFutureRef.set(streamingFuture);
-        LOGGER.info("Streaming Started.");
+        public void stopWorker() {
+            stopping = true;
+        }
     }
-
 }

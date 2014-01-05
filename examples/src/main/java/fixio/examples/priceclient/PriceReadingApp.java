@@ -1,5 +1,5 @@
 /*
- * Copyright 2013 The FIX.io Project
+ * Copyright 2014 The FIX.io Project
  *
  * The FIX.io Project licenses this file to you under the Apache License,
  * version 2.0 (the "License"); you may not use this file except in compliance
@@ -35,6 +35,7 @@ class PriceReadingApp extends FixApplicationAdapter {
     private int counter;
     private long startTimeNanos;
     private boolean finished;
+    private String quoteRequestId;
 
     @Override
     protected void onLogon(ChannelHandlerContext ctx, LogonEvent msg) {
@@ -51,11 +52,14 @@ class PriceReadingApp extends FixApplicationAdapter {
                 onQuote(msg);
                 break;
         }
+        if (counter % 10000 == 0) {
+            LOGGER.debug("Read {} Quotes", counter);
+        }
         if (counter > MAX_QUOTE_COUNT && !finished) {
             finished = true;
 
             long timeMillis = (System.nanoTime() - startTimeNanos) / 1000000;
-            LOGGER.info("Read {} Quotes in {} ms, ~{} Quote/sec", counter, timeMillis, counter * 1000 / timeMillis);
+            LOGGER.info("Read {} Quotes in {} ms, ~{} Quote/sec", counter, timeMillis, counter * 1000.0 / timeMillis);
 
             ctx.writeAndFlush(createQuoteCancel()).addListener(ChannelFutureListener.CLOSE);
         }
@@ -69,12 +73,13 @@ class PriceReadingApp extends FixApplicationAdapter {
     private FixMessage createQuoteCancel() {
         SimpleFixMessage quoteCancel = new SimpleFixMessage(MessageTypes.QUOTE_CANCEL);//QuoteCancel
         quoteCancel.add(298, 4); //QuoteRequestType=AUTOMATIC
+        quoteCancel.add(131, quoteRequestId); //quoteReqId
         return quoteCancel;
     }
 
     private FixMessage createQuoteRequest() {
         SimpleFixMessage quoteRequest = new SimpleFixMessage(MessageTypes.QUOTE_REQUEST);
-        String quoteRequestId = Long.toHexString(System.currentTimeMillis());
+        quoteRequestId = Long.toHexString(System.currentTimeMillis());
         quoteRequest.add(131, quoteRequestId); //quoteReqId
         String clientReqId = quoteRequestId + counter;
         quoteRequest.add(11, clientReqId);
