@@ -50,8 +50,8 @@ class PriceStreamingApp extends FixApplicationAdapter {
         SimpleFixMessage message = new SimpleFixMessage(MessageTypes.QUOTE);
         message.add(FieldType.QuoteReqID, reqId);
 
-        message.add(645, String.format("%1$.5f", quote.getBid()));// MktBidPx
-        message.add(646, String.format("%1$.5f", quote.getOffer()));//MktOfferPx
+        message.add(FieldType.MktBidPx, String.format("%1$.5f", quote.getBid()));// MktBidPx
+        message.add(FieldType.MktOfferPx, String.format("%1$.5f", quote.getOffer()));//MktOfferPx
 
         return message;
     }

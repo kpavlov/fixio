@@ -16,10 +16,7 @@
 package fixio.examples.priceclient;
 
 import fixio.events.LogonEvent;
-import fixio.fixprotocol.FixMessage;
-import fixio.fixprotocol.Group;
-import fixio.fixprotocol.MessageTypes;
-import fixio.fixprotocol.SimpleFixMessage;
+import fixio.fixprotocol.*;
 import fixio.handlers.FixApplicationAdapter;
 import io.netty.channel.ChannelFutureListener;
 import io.netty.channel.ChannelHandlerContext;
@@ -30,8 +27,8 @@ import java.util.List;
 
 class PriceReadingApp extends FixApplicationAdapter {
 
-    private static final Logger LOGGER = LoggerFactory.getLogger(PriceReadingApp.class);
     public static final int MAX_QUOTE_COUNT = 100_000;
+    private static final Logger LOGGER = LoggerFactory.getLogger(PriceReadingApp.class);
     private int counter;
     private long startTimeNanos;
     private boolean finished;
@@ -72,28 +69,27 @@ class PriceReadingApp extends FixApplicationAdapter {
 
     private FixMessage createQuoteCancel() {
         SimpleFixMessage quoteCancel = new SimpleFixMessage(MessageTypes.QUOTE_CANCEL);//QuoteCancel
-        quoteCancel.add(298, 4); //QuoteRequestType=AUTOMATIC
-        quoteCancel.add(131, quoteRequestId); //quoteReqId
+        quoteCancel.add(FieldType.QuoteRequestType, "4"); //QuoteRequestType=AUTOMATIC
+        quoteCancel.add(FieldType.QuoteReqID, quoteRequestId); //quoteReqId
         return quoteCancel;
     }
 
     private FixMessage createQuoteRequest() {
         SimpleFixMessage quoteRequest = new SimpleFixMessage(MessageTypes.QUOTE_REQUEST);
         quoteRequestId = Long.toHexString(System.currentTimeMillis());
-        quoteRequest.add(131, quoteRequestId); //quoteReqId
+        quoteRequest.add(FieldType.QuoteReqID, quoteRequestId); //quoteReqId
         String clientReqId = quoteRequestId + counter;
         quoteRequest.add(11, clientReqId);
 
+        Group instrument1 = quoteRequest.newGroup(FieldType.NoRelatedSym);//noRelatedSym
+        instrument1.add(FieldType.Symbol, "EUR/USD");
+        instrument1.add(FieldType.SecurityType, "CURRENCY");
 
-        Group instrument1 = quoteRequest.newGroup(146);//noRelatedSym
-        instrument1.add(55, "EUR/USD");
-        instrument1.add(167, "CURRENCY");
+        Group instrument2 = quoteRequest.newGroup(FieldType.NoRelatedSym);//noRelatedSym
+        instrument2.add(FieldType.Symbol, "EUR/CHF");
+        instrument2.add(FieldType.SecurityType, "CURRENCY");
 
-        Group instrument2 = quoteRequest.newGroup(146);//noRelatedSym
-        instrument2.add(55, "EUR/CHF");
-        instrument2.add(167, "CURRENCY");
-
-        quoteRequest.add(303, 2); //QuoteRequestType=AUTOMATIC
+        quoteRequest.add(FieldType.QuoteRequestType, 2); //QuoteRequestType=AUTOMATIC
         return quoteRequest;
     }
 }
