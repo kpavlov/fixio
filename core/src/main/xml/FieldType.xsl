@@ -55,58 +55,56 @@
         private static final HashMap&lt;Integer,FieldType&gt; TYPES = new HashMap&lt;&gt;();
 
         static {
-        for (FieldType fieldType : FieldType.values()) {
-        if (fieldType.tag &gt; 0) {
-        TYPES.put(fieldType.tag, fieldType);
-        }
-        }
+            for (FieldType fieldType : FieldType.values()) {
+                if (fieldType.tag &gt; 0) {
+                    TYPES.put(fieldType.tag, fieldType);
+                }
+            }
         }
 
         public static FieldType forTag(int tag) {
-        FieldType fieldType = TYPES.get(tag);
-        return (fieldType != null) ? fieldType : UNKNOWN;
+            FieldType fieldType = TYPES.get(tag);
+            return (fieldType != null) ? fieldType : UNKNOWN;
         }
 
         private FieldType(int tag, DataType type) {
-        this.tag = tag;
-        this.type = type;
-        this.enumValues = null;
+            this.tag = tag;
+            this.type = type;
+            this.enumValues = null;
         }
 
         private FieldType(int tag, DataType type, String[] enumValues) {
-        this.tag = tag;
-        this.type = type;
-        this.enumValues = enumValues;
+            this.tag = tag;
+            this.type = type;
+            this.enumValues = enumValues;
         }
 
         public int tag() {
-        return tag;
+            return tag;
         }
 
         public DataType type() {
-        return type;
+            return type;
         }
 
         public String[] enumValues() {
-        return enumValues;
+            return enumValues;
         }
-        }
+    }
     </template>
 
     <template name="field" match="/fix/fields/field">
         <value-of select="@name"/>(<value-of select="@number"/>,
         <value-of select="@type"/>
         <if test="count(value) &gt; 0">
-            ,new String[]{
-            <apply-templates select="value"/>
+            ,new String[]{<apply-templates select="value"/>
             }
         </if>
         ),
     </template>
 
     <template match="value">
-        "<value-of select="@enum"/>",//
-        <value-of select="@description"/>
+        "<value-of select="@enum"/>",//<value-of select="@description"/>
     </template>
 
 </stylesheet>
