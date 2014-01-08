@@ -89,6 +89,7 @@
                 <groupId>net.sf.xsltmp</groupId>
                 <artifactId>xslt-generator-maven-plugin</artifactId>
                 <version>1.8</version>
+
                 <executions>
                     <execution>
                         <id>transform-fields</id>
@@ -103,6 +104,21 @@
                             <addDestDirTo>sources</addDestDirTo>
                             <fileNameRegex>.+\.xml</fileNameRegex>
                             <fileNameReplacement>fixio/fixprotocol/FieldType\.java</fileNameReplacement>
+                        </configuration>
+                    </execution>
+                    <execution>
+                        <id>transform-messages</id>
+                        <goals>
+                            <goal>many-to-many</goal>
+                        </goals>
+                        <configuration>
+                            <xslTemplate>src/main/xml/MessageType.xsl</xslTemplate>
+                            <srcDir>src/main/xml</srcDir>
+                            <destDir>target/generated-sources/java</destDir>
+                            <srcIncludes>FIX50SP2.xml</srcIncludes>
+                            <addDestDirTo>sources</addDestDirTo>
+                            <fileNameRegex>.+\.xml</fileNameRegex>
+                            <fileNameReplacement>fixio/fixprotocol/MessageType\.java</fileNameReplacement>
                         </configuration>
                     </execution>
                 </executions>
