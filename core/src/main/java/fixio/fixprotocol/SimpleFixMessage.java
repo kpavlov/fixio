@@ -28,6 +28,10 @@ public class SimpleFixMessage implements FixMessage {
     public SimpleFixMessage() {
     }
 
+    public SimpleFixMessage(MessageType messageType) {
+        header.setMessageType(messageType.getValue());
+    }
+
     public SimpleFixMessage(String messageType) {
         header.setMessageType(messageType);
     }
