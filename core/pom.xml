@@ -106,21 +106,6 @@
                             <fileNameReplacement>fixio/fixprotocol/FieldType\.java</fileNameReplacement>
                         </configuration>
                     </execution>
-                    <execution>
-                        <id>transform-messages</id>
-                        <goals>
-                            <goal>many-to-many</goal>
-                        </goals>
-                        <configuration>
-                            <xslTemplate>src/main/xml/MessageType.xsl</xslTemplate>
-                            <srcDir>src/main/xml</srcDir>
-                            <destDir>target/generated-sources/java</destDir>
-                            <srcIncludes>FIX50SP2.xml</srcIncludes>
-                            <addDestDirTo>sources</addDestDirTo>
-                            <fileNameRegex>.+\.xml</fileNameRegex>
-                            <fileNameReplacement>fixio/fixprotocol/MessageType\.java</fileNameReplacement>
-                        </configuration>
-                    </execution>
                 </executions>
             </plugin>
 

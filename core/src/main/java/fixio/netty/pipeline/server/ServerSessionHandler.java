@@ -67,7 +67,7 @@ public class ServerSessionHandler extends AbstractSessionHandler {
             if (fixSession != null) {
                 throw new IllegalStateException("Duplicate Logon Request. Session Already Established.");
             } else {
-                if (authenticator.authenticate(header)) {
+                if (authenticator.authenticate(msg)) {
                     fixSession = initSession(ctx, header);
 
                     final int msgSeqNum = header.getMsgSeqNum();

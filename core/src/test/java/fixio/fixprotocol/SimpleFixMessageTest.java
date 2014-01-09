@@ -55,7 +55,7 @@ public class SimpleFixMessageTest {
 
     @Test
     public void testWithGroups() {
-        SimpleFixMessage quoteRequest = new SimpleFixMessage(MessageType.QuoteRequest);
+        SimpleFixMessage quoteRequest = new SimpleFixMessage(MessageTypes.QUOTE_REQUEST);
         String quoteRequestId = randomAscii(3);
         quoteRequest.add(131, quoteRequestId); //quoteReqId
         String clientReqId = randomAscii(4);

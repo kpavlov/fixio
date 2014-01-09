@@ -16,7 +16,7 @@
 package fixio.netty.pipeline;
 
 import fixio.fixprotocol.FieldType;
-import fixio.fixprotocol.FixMessageHeader;
+import fixio.fixprotocol.FixMessage;
 import fixio.fixprotocol.MessageTypes;
 import fixio.fixprotocol.SimpleFixMessage;
 import fixio.handlers.FixMessageHandlerAdapter;
@@ -25,9 +25,9 @@ import fixio.netty.pipeline.server.FixAuthenticator;
 import io.netty.bootstrap.ServerBootstrap;
 import io.netty.channel.Channel;
 import io.netty.channel.ChannelPipeline;
+import io.netty.channel.DefaultEventLoopGroup;
 import io.netty.channel.EventLoopGroup;
 import io.netty.channel.local.LocalAddress;
-import io.netty.channel.local.LocalEventLoopGroup;
 import io.netty.channel.local.LocalServerChannel;
 import org.junit.After;
 import org.junit.Before;
@@ -56,11 +56,11 @@ public class ServerChannelPipelineIntegrationTest {
 
         LocalAddress address = LocalAddress.ANY;
 
-        EventLoopGroup workerGroup = new LocalEventLoopGroup();
+        EventLoopGroup workerGroup = new DefaultEventLoopGroup();
         final FixAcceptorChannelInitializer<Channel> channelInitializer = new FixAcceptorChannelInitializer<>(workerGroup, null);
         channelInitializer.setAuthenticator(authenticator);
 
-        serverChannel = (LocalServerChannel) b.group(new LocalEventLoopGroup())
+        serverChannel = (LocalServerChannel) b.group(new DefaultEventLoopGroup())
                 .channel(LocalServerChannel.class)
                 .handler(channelInitializer)
                 .childHandler(new FixMessageHandlerAdapter())
@@ -71,7 +71,7 @@ public class ServerChannelPipelineIntegrationTest {
 
         pipeline = serverChannel.pipeline();
 
-        when(authenticator.authenticate(any(FixMessageHeader.class))).thenReturn(true);
+        when(authenticator.authenticate(any(FixMessage.class))).thenReturn(true);
     }
 
     @After

@@ -50,7 +50,6 @@ public class ServerSessionHandlerTest {
     private ChannelHandlerContext ctx;
     @Captor
     private ArgumentCaptor<FixMessage> messageCaptor;
-    private Attribute<FixSession> sessionAttribute;
     private FixMessage logonMsg;
     private List<Object> outgoingMessages;
 
@@ -66,13 +65,13 @@ public class ServerSessionHandlerTest {
         header.setTargetCompID(randomAscii(4));
 
         AttributeKey<FixSession> fixSessionKey = AbstractSessionHandler.FIX_SESSION_KEY;
-        sessionAttribute = new AttributeMock<>();
-        when(ctx.attr(fixSessionKey)).thenReturn((Attribute) sessionAttribute);
+        Attribute<FixSession> sessionAttribute = new AttributeMock<>();
+        when(ctx.attr(fixSessionKey)).thenReturn(sessionAttribute);
     }
 
     @Test
     public void testLogonSuccess() throws Exception {
-        when(authenticator.authenticate(logonMsg.getHeader())).thenReturn(true);
+        when(authenticator.authenticate(same(logonMsg))).thenReturn(true);
 
         handler.decode(ctx, logonMsg, outgoingMessages);
 
@@ -90,7 +89,7 @@ public class ServerSessionHandlerTest {
 
     @Test
     public void testAuthenticationFailed() throws Exception {
-        when(authenticator.authenticate(logonMsg.getHeader())).thenReturn(false);
+        when(authenticator.authenticate(same(logonMsg))).thenReturn(false);
 
         handler.decode(ctx, logonMsg, outgoingMessages);
 
@@ -101,7 +100,7 @@ public class ServerSessionHandlerTest {
 
     @Test
     public void testSequenceTooHigh() throws Exception {
-        when(authenticator.authenticate(logonMsg.getHeader())).thenReturn(true);
+        when(authenticator.authenticate(same(logonMsg))).thenReturn(true);
         logonMsg.getHeader().setMsgSeqNum(2);
 
         handler.decode(ctx, logonMsg, outgoingMessages);
@@ -121,7 +120,7 @@ public class ServerSessionHandlerTest {
 
     @Test
     public void testSequenceNumberTooLow() throws Exception {
-        when(authenticator.authenticate(logonMsg.getHeader())).thenReturn(true);
+        when(authenticator.authenticate(same(logonMsg))).thenReturn(true);
         logonMsg.getHeader().setMsgSeqNum(0);
         ChannelFuture channelFeature = mock(ChannelFuture.class);
         when(ctx.writeAndFlush(any())).thenReturn(channelFeature);

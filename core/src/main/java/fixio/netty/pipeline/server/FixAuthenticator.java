@@ -16,8 +16,15 @@
 
 package fixio.netty.pipeline.server;
 
-import fixio.fixprotocol.FixMessageHeader;
+import fixio.fixprotocol.FixMessage;
 
 public interface FixAuthenticator {
-    boolean authenticate(FixMessageHeader header);
+
+    /**
+     * Verify credentials and returns true if acceptor authorize session initiator.
+     *
+     * @param logonMessage a Logon(35='A') message
+     * @return true if the session acceptor has authenticated the party requesting connection.
+     */
+    boolean authenticate(FixMessage logonMessage);
 }

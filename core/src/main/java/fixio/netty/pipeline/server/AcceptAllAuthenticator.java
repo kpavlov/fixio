@@ -16,7 +16,7 @@
 
 package fixio.netty.pipeline.server;
 
-import fixio.fixprotocol.FixMessageHeader;
+import fixio.fixprotocol.FixMessage;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -25,10 +25,10 @@ public class AcceptAllAuthenticator implements FixAuthenticator {
     private static final Logger LOGGER = LoggerFactory.getLogger(AcceptAllAuthenticator.class);
 
     @Override
-    public boolean authenticate(FixMessageHeader header) {
-        LOGGER.info("Received Auth Request: {}", header);
+    public boolean authenticate(FixMessage logonMessage) {
+        LOGGER.info("Received Auth Request: {}", logonMessage);
 
-        LOGGER.info("Authentication Successful: {}", header);
+        LOGGER.info("Authentication Successful.");
         return true;
     }
 }
