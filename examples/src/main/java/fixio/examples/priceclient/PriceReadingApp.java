@@ -67,15 +67,15 @@ class PriceReadingApp extends FixApplicationAdapter {
         counter++;
     }
 
-    private FixMessage createQuoteCancel() {
-        FixMessageBuilderImpl quoteCancel = new FixMessageBuilderImpl(MessageTypes.QUOTE_CANCEL);//QuoteCancel
+    private FixMessageBuilder createQuoteCancel() {
+        FixMessageBuilder quoteCancel = new FixMessageBuilderImpl(MessageTypes.QUOTE_CANCEL);//QuoteCancel
         quoteCancel.add(FieldType.QuoteRequestType, "4"); //QuoteRequestType=AUTOMATIC
         quoteCancel.add(FieldType.QuoteReqID, quoteRequestId); //quoteReqId
         return quoteCancel;
     }
 
-    private FixMessage createQuoteRequest() {
-        FixMessageBuilderImpl quoteRequest = new FixMessageBuilderImpl(MessageTypes.QUOTE_REQUEST);
+    private FixMessageBuilder createQuoteRequest() {
+        FixMessageBuilder quoteRequest = new FixMessageBuilderImpl(MessageTypes.QUOTE_REQUEST);
         quoteRequestId = Long.toHexString(System.currentTimeMillis());
         quoteRequest.add(FieldType.QuoteReqID, quoteRequestId); //quoteReqId
         String clientReqId = quoteRequestId + counter;

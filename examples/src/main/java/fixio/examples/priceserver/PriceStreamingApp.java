@@ -17,10 +17,7 @@ package fixio.examples.priceserver;
 
 import fixio.events.LogonEvent;
 import fixio.events.LogoutEvent;
-import fixio.fixprotocol.FieldType;
-import fixio.fixprotocol.FixMessage;
-import fixio.fixprotocol.FixMessageBuilderImpl;
-import fixio.fixprotocol.MessageTypes;
+import fixio.fixprotocol.*;
 import fixio.handlers.FixApplicationAdapter;
 import io.netty.channel.ChannelHandlerContext;
 import org.slf4j.Logger;
@@ -44,9 +41,7 @@ class PriceStreamingApp extends FixApplicationAdapter {
         new Thread(streamingWorker, "StreamingWorker").start();
     }
 
-    ;
-
-    private static FixMessage createQuoteMessage(String reqId, Quote quote) {
+    private static FixMessageBuilder createQuoteMessage(String reqId, Quote quote) {
         FixMessageBuilderImpl message = new FixMessageBuilderImpl(MessageTypes.QUOTE);
         message.add(FieldType.QuoteReqID, reqId);
 
@@ -57,7 +52,7 @@ class PriceStreamingApp extends FixApplicationAdapter {
     }
 
     private static void publish(final ChannelHandlerContext ctx, String reqId, Quote quote) {
-        FixMessage message = createQuoteMessage(reqId, quote);
+        FixMessageBuilder message = createQuoteMessage(reqId, quote);
         LOGGER.trace("Submit quote.");
         ctx.writeAndFlush(message);
     }

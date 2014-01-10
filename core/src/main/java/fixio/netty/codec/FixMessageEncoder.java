@@ -34,7 +34,7 @@ import java.util.Locale;
 import java.util.TimeZone;
 
 @ChannelHandler.Sharable
-public class FixMessageEncoder extends MessageToByteEncoder<FixMessage> {
+public class FixMessageEncoder extends MessageToByteEncoder<FixMessageBuilder> {
 
     private static final TimeZone UTC = TimeZone.getTimeZone("UTC");
     private static final Charset CHARSET = StandardCharsets.US_ASCII;
@@ -81,7 +81,7 @@ public class FixMessageEncoder extends MessageToByteEncoder<FixMessage> {
     }
 
     @Override
-    public void encode(ChannelHandlerContext ctx, FixMessage msg, ByteBuf out) throws Exception {
+    public void encode(ChannelHandlerContext ctx, FixMessageBuilder msg, ByteBuf out) throws Exception {
         final int initialOffset = out.writerIndex();
         final FixMessageHeader header = msg.getHeader();
 
@@ -134,7 +134,7 @@ public class FixMessageEncoder extends MessageToByteEncoder<FixMessage> {
         writeField(52, timeStr, out);
     }
 
-    private ByteBuf createBodyBuf(FixMessage msg, FixMessageHeader header) {
+    private ByteBuf createBodyBuf(FixMessageBuilder msg, FixMessageHeader header) {
         final ByteBuf payloadBuf = Unpooled.buffer();
 
         encodeHeader(header, payloadBuf);
