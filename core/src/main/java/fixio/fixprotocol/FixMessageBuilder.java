@@ -1,5 +1,5 @@
 /*
- * Copyright 2013 The FIX.io Project
+ * Copyright 2014 The FIX.io Project
  *
  * The FIX.io Project licenses this file to you under the Apache License,
  * version 2.0 (the "License"); you may not use this file except in compliance
@@ -13,34 +13,29 @@
  * License for the specific language governing permissions and limitations
  * under the License.
  */
-
 package fixio.fixprotocol;
 
 import java.util.List;
 
 /**
- * Represents incoming FIX Protocol message.
+ * Represents outgoing FIX Protocol message.
+ * <p/>
+ * Messages of this type are passed into {@link fixio.netty.codec.FixMessageEncoder}.
  */
-public interface FixMessage {
-
-    String FIX_4_0 = "FIX.4.0";
-    String FIX_4_1 = "FIX.4.1";
-    String FIX_4_2 = "FIX.4.2";
-    String FIX_4_3 = "FIX.4.3";
-    String FIX_4_4 = "FIX.4.4";
-
+public interface FixMessageBuilder {
     FixMessageHeader getHeader();
 
     List<FixMessageFragment> getBody();
 
-    Integer getInt(int tagNum);
+    Group newGroup(int tagNum);
 
-    Integer getInt(FieldType field);
+    FixMessageBuilder add(FieldType quoteReqID, String quoteRequestId);
 
-    String getString(int tagNum);
+    FixMessageBuilder add(FieldType field, int value);
 
-    String getString(FieldType field);
+    Group newGroup(FieldType fieldType);
 
-    String getMessageType();
+    FixMessageBuilder add(int tagNum, String value);
 
+    FixMessageBuilder add(int tagNum, int value);
 }
