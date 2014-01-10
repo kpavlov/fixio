@@ -58,7 +58,7 @@ public class ServerSessionHandlerTest {
         handler = new ServerSessionHandler(authenticator);
         outgoingMessages = new ArrayList<>();
 
-        logonMsg = new SimpleFixMessage(MessageTypes.LOGON);
+        logonMsg = new FixMessageBuilderImpl(MessageTypes.LOGON);
         FixMessageHeader header = logonMsg.getHeader();
         header.setMsgSeqNum(1);
         header.setSenderCompID(randomAscii(3));

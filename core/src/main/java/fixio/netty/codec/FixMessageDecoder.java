@@ -16,7 +16,7 @@
 
 package fixio.netty.codec;
 
-import fixio.fixprotocol.SimpleFixMessage;
+import fixio.fixprotocol.FixMessageBuilderImpl;
 import io.netty.buffer.ByteBuf;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.handler.codec.DecoderException;
@@ -48,7 +48,7 @@ import static java.nio.charset.StandardCharsets.US_ASCII;
  */
 public class FixMessageDecoder extends MessageToMessageDecoder<ByteBuf> {
 
-    private SimpleFixMessage message;
+    private FixMessageBuilderImpl message;
     private int checksum;
 
     @Override
@@ -81,7 +81,7 @@ public class FixMessageDecoder extends MessageToMessageDecoder<ByteBuf> {
                 if (message != null) {
                     throw new DecoderException("Unexpected BeginString(8)");
                 }
-                message = new SimpleFixMessage();
+                message = new FixMessageBuilderImpl();
                 checksum = sumBytes;
                 message.add(tagNum, value);
                 break;

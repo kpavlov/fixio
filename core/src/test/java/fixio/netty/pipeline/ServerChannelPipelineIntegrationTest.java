@@ -17,8 +17,8 @@ package fixio.netty.pipeline;
 
 import fixio.fixprotocol.FieldType;
 import fixio.fixprotocol.FixMessage;
+import fixio.fixprotocol.FixMessageBuilderImpl;
 import fixio.fixprotocol.MessageTypes;
-import fixio.fixprotocol.SimpleFixMessage;
 import fixio.handlers.FixMessageHandlerAdapter;
 import fixio.netty.pipeline.server.FixAcceptorChannelInitializer;
 import fixio.netty.pipeline.server.FixAuthenticator;
@@ -81,7 +81,7 @@ public class ServerChannelPipelineIntegrationTest {
 
     @Test
     public void processLogonSuccess() {
-        final SimpleFixMessage logon = new SimpleFixMessage(MessageTypes.LOGON);
+        final FixMessageBuilderImpl logon = new FixMessageBuilderImpl(MessageTypes.LOGON);
         logon.getHeader().setSenderCompID(randomAscii(3));
         logon.getHeader().setTargetCompID(randomAscii(4));
 
@@ -91,7 +91,7 @@ public class ServerChannelPipelineIntegrationTest {
 
     @Test
     public void processHeartbeat() {
-        final SimpleFixMessage testRequest = new SimpleFixMessage(MessageTypes.TEST_REQUEST);
+        final FixMessageBuilderImpl testRequest = new FixMessageBuilderImpl(MessageTypes.TEST_REQUEST);
         testRequest.getHeader().setSenderCompID(randomAscii(3));
         testRequest.getHeader().setTargetCompID(randomAscii(4));
 

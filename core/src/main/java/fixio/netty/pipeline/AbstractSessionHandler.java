@@ -90,7 +90,7 @@ public abstract class AbstractSessionHandler extends MessageToMessageCodec<FixMe
     protected abstract Logger getLogger();
 
     protected void sendReject(ChannelHandlerContext ctx, FixMessage originalMsg, boolean closeConnection) {
-        final SimpleFixMessage reject = createReject(originalMsg);
+        final FixMessageBuilderImpl reject = createReject(originalMsg);
 
         ChannelFuture channelFuture = ctx.writeAndFlush(reject);
         if (closeConnection) {
@@ -98,8 +98,8 @@ public abstract class AbstractSessionHandler extends MessageToMessageCodec<FixMe
         }
     }
 
-    protected SimpleFixMessage createReject(FixMessage originalMsg) {
-        final SimpleFixMessage reject = new SimpleFixMessage(MessageTypes.REJECT);
+    protected FixMessageBuilderImpl createReject(FixMessage originalMsg) {
+        final FixMessageBuilderImpl reject = new FixMessageBuilderImpl(MessageTypes.REJECT);
         reject.add(FieldType.RefSeqNum, originalMsg.getInt(FieldType.MsgSeqNum.tag()));
         reject.add(FieldType.RefMsgType, originalMsg.getMessageType());
         return reject;

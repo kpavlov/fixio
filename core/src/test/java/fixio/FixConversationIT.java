@@ -17,7 +17,7 @@ package fixio;
 
 import fixio.events.LogonEvent;
 import fixio.fixprotocol.FixMessage;
-import fixio.fixprotocol.SimpleFixMessage;
+import fixio.fixprotocol.FixMessageBuilderImpl;
 import fixio.handlers.FixApplicationAdapter;
 import fixio.handlers.FixMessageHandlerAdapter;
 import io.netty.channel.ChannelFuture;
@@ -50,7 +50,7 @@ public class FixConversationIT {
     }
 
     private static FixMessage createUserStatusRequest() {
-        SimpleFixMessage userRequest = new SimpleFixMessage("BE");
+        FixMessageBuilderImpl userRequest = new FixMessageBuilderImpl("BE");
         userRequest.add(923, "UserRequestID");//UserRequestID
         userRequest.add(924, 4);//UserRequestType=RequestIndividualUserStatus
         userRequest.add(553, "user");//553 Username
@@ -58,7 +58,7 @@ public class FixConversationIT {
     }
 
     private static FixMessage createUserStatusReport() {
-        SimpleFixMessage userRequest = new SimpleFixMessage("BF");
+        FixMessageBuilderImpl userRequest = new FixMessageBuilderImpl("BF");
         userRequest.add(923, "UserRequestID");//UserRequestID
         userRequest.add(553, "user");//553 Username
         userRequest.add(926, 1);

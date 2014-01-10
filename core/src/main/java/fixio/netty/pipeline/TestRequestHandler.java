@@ -17,8 +17,8 @@
 package fixio.netty.pipeline;
 
 import fixio.fixprotocol.FixMessage;
+import fixio.fixprotocol.FixMessageBuilderImpl;
 import fixio.fixprotocol.MessageTypes;
-import fixio.fixprotocol.SimpleFixMessage;
 import io.netty.channel.ChannelHandler;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.handler.codec.MessageToMessageDecoder;
@@ -46,7 +46,7 @@ public class TestRequestHandler extends MessageToMessageDecoder<FixMessage> {
             return;
         }
         final String testReqId = msg.getString(TestReqID.tag());
-        final SimpleFixMessage builder = new SimpleFixMessage(MessageTypes.HEARTBEAT);
+        final FixMessageBuilderImpl builder = new FixMessageBuilderImpl(MessageTypes.HEARTBEAT);
         builder.add(TestReqID.tag(), testReqId);
 
         ctx.writeAndFlush(builder);

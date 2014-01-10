@@ -19,8 +19,8 @@ import fixio.events.LogonEvent;
 import fixio.events.LogoutEvent;
 import fixio.fixprotocol.FieldType;
 import fixio.fixprotocol.FixMessage;
+import fixio.fixprotocol.FixMessageBuilderImpl;
 import fixio.fixprotocol.MessageTypes;
-import fixio.fixprotocol.SimpleFixMessage;
 import fixio.handlers.FixApplicationAdapter;
 import io.netty.channel.ChannelHandlerContext;
 import org.slf4j.Logger;
@@ -47,7 +47,7 @@ class PriceStreamingApp extends FixApplicationAdapter {
     ;
 
     private static FixMessage createQuoteMessage(String reqId, Quote quote) {
-        SimpleFixMessage message = new SimpleFixMessage(MessageTypes.QUOTE);
+        FixMessageBuilderImpl message = new FixMessageBuilderImpl(MessageTypes.QUOTE);
         message.add(FieldType.QuoteReqID, reqId);
 
         message.add(FieldType.MktBidPx, String.format("%1$.5f", quote.getBid()));// MktBidPx

@@ -40,7 +40,7 @@ public class FixMessageEncoderTest {
     private ChannelHandlerContext ctx;
     @Mock
     private ByteBufAllocator byteBufAllocator;
-    private SimpleFixMessage fixMessage;
+    private FixMessageBuilderImpl fixMessage;
     private ByteBuf out;
     private long timestamp = 123456789;
 
@@ -55,7 +55,7 @@ public class FixMessageEncoderTest {
         when(byteBufAllocator.buffer()).thenReturn(Unpooled.buffer());
 
 
-        SimpleFixMessage fixMessage = new SimpleFixMessage();
+        FixMessageBuilderImpl fixMessage = new FixMessageBuilderImpl();
 
         FixMessageHeader header = fixMessage.getHeader();
 

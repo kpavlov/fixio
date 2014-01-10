@@ -15,8 +15,8 @@
  */
 package fixio.netty.pipeline;
 
+import fixio.fixprotocol.FixMessageBuilderImpl;
 import fixio.fixprotocol.MessageTypes;
-import fixio.fixprotocol.SimpleFixMessage;
 import io.netty.channel.ChannelHandlerContext;
 import org.junit.Before;
 import org.junit.Test;
@@ -39,11 +39,11 @@ public class TestRequestHandlerTest {
 
     private TestRequestHandler handler;
     @Mock
-    private SimpleFixMessage fixMessage;
+    private FixMessageBuilderImpl fixMessage;
     @Mock
     private ChannelHandlerContext ctx;
     @Captor
-    private ArgumentCaptor<SimpleFixMessage> messageBuilderCaptor;
+    private ArgumentCaptor<FixMessageBuilderImpl> messageBuilderCaptor;
 
     @Before
     public void setUp() throws Exception {
@@ -82,7 +82,7 @@ public class TestRequestHandlerTest {
 
         verify(ctx, times(1)).writeAndFlush(messageBuilderCaptor.capture());
 
-        final SimpleFixMessage fixMessageBuilder = messageBuilderCaptor.getValue();
+        final FixMessageBuilderImpl fixMessageBuilder = messageBuilderCaptor.getValue();
 
         assertEquals(MessageTypes.HEARTBEAT, fixMessageBuilder.getMessageType());
         assertEquals(fixMessageBuilder.getString(TestReqID.tag()), testReqId);

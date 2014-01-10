@@ -50,7 +50,7 @@ public class ServerSessionHandler extends AbstractSessionHandler {
     }
 
     private FixMessage createLogonResponse() {
-        SimpleFixMessage logonResponse = new SimpleFixMessage(MessageTypes.LOGON);
+        FixMessageBuilderImpl logonResponse = new FixMessageBuilderImpl(MessageTypes.LOGON);
         logonResponse.add(FieldType.HeartBtInt, heartbeatIntervalSec);
         return logonResponse;
     }
@@ -89,7 +89,7 @@ public class ServerSessionHandler extends AbstractSessionHandler {
                     ctx.write(logonResponse);
 
                     if (seqTooHigh) {
-                        FixMessage resendRequest = new SimpleFixMessage(MessageTypes.RESEND_REQUEST);
+                        FixMessage resendRequest = new FixMessageBuilderImpl(MessageTypes.RESEND_REQUEST);
                         updateFixMessageHeader(ctx, resendRequest);
                         ctx.write(resendRequest);
                     }
@@ -120,7 +120,7 @@ public class ServerSessionHandler extends AbstractSessionHandler {
     private void sendLogoutAndClose(ChannelHandlerContext ctx, String text) {
         //rejected logon
 
-        SimpleFixMessage logout = new SimpleFixMessage(MessageTypes.LOGOUT);
+        FixMessageBuilderImpl logout = new FixMessageBuilderImpl(MessageTypes.LOGOUT);
         if (text != null) {
             logout.add(58, text);
         }

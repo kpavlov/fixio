@@ -16,8 +16,8 @@
 package fixio.fixprotocol.session;
 
 import fixio.fixprotocol.FixMessage;
+import fixio.fixprotocol.FixMessageBuilderImpl;
 import fixio.fixprotocol.FixMessageHeader;
-import fixio.fixprotocol.SimpleFixMessage;
 import org.junit.Before;
 import org.junit.Test;
 
@@ -58,7 +58,7 @@ public class FixSessionTest {
         int nextOutgoingMsgSeqNum = new Random().nextInt(100);
         session.setNextOutgoingMessageSeqNum(nextOutgoingMsgSeqNum);
 
-        FixMessage messageBuilder = new SimpleFixMessage();
+        FixMessage messageBuilder = new FixMessageBuilderImpl();
 
         session.prepareOutgoing(messageBuilder);
 

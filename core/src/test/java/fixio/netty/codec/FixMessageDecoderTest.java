@@ -15,9 +15,9 @@
  */
 package fixio.netty.codec;
 
+import fixio.fixprotocol.FixMessageBuilderImpl;
 import fixio.fixprotocol.FixMessageHeader;
 import fixio.fixprotocol.MessageTypes;
-import fixio.fixprotocol.SimpleFixMessage;
 import io.netty.buffer.Unpooled;
 import org.junit.BeforeClass;
 import org.junit.Test;
@@ -43,8 +43,8 @@ public class FixMessageDecoderTest {
         List<Object> result = decode("8=FIX.4.1\u00019=90\u000135=0\u000149=INVMGR\u000156=BRKR\u000134=240\u000152=19980604-08:03:31\u000110=129\u0001");
 
         assertEquals(1, result.size());
-        assertTrue(result.get(0) instanceof SimpleFixMessage);
-        final SimpleFixMessage fixMessage = (SimpleFixMessage) result.get(0);
+        assertTrue(result.get(0) instanceof FixMessageBuilderImpl);
+        final FixMessageBuilderImpl fixMessage = (FixMessageBuilderImpl) result.get(0);
 
         FixMessageHeader header = fixMessage.getHeader();
 

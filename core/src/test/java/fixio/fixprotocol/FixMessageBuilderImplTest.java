@@ -24,13 +24,13 @@ import static org.apache.commons.lang3.RandomStringUtils.randomAscii;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertSame;
 
-public class SimpleFixMessageTest {
+public class FixMessageBuilderImplTest {
 
-    private SimpleFixMessage fixMessage;
+    private FixMessageBuilderImpl fixMessage;
 
     @Before
     public void setUp() throws Exception {
-        fixMessage = new SimpleFixMessage();
+        fixMessage = new FixMessageBuilderImpl();
     }
 
     @Test
@@ -45,7 +45,7 @@ public class SimpleFixMessageTest {
         fixMessage.getHeader().setSenderCompID(senderCompID);
         fixMessage.getHeader().setTargetCompID(targetCompID);
 
-        //SimpleFixMessage fixMessage = builder.build();
+        //FixMessageBuilderImpl fixMessage = builder.build();
 
         assertEquals("beginString", beginString, fixMessage.getHeader().getBeginString());
         assertEquals("msgType", msgType, fixMessage.getMessageType());
@@ -55,7 +55,7 @@ public class SimpleFixMessageTest {
 
     @Test
     public void testWithGroups() {
-        SimpleFixMessage quoteRequest = new SimpleFixMessage(MessageTypes.QUOTE_REQUEST);
+        FixMessageBuilderImpl quoteRequest = new FixMessageBuilderImpl(MessageTypes.QUOTE_REQUEST);
         String quoteRequestId = randomAscii(3);
         quoteRequest.add(131, quoteRequestId); //quoteReqId
         String clientReqId = randomAscii(4);

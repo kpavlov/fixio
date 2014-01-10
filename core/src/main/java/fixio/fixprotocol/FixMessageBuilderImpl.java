@@ -19,36 +19,36 @@ package fixio.fixprotocol;
 import java.util.LinkedList;
 import java.util.List;
 
-public class SimpleFixMessage implements FixMessage {
+public class FixMessageBuilderImpl implements FixMessage, FixMessageBuilder {
 
     private final FixMessageHeader header = new FixMessageHeader();
     private final FixMessageTrailer trailer = new FixMessageTrailer();
     private final List<FixMessageFragment> body = new LinkedList<>();
 
-    public SimpleFixMessage() {
+    public FixMessageBuilderImpl() {
     }
 
-    public SimpleFixMessage(String messageType) {
+    public FixMessageBuilderImpl(String messageType) {
         header.setMessageType(messageType);
     }
 
-    public SimpleFixMessage add(FieldType field, int value) {
+    public FixMessageBuilderImpl add(FieldType field, int value) {
         assert (field != null) : "Tag must be specified.";
         return add(field, String.valueOf(value));
     }
 
-    public SimpleFixMessage add(int tagNum, int value) {
+    public FixMessageBuilderImpl add(int tagNum, int value) {
         assert (tagNum > 0) : "Tag must be positive.";
         return add(tagNum, String.valueOf(value));
     }
 
-    public SimpleFixMessage add(FieldType field, String value) {
+    public FixMessageBuilderImpl add(FieldType field, String value) {
         assert (field != null) : "Tag must be specified.";
         assert (value != null) : "Value must be specified.";
         return add(field.tag(), value);
     }
 
-    public SimpleFixMessage add(int tagNum, String value) {
+    public FixMessageBuilderImpl add(int tagNum, String value) {
         assert (tagNum > 0) : "TagNum must be positive. Got " + tagNum;
         assert (value != null) : "Value must be specified.";
         switch (tagNum) {
@@ -166,7 +166,7 @@ public class SimpleFixMessage implements FixMessage {
 
     @Override
     public String toString() {
-        final StringBuilder sb = new StringBuilder("SimpleFixMessage{");
+        final StringBuilder sb = new StringBuilder("FixMessageBuilderImpl{");
         sb.append("header=").append(header);
         sb.append(", body=").append(body);
         sb.append(", trailer=").append(trailer);
