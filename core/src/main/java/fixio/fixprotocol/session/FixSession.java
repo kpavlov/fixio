@@ -16,7 +16,7 @@
 
 package fixio.fixprotocol.session;
 
-import fixio.fixprotocol.FixMessage;
+import fixio.fixprotocol.FixMessageBuilder;
 import fixio.fixprotocol.FixMessageHeader;
 
 import java.util.concurrent.atomic.AtomicInteger;
@@ -88,7 +88,7 @@ public class FixSession {
         return INCOMING_SEQ_NUM_UPDATER.compareAndSet(this, num, num + 1);
     }
 
-    public void prepareOutgoing(FixMessage fixMessage) {
+    public void prepareOutgoing(FixMessageBuilder fixMessage) {
         FixMessageHeader header = fixMessage.getHeader();
         header.setBeginString(beginString);
         header.setMessageType(fixMessage.getHeader().getMessageType());

@@ -17,6 +17,7 @@ package fixio.netty.pipeline;
 
 import fixio.fixprotocol.FieldType;
 import fixio.fixprotocol.FixMessage;
+import fixio.fixprotocol.FixMessageBuilder;
 import fixio.fixprotocol.MessageTypes;
 import io.netty.channel.ChannelHandlerContext;
 import org.junit.Before;
@@ -52,7 +53,7 @@ public class AbstractSessionHandlerTest {
     public void setUp() {
         sessionHandler = new AbstractSessionHandler() {
             @Override
-            protected void encode(ChannelHandlerContext ctx, FixMessage msg, List<Object> out) throws Exception {
+            protected void encode(ChannelHandlerContext ctx, FixMessageBuilder msg, List<Object> out) throws Exception {
             }
 
             @Override

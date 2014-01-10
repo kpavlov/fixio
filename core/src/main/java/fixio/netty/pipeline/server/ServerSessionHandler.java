@@ -49,8 +49,8 @@ public class ServerSessionHandler extends AbstractSessionHandler {
         return LOGGER;
     }
 
-    private FixMessage createLogonResponse() {
-        FixMessageBuilderImpl logonResponse = new FixMessageBuilderImpl(MessageTypes.LOGON);
+    private FixMessageBuilder createLogonResponse() {
+        FixMessageBuilder logonResponse = new FixMessageBuilderImpl(MessageTypes.LOGON);
         logonResponse.add(FieldType.HeartBtInt, heartbeatIntervalSec);
         return logonResponse;
     }
@@ -83,13 +83,13 @@ public class ServerSessionHandler extends AbstractSessionHandler {
                         }
                     }
 
-                    final FixMessage logonResponse = createLogonResponse();
+                    final FixMessageBuilder logonResponse = createLogonResponse();
                     updateFixMessageHeader(ctx, logonResponse);
                     LOGGER.info("Sending Logon Response: {}", logonResponse);
                     ctx.write(logonResponse);
 
                     if (seqTooHigh) {
-                        FixMessage resendRequest = new FixMessageBuilderImpl(MessageTypes.RESEND_REQUEST);
+                        FixMessageBuilder resendRequest = new FixMessageBuilderImpl(MessageTypes.RESEND_REQUEST);
                         updateFixMessageHeader(ctx, resendRequest);
                         ctx.write(resendRequest);
                     }

@@ -17,6 +17,7 @@
 package fixio.netty.pipeline.client;
 
 import fixio.fixprotocol.FixMessage;
+import fixio.fixprotocol.FixMessageBuilder;
 import fixio.handlers.AdminEventHandler;
 import fixio.handlers.FixMessageHandler;
 import fixio.netty.pipeline.FixChannelInitializer;
@@ -37,7 +38,7 @@ public class FixInitiatorChannelInitializer<C extends Channel> extends FixChanne
     }
 
     @Override
-    protected MessageToMessageCodec<FixMessage, FixMessage> createSessionHandler() {
+    protected MessageToMessageCodec<FixMessage, FixMessageBuilder> createSessionHandler() {
         return new ClientSessionHandler(settingsProvider);
     }
 }

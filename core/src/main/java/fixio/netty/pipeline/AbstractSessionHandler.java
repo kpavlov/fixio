@@ -28,13 +28,13 @@ import org.slf4j.Logger;
 
 import java.util.List;
 
-public abstract class AbstractSessionHandler extends MessageToMessageCodec<FixMessage, FixMessage> {
+public abstract class AbstractSessionHandler extends MessageToMessageCodec<FixMessage, FixMessageBuilder> {
 
     public static final AttributeKey<FixSession> FIX_SESSION_KEY = AttributeKey.valueOf("fixSession");
 
     private Clock clock = Clock.systemUTC();
 
-    protected void updateFixMessageHeader(ChannelHandlerContext ctx, FixMessage response) {
+    protected void updateFixMessageHeader(ChannelHandlerContext ctx, FixMessageBuilder response) {
         getSession(ctx).prepareOutgoing(response);
         response.getHeader().setSendingTime(clock.millis());
     }
@@ -63,7 +63,7 @@ public abstract class AbstractSessionHandler extends MessageToMessageCodec<FixMe
     }
 
     @Override
-    protected void encode(ChannelHandlerContext ctx, FixMessage msg, List<Object> out) throws Exception {
+    protected void encode(ChannelHandlerContext ctx, FixMessageBuilder msg, List<Object> out) throws Exception {
         updateFixMessageHeader(ctx, msg);
         getLogger().trace("Sending outbound: {}", msg);
         out.add(msg);

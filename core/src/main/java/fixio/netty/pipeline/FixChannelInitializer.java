@@ -17,6 +17,7 @@
 package fixio.netty.pipeline;
 
 import fixio.fixprotocol.FixMessage;
+import fixio.fixprotocol.FixMessageBuilder;
 import fixio.handlers.AdminEventHandler;
 import fixio.handlers.FixMessageHandler;
 import fixio.netty.codec.FixMessageDecoder;
@@ -68,5 +69,5 @@ public abstract class FixChannelInitializer<C extends Channel> extends ChannelIn
         }
     }
 
-    protected abstract MessageToMessageCodec<FixMessage, FixMessage> createSessionHandler();
+    protected abstract MessageToMessageCodec<FixMessage, FixMessageBuilder> createSessionHandler();
 }

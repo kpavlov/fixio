@@ -17,10 +17,7 @@
 package fixio.netty.pipeline.client;
 
 import fixio.events.LogonEvent;
-import fixio.fixprotocol.FixMessage;
-import fixio.fixprotocol.FixMessageBuilderImpl;
-import fixio.fixprotocol.FixMessageHeader;
-import fixio.fixprotocol.MessageTypes;
+import fixio.fixprotocol.*;
 import fixio.fixprotocol.session.FixSession;
 import fixio.netty.pipeline.AbstractSessionHandler;
 import io.netty.channel.ChannelHandlerContext;
@@ -64,7 +61,7 @@ public class ClientSessionHandler extends AbstractSessionHandler {
     public void channelActive(ChannelHandlerContext ctx) throws Exception {
         getLogger().info("Connection established, starting Client FIX session.");
 
-        FixMessageBuilderImpl logonRequest = new FixMessageBuilderImpl(MessageTypes.LOGON);
+        FixMessageBuilder logonRequest = new FixMessageBuilderImpl(MessageTypes.LOGON);
 
         FixSession pendingSession = createSession(sessionSettingsProvider);
         setSession(ctx, pendingSession);
