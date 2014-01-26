@@ -13,36 +13,30 @@
  * License for the specific language governing permissions and limitations
  * under the License.
  */
+package fixio.fixprotocol.fields;
 
-package fixio.fixprotocol;
+public class BooleanField extends AbstractField<Boolean> {
 
-import java.util.List;
+    private final boolean value;
+    private final byte[] TRUE_BYTES = new byte[]{(byte) 'Y'};
+    private final byte[] FALSE_BYTES = new byte[]{(byte) 'N'};
 
-/**
- * Represents incoming FIX Protocol message.
- */
-public interface FixMessage {
+    protected BooleanField(int tagNum, boolean value) {
+        super(tagNum);
+        this.value = value;
+    }
 
-    String FIX_4_0 = "FIX.4.0";
-    String FIX_4_1 = "FIX.4.1";
-    String FIX_4_2 = "FIX.4.2";
-    String FIX_4_3 = "FIX.4.3";
-    String FIX_4_4 = "FIX.4.4";
+    @Override
+    public Boolean getValue() {
+        return value;
+    }
 
-    FixMessageHeader getHeader();
+    @Override
+    public byte[] getBytes() {
+        return (value) ? TRUE_BYTES : FALSE_BYTES;
+    }
 
-    List<FixMessageFragment> getBody();
-
-    Integer getInt(int tagNum);
-
-    Integer getInt(FieldType field);
-
-    String getString(int tagNum);
-
-    <T> T getValue(FieldType field);
-
-    String getString(FieldType field);
-
-    String getMessageType();
-
+    public boolean booleanValue() {
+        return value;
+    }
 }

@@ -25,17 +25,18 @@ import org.slf4j.LoggerFactory;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Locale;
 import java.util.Map;
-import java.util.concurrent.BlockingDeque;
+import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.ConcurrentHashMap;
 
 class PriceStreamingApp extends FixApplicationAdapter {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(PriceStreamingApp.class);
-    private final BlockingDeque<Quote> quoteQueue;
+    private final BlockingQueue<Quote> quoteQueue;
     private final Map<String, ChannelHandlerContext> subscriptions = new ConcurrentHashMap<>();
 
-    public PriceStreamingApp(BlockingDeque<Quote> quoteQueue) {
+    public PriceStreamingApp(BlockingQueue<Quote> quoteQueue) {
         this.quoteQueue = quoteQueue;
         StreamingWorker streamingWorker = new StreamingWorker();
         new Thread(streamingWorker, "StreamingWorker").start();
@@ -45,15 +46,14 @@ class PriceStreamingApp extends FixApplicationAdapter {
         FixMessageBuilderImpl message = new FixMessageBuilderImpl(MessageTypes.QUOTE);
         message.add(FieldType.QuoteReqID, reqId);
 
-        message.add(FieldType.MktBidPx, String.format("%1$.5f", quote.getBid()));// MktBidPx
-        message.add(FieldType.MktOfferPx, String.format("%1$.5f", quote.getOffer()));//MktOfferPx
+        message.add(FieldType.MktBidPx, String.format(Locale.US, "%1$.5f", quote.getBid()));// MktBidPx
+        message.add(FieldType.MktOfferPx, String.format(Locale.US, "%1$.5f", quote.getOffer()));//MktOfferPx
 
         return message;
     }
 
     private static void publish(final ChannelHandlerContext ctx, String reqId, Quote quote) {
         FixMessageBuilder message = createQuoteMessage(reqId, quote);
-        LOGGER.trace("Submit quote.");
         ctx.writeAndFlush(message);
     }
 
@@ -107,7 +107,7 @@ class PriceStreamingApp extends FixApplicationAdapter {
             Quote quote = null;
             while (!stopping) {
                 try {
-                    quote = quoteQueue.takeFirst();
+                    quote = quoteQueue.take();
                 } catch (InterruptedException e) {
 
                 }

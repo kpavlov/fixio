@@ -13,9 +13,13 @@
  * License for the specific language governing permissions and limitations
  * under the License.
  */
-
 package fixio.fixprotocol;
 
+import fixio.fixprotocol.fields.FieldFactory;
+import fixio.fixprotocol.fields.IntField;
+import fixio.fixprotocol.fields.StringField;
+
+import java.nio.charset.StandardCharsets;
 import java.util.LinkedList;
 import java.util.List;
 
@@ -71,7 +75,7 @@ public class FixMessageBuilderImpl implements FixMessage, FixMessageBuilder {
                 header.setMessageType(value.intern());
                 break;
             default:
-                body.add(new Field(tagNum, value));
+                body.add(FieldFactory.valueOf(tagNum, value.getBytes(StandardCharsets.US_ASCII)));
                 break;
         }
         return this;
@@ -103,12 +107,16 @@ public class FixMessageBuilderImpl implements FixMessage, FixMessageBuilder {
         if (item == null) {
             return null;
         }
-        if (item instanceof Field) {
-            return ((Field) item).getValue();
+        if (item instanceof StringField) {
+            return ((StringField) item).getValue();
         } else {
             throw new IllegalArgumentException("Tag " + tagNum + " is not a Field.");
         }
+    }
 
+    @Override
+    public <T> T getValue(FieldType field) {
+        return null;
     }
 
     @Override
@@ -118,9 +126,9 @@ public class FixMessageBuilderImpl implements FixMessage, FixMessageBuilder {
 
     @Override
     public Integer getInt(int tagNum) {
-        String s = getString(tagNum);
-        if (s != null) {
-            return Integer.parseInt(s);
+        FixMessageFragment field = getFirst(tagNum);
+        if (field instanceof IntField) {
+            return ((IntField) field).getValue();
         }
         return null;
     }
@@ -158,10 +166,6 @@ public class FixMessageBuilderImpl implements FixMessage, FixMessageBuilder {
 
     public void setMessageType(String messageType) {
         header.setMessageType(messageType);
-    }
-
-    public int getChecksum() {
-        return trailer.getCheckSum();
     }
 
     @Override

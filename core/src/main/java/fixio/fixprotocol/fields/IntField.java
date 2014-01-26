@@ -13,36 +13,30 @@
  * License for the specific language governing permissions and limitations
  * under the License.
  */
+package fixio.fixprotocol.fields;
 
-package fixio.fixprotocol;
+import static java.nio.charset.StandardCharsets.US_ASCII;
 
-import java.util.List;
+public class IntField extends AbstractField<Integer> {
 
-/**
- * Represents incoming FIX Protocol message.
- */
-public interface FixMessage {
+    private int value;
 
-    String FIX_4_0 = "FIX.4.0";
-    String FIX_4_1 = "FIX.4.1";
-    String FIX_4_2 = "FIX.4.2";
-    String FIX_4_3 = "FIX.4.3";
-    String FIX_4_4 = "FIX.4.4";
+    protected IntField(int tagNum, int value) {
+        super(tagNum);
+        this.value = value;
+    }
 
-    FixMessageHeader getHeader();
+    @Override
+    public Integer getValue() {
+        return value;
+    }
 
-    List<FixMessageFragment> getBody();
+    @Override
+    public byte[] getBytes() {
+        return String.valueOf(value).getBytes(US_ASCII);
+    }
 
-    Integer getInt(int tagNum);
-
-    Integer getInt(FieldType field);
-
-    String getString(int tagNum);
-
-    <T> T getValue(FieldType field);
-
-    String getString(FieldType field);
-
-    String getMessageType();
-
+    public int intValue() {
+        return value;
+    }
 }

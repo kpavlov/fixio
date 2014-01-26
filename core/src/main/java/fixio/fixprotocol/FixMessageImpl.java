@@ -16,63 +16,54 @@
 
 package fixio.fixprotocol;
 
+import fixio.fixprotocol.fields.AbstractField;
+import fixio.fixprotocol.fields.FieldFactory;
+import fixio.fixprotocol.fields.IntField;
+import fixio.fixprotocol.fields.StringField;
+
 import java.util.LinkedList;
 import java.util.List;
 
+/**
+ * Read-only view implementation of received {@link FixMessage}.
+ */
 public class FixMessageImpl implements FixMessage {
 
     private final FixMessageHeader header = new FixMessageHeader();
     private final FixMessageTrailer trailer = new FixMessageTrailer();
     private final List<FixMessageFragment> body = new LinkedList<>();
 
-    public FixMessageImpl() {
+    public FixMessageImpl add(int tagNum, byte[] value) {
+        return add(tagNum, value, 0, value.length);
     }
 
-    public FixMessageImpl(String messageType) {
-        header.setMessageType(messageType);
-    }
-
-    public FixMessageImpl add(FieldType field, int value) {
-        assert (field != null) : "Tag must be specified.";
-        return add(field, String.valueOf(value));
-    }
-
-    public FixMessageImpl add(int tagNum, int value) {
-        assert (tagNum > 0) : "Tag must be positive.";
-        return add(tagNum, String.valueOf(value));
-    }
-
-    public FixMessageImpl add(FieldType field, String value) {
-        assert (field != null) : "Tag must be specified.";
-        assert (value != null) : "Value must be specified.";
-        return add(field.tag(), value);
-    }
-
-    public FixMessageImpl add(int tagNum, String value) {
+    public FixMessageImpl add(int tagNum, byte[] value, int offset, int length) {
         assert (tagNum > 0) : "TagNum must be positive. Got " + tagNum;
         assert (value != null) : "Value must be specified.";
+        AbstractField field = FieldFactory.valueOf(tagNum, value, offset, length);
         FieldType fieldType = FieldType.forTag(tagNum);
         switch (fieldType) {
             case BeginString:
-                header.setBeginString(value.intern());
+                header.setBeginString(((StringField) field).getValue().intern());
                 break;
             case CheckSum:
-                trailer.setCheckSum(Integer.parseInt(value));
+                int checksum = (value[offset] - '0') * 100 + (value[offset + 1] - '0') * 10 + (value[offset + 2] - '0');
+                trailer.setCheckSum(checksum);
                 break;
             case SenderCompID:
-                header.setSenderCompID(value);
+                header.setSenderCompID(((StringField) field).getValue());
                 break;
             case TargetCompID:
-                header.setTargetCompID(value);
+                header.setTargetCompID(((StringField) field).getValue());
                 break;
             case MsgSeqNum:
-                header.setMsgSeqNum(Integer.parseInt(value));
+                header.setMsgSeqNum(((IntField) field).intValue());
                 break;
             case MsgType:
-                header.setMessageType(value.intern());
+                header.setMessageType(((StringField) field).getValue().intern());
                 break;
             default:
-                body.add(new Field(tagNum, value));
+                body.add(field);
                 break;
         }
         return this;
@@ -89,12 +80,21 @@ public class FixMessageImpl implements FixMessage {
         if (item == null) {
             return null;
         }
-        if (item instanceof Field) {
-            return ((Field) item).getValue();
+        if (item instanceof StringField) {
+            return ((StringField) item).getValue();
         } else {
             throw new IllegalArgumentException("Tag " + tagNum + " is not a Field.");
         }
+    }
 
+    @SuppressWarnings("unchecked")
+    @Override
+    public <T> T getValue(FieldType fieldType) {
+        FixMessageFragment field = getFirst(fieldType.tag());
+        if (field instanceof AbstractField) {
+            return (T) ((AbstractField) field).getValue();
+        }
+        return null;
     }
 
     @Override
@@ -104,9 +104,9 @@ public class FixMessageImpl implements FixMessage {
 
     @Override
     public Integer getInt(int tagNum) {
-        String s = getString(tagNum);
-        if (s != null) {
-            return Integer.parseInt(s);
+        FixMessageFragment field = getFirst(tagNum);
+        if (field instanceof IntField) {
+            return ((IntField) field).getValue();
         }
         return null;
     }
@@ -138,16 +138,6 @@ public class FixMessageImpl implements FixMessage {
         return trailer.getCheckSum();
     }
 
-    @Override
-    public String toString() {
-        final StringBuilder sb = new StringBuilder("FixMessageImpl{");
-        sb.append("header=").append(header);
-        sb.append(", body=").append(body);
-        sb.append(", trailer=").append(trailer);
-        sb.append('}');
-        return sb.toString();
-    }
-
     public List<Group> getGroups(int tagNum) {
         FixMessageFragment fragment = getFirst(tagNum);
         if (fragment instanceof GroupField) {
@@ -163,5 +153,15 @@ public class FixMessageImpl implements FixMessage {
             }
         }
         return null;
+    }
+
+    @Override
+    public String toString() {
+        final StringBuilder sb = new StringBuilder("FixMessageImpl{");
+        sb.append("header=").append(header);
+        sb.append(", body=").append(body);
+        sb.append(", trailer=").append(trailer);
+        sb.append('}');
+        return sb.toString();
     }
 }

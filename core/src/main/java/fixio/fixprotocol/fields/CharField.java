@@ -13,36 +13,28 @@
  * License for the specific language governing permissions and limitations
  * under the License.
  */
+package fixio.fixprotocol.fields;
 
-package fixio.fixprotocol;
+public class CharField extends AbstractField<Character> {
 
-import java.util.List;
+    private final char value;
 
-/**
- * Represents incoming FIX Protocol message.
- */
-public interface FixMessage {
+    protected CharField(int tagNum, char value) {
+        super(tagNum);
+        this.value = value;
+    }
 
-    String FIX_4_0 = "FIX.4.0";
-    String FIX_4_1 = "FIX.4.1";
-    String FIX_4_2 = "FIX.4.2";
-    String FIX_4_3 = "FIX.4.3";
-    String FIX_4_4 = "FIX.4.4";
+    @Override
+    public Character getValue() {
+        return value;
+    }
 
-    FixMessageHeader getHeader();
+    @Override
+    public byte[] getBytes() {
+        return new byte[]{(byte) value};
+    }
 
-    List<FixMessageFragment> getBody();
-
-    Integer getInt(int tagNum);
-
-    Integer getInt(FieldType field);
-
-    String getString(int tagNum);
-
-    <T> T getValue(FieldType field);
-
-    String getString(FieldType field);
-
-    String getMessageType();
-
+    public char charValue() {
+        return value;
+    }
 }

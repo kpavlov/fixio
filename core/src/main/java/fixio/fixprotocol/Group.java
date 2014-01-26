@@ -15,6 +15,8 @@
  */
 package fixio.fixprotocol;
 
+import fixio.fixprotocol.fields.StringField;
+
 import java.util.Collection;
 import java.util.LinkedHashMap;
 
@@ -46,7 +48,7 @@ public class Group extends FixMessageFragment {
         assert (tagNum > 0) : "Tag must be positive.";
         assert (value != null) : "Value  must be specified.";
 
-        contents.put(tagNum, new Field(tagNum, value));
+        contents.put(tagNum, new StringField(tagNum, value));
 
         return this;
     }

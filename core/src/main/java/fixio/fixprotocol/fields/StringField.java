@@ -1,5 +1,5 @@
 /*
- * Copyright 2013 The FIX.io Project
+ * Copyright 2014 The FIX.io Project
  *
  * The FIX.io Project licenses this file to you under the Apache License,
  * version 2.0 (the "License"); you may not use this file except in compliance
@@ -13,19 +13,26 @@
  * License for the specific language governing permissions and limitations
  * under the License.
  */
-package fixio.fixprotocol;
+package fixio.fixprotocol.fields;
 
-public class Field extends FixMessageFragment {
+import java.nio.charset.StandardCharsets;
+
+public class StringField extends AbstractField<String> {
 
     private final String value;
 
-    public Field(int tagNum, String value) {
+    public StringField(int tagNum, String value) {
         super(tagNum);
         this.value = value;
     }
 
     public String getValue() {
         return value;
+    }
+
+    @Override
+    public byte[] getBytes() {
+        return value.getBytes(StandardCharsets.US_ASCII);
     }
 
     @Override

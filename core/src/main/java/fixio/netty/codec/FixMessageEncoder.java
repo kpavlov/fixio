@@ -1,5 +1,5 @@
 /*
- * Copyright 2013 The FIX.io Project
+ * Copyright 2014 The FIX.io Project
  *
  * The FIX.io Project licenses this file to you under the Apache License,
  * version 2.0 (the "License"); you may not use this file except in compliance
@@ -17,6 +17,7 @@
 package fixio.netty.codec;
 
 import fixio.fixprotocol.*;
+import fixio.fixprotocol.fields.AbstractField;
 import io.netty.buffer.ByteBuf;
 import io.netty.buffer.ByteBufAllocator;
 import io.netty.buffer.Unpooled;
@@ -39,7 +40,6 @@ public class FixMessageEncoder extends MessageToByteEncoder<FixMessageBuilder> {
     private static final TimeZone UTC = TimeZone.getTimeZone("UTC");
     private static final Charset CHARSET = StandardCharsets.US_ASCII;
     private static final String UTC_TIMESTAMP_WITH_MILLIS_PATTERN = "yyyyMMdd-HH:mm:ss.SSS";
-
     private static final ThreadLocal<DateFormat> sdf = new ThreadLocal<DateFormat>() {
         @Override
         protected DateFormat initialValue() {
@@ -65,10 +65,17 @@ public class FixMessageEncoder extends MessageToByteEncoder<FixMessageBuilder> {
         }
     }
 
-    private static void writeField(int fieldNum, String value, ByteBuf out) {
+    private static void writeField(int fieldNum, AbstractField field, ByteBuf out) {
         out.writeBytes(String.valueOf(fieldNum).getBytes(CHARSET));
         out.writeByte('=');
-        out.writeBytes(value.getBytes(CHARSET));
+        out.writeBytes(field.getBytes());
+        out.writeByte(1);
+    }
+
+    private static void writeField(int fieldNum, String stringValue, ByteBuf out) {
+        out.writeBytes(String.valueOf(fieldNum).getBytes(CHARSET));
+        out.writeByte('=');
+        out.writeBytes(stringValue.getBytes(CHARSET));
         out.writeByte(1);
     }
 
@@ -147,8 +154,8 @@ public class FixMessageEncoder extends MessageToByteEncoder<FixMessageBuilder> {
     }
 
     private void encodeComponent(ByteBuf payloadBuf, FixMessageFragment component) {
-        if (component instanceof Field) {
-            writeField(component.getTagNum(), ((Field) component).getValue(), payloadBuf);
+        if (component instanceof AbstractField) {
+            writeField(component.getTagNum(), (AbstractField) component, payloadBuf);
         } else if (component instanceof Group) {
             Group group = (Group) component;
             for (FixMessageFragment fixMessageFragment : group.getContents()) {

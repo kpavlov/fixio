@@ -18,16 +18,16 @@ package fixio.examples.priceserver;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.util.concurrent.BlockingDeque;
+import java.util.concurrent.BlockingQueue;
 
 class QuoteGeneratorTask implements Runnable {
 
     public static final Logger LOGGER = LoggerFactory.getLogger(QuoteGeneratorTask.class);
-    private final BlockingDeque<Quote> receiver;
+    private final BlockingQueue<Quote> receiver;
     private int t;
     private volatile boolean isStopping = false;
 
-    QuoteGeneratorTask(BlockingDeque<Quote> receiverQueue) {
+    QuoteGeneratorTask(BlockingQueue<Quote> receiverQueue) {
         receiver = receiverQueue;
     }
 
@@ -40,9 +40,11 @@ class QuoteGeneratorTask implements Runnable {
                 double offer = Math.sin((double) t - 10 / 100) * 2 + 0.5;
                 Quote quote = new Quote(bid, offer);
                 t++;
-                if (!receiver.offerLast(quote)) {
+                if (!receiver.offer(quote)) {
                     // slow quote reader. We may discard the oldest quite in the queue.
-                    receiver.pollFirst();
+                    for (int i = 0; i < 10; i++) {
+                        receiver.poll();
+                    }
                 }
 
             } catch (Throwable e) {

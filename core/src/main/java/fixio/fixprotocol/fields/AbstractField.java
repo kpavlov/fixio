@@ -13,36 +13,18 @@
  * License for the specific language governing permissions and limitations
  * under the License.
  */
+package fixio.fixprotocol.fields;
 
-package fixio.fixprotocol;
 
-import java.util.List;
+import fixio.fixprotocol.FixMessageFragment;
 
-/**
- * Represents incoming FIX Protocol message.
- */
-public interface FixMessage {
+public abstract class AbstractField<T> extends FixMessageFragment {
 
-    String FIX_4_0 = "FIX.4.0";
-    String FIX_4_1 = "FIX.4.1";
-    String FIX_4_2 = "FIX.4.2";
-    String FIX_4_3 = "FIX.4.3";
-    String FIX_4_4 = "FIX.4.4";
+    protected AbstractField(int tagNum) {
+        super(tagNum);
+    }
 
-    FixMessageHeader getHeader();
+    public abstract T getValue();
 
-    List<FixMessageFragment> getBody();
-
-    Integer getInt(int tagNum);
-
-    Integer getInt(FieldType field);
-
-    String getString(int tagNum);
-
-    <T> T getValue(FieldType field);
-
-    String getString(FieldType field);
-
-    String getMessageType();
-
+    public abstract byte[] getBytes();
 }

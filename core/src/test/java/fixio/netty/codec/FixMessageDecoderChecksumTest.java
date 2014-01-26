@@ -1,5 +1,5 @@
 /*
- * Copyright 2013 The FIX.io Project
+ * Copyright 2014 The FIX.io Project
  *
  * The FIX.io Project licenses this file to you under the Apache License,
  * version 2.0 (the "License"); you may not use this file except in compliance
@@ -16,7 +16,7 @@
 package fixio.netty.codec;
 
 
-import fixio.fixprotocol.FixMessageBuilderImpl;
+import fixio.fixprotocol.FixMessageImpl;
 import io.netty.buffer.Unpooled;
 import io.netty.handler.codec.DecoderException;
 import org.junit.BeforeClass;
@@ -75,7 +75,7 @@ public class FixMessageDecoderChecksumTest {
         try {
             List<Object> result = decode(fixMessage);
             assertTrue("Checksum is not valid, exception expected", checksumValid);
-            final FixMessageBuilderImpl fixMessage = (FixMessageBuilderImpl) result.get(0);
+            final FixMessageImpl fixMessage = (FixMessageImpl) result.get(0);
             assertEquals(expectedChecksum, fixMessage.getChecksum());
         } catch (DecoderException e) {
             assertFalse("Checksum is valid, no exception expected, but got: " + e, checksumValid);

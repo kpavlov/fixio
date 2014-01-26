@@ -1,5 +1,5 @@
 /*
- * Copyright 2013 The FIX.io Project
+ * Copyright 2014 The FIX.io Project
  *
  * The FIX.io Project licenses this file to you under the Apache License,
  * version 2.0 (the "License"); you may not use this file except in compliance
@@ -15,8 +15,9 @@
  */
 package fixio.netty.codec;
 
-import fixio.fixprotocol.FixMessageBuilderImpl;
+import fixio.fixprotocol.FieldType;
 import fixio.fixprotocol.FixMessageHeader;
+import fixio.fixprotocol.FixMessageImpl;
 import fixio.fixprotocol.MessageTypes;
 import io.netty.buffer.Unpooled;
 import org.junit.BeforeClass;
@@ -24,7 +25,9 @@ import org.junit.Test;
 
 import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
+import java.util.Calendar;
 import java.util.List;
+import java.util.TimeZone;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
@@ -43,18 +46,27 @@ public class FixMessageDecoderTest {
         List<Object> result = decode("8=FIX.4.1\u00019=90\u000135=0\u000149=INVMGR\u000156=BRKR\u000134=240\u000152=19980604-08:03:31\u000110=129\u0001");
 
         assertEquals(1, result.size());
-        assertTrue(result.get(0) instanceof FixMessageBuilderImpl);
-        final FixMessageBuilderImpl fixMessage = (FixMessageBuilderImpl) result.get(0);
+        assertTrue(result.get(0) instanceof FixMessageImpl);
+        final FixMessageImpl fixMessage = (FixMessageImpl) result.get(0);
 
         FixMessageHeader header = fixMessage.getHeader();
 
-        assertEquals("FIX.4.1", fixMessage.getBeginString());
+        assertEquals("FIX.4.1", fixMessage.getHeader().getBeginString());
         assertEquals(MessageTypes.HEARTBEAT, fixMessage.getMessageType());
         assertEquals("INVMGR", header.getSenderCompID());
         assertEquals("BRKR", header.getTargetCompID());
         assertEquals(240, header.getMsgSeqNum());
-        assertEquals("19980604-08:03:31", fixMessage.getString(52));
         assertEquals(129, fixMessage.getChecksum());
+
+        Calendar calendar = Calendar.getInstance(TimeZone.getTimeZone("UTC"));
+        calendar.set(Calendar.YEAR, 1998);
+        calendar.set(Calendar.MONTH, Calendar.JUNE);
+        calendar.set(Calendar.DAY_OF_MONTH, 4);
+        calendar.set(Calendar.HOUR_OF_DAY, 8);
+        calendar.set(Calendar.MINUTE, 3);
+        calendar.set(Calendar.SECOND, 31);
+        calendar.set(Calendar.MILLISECOND, 0);
+        assertEquals(calendar.getTimeInMillis(), fixMessage.getValue(FieldType.SendingTime));
     }
 
     private List<Object> decode(String message) throws Exception {

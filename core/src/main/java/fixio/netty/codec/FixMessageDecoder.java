@@ -1,5 +1,5 @@
 /*
- * Copyright 2013 The FIX.io Project
+ * Copyright 2014 The FIX.io Project
  *
  * The FIX.io Project licenses this file to you under the Apache License,
  * version 2.0 (the "License"); you may not use this file except in compliance
@@ -16,15 +16,13 @@
 
 package fixio.netty.codec;
 
-import fixio.fixprotocol.FixMessageBuilderImpl;
+import fixio.fixprotocol.FixMessageImpl;
 import io.netty.buffer.ByteBuf;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.handler.codec.DecoderException;
 import io.netty.handler.codec.MessageToMessageDecoder;
 
 import java.util.List;
-
-import static java.nio.charset.StandardCharsets.US_ASCII;
 
 /**
  * Decodes series of {@link ByteBuf}s into FixMessages.
@@ -48,7 +46,7 @@ import static java.nio.charset.StandardCharsets.US_ASCII;
  */
 public class FixMessageDecoder extends MessageToMessageDecoder<ByteBuf> {
 
-    private FixMessageBuilderImpl message;
+    private FixMessageImpl message;
     private int checksum;
 
     @Override
@@ -66,8 +64,10 @@ public class FixMessageDecoder extends MessageToMessageDecoder<ByteBuf> {
             }
             tagNum = tagNum * 10 + (b - '0');
         }
-
-        String value = new String(bytes, arrayIndex + 1, length - arrayIndex - 1, US_ASCII);
+        int offset = arrayIndex + 1;
+        int valueLength = length - arrayIndex - 1;
+//        byte[] value = Arrays.copyOfRange(bytes, offset, length);
+//        String value = new String(bytes, arrayIndex + 1, length - arrayIndex - 1, US_ASCII);
 
         int sumBytes = 0;
         if (tagNum != 10) {
@@ -81,32 +81,31 @@ public class FixMessageDecoder extends MessageToMessageDecoder<ByteBuf> {
                 if (message != null) {
                     throw new DecoderException("Unexpected BeginString(8)");
                 }
-                message = new FixMessageBuilderImpl();
+                message = new FixMessageImpl();
                 checksum = sumBytes;
-                message.add(tagNum, value);
+                message.add(tagNum, bytes, offset, valueLength);
                 break;
             case 10:
-                appendField(tagNum, value);
-                verifyChecksum(value);
+                appendField(tagNum, bytes, offset, valueLength);
+                verifyChecksum(message.getChecksum());
                 out.add(message);
                 message = null;
                 checksum = 0;
                 break;
             default:
-                appendField(tagNum, value);
+                appendField(tagNum, bytes, offset, valueLength);
                 checksum += sumBytes;
         }
     }
 
-    private void appendField(int tag, String value) {
+    private void appendField(int tag, byte[] value, int offset, int valueLength) {
         if (message == null) {
             throw new DecoderException("BeginString tag expected, but got: " + tag + "=" + value);
         }
-        message.add(tag, value);
+        message.add(tag, value, offset, valueLength);
     }
 
-    private void verifyChecksum(String value) {
-        int declaredChecksum = Integer.parseInt(value);
+    private void verifyChecksum(int declaredChecksum) {
         checksum = (checksum % 256);
         if (declaredChecksum != checksum) {
             message = null;

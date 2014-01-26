@@ -17,14 +17,13 @@ package fixio.examples.priceserver;
 
 import fixio.FixServer;
 
-import java.util.concurrent.BlockingDeque;
-import java.util.concurrent.LinkedBlockingDeque;
+import java.util.concurrent.ArrayBlockingQueue;
 
 public class PriceServer {
 
     public static final int DEFAULT_PORT = 10101;
 
-    private final BlockingDeque<Quote> quoteQueue = new LinkedBlockingDeque<>(4096);
+    private final ArrayBlockingQueue<Quote> quoteQueue = new ArrayBlockingQueue<>(8192);
 
     private final FixServer server;
     private Thread generator;
