@@ -15,23 +15,20 @@
  */
 package fixio.fixprotocol.fields;
 
+import org.junit.Test;
 
-import fixio.fixprotocol.FieldType;
-import fixio.fixprotocol.FixMessageFragment;
+import static org.junit.Assert.assertEquals;
 
-public abstract class AbstractField<T> extends FixMessageFragment {
+public class FixedPointNumberTest {
 
-    protected AbstractField(int tagNum) {
-        super(tagNum);
-    }
+    @Test
+    public void testCreateFromLong() {
+        FixedPointNumber value = new FixedPointNumber(1234567890L);
 
-    public abstract T getValue();
+        assertEquals(1234567890L, value.getScaledValue());
+        assertEquals(0, value.getScale());
+        assertEquals(1234567890.0, value.doubleValue(), 0.0);
 
-    public abstract byte[] getBytes();
-
-    @Override
-    public String toString() {
-        int tagNum = getTagNum();
-        return FieldType.forTag(tagNum) + "(" + tagNum + ")=" + getValue();
+        assertEquals("1234567890", value.toString());
     }
 }

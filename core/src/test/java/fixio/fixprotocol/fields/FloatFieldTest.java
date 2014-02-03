@@ -18,20 +18,19 @@ package fixio.fixprotocol.fields;
 import org.junit.Before;
 import org.junit.Test;
 
-import java.math.BigDecimal;
 import java.util.Random;
 
 import static java.nio.charset.StandardCharsets.US_ASCII;
 import static org.junit.Assert.assertArrayEquals;
 
 public class FloatFieldTest {
-    private BigDecimal value;
+    private FixedPointNumber value;
     private int tag;
     private FloatField field;
 
     @Before
     public void setUp() throws Exception {
-        value = BigDecimal.valueOf(new Random().nextDouble());// it's ok to use it here;
+        value = new FixedPointNumber(new Random().nextDouble(), 13);
         tag = new Random().nextInt();
 
         field = new FloatField(tag, value);
@@ -41,6 +40,8 @@ public class FloatFieldTest {
     public void testGetBytes() throws Exception {
         byte[] bytes = field.getBytes();
 
-        assertArrayEquals(value.toPlainString().getBytes(US_ASCII), bytes);
+        byte[] expectedBytes = value.toString().getBytes(US_ASCII);
+
+        assertArrayEquals(expectedBytes, bytes);
     }
 }

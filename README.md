@@ -7,18 +7,19 @@ fixio - FIX Protocol Support for Netty [![Build Status](https://travis-ci.org/kp
 
 This API is intended to be a replacement for well known [QuickFIX/J][quickfix] library to be used for high-frequency trading cases.
 
-I'm trying to keep a memory footprint as low as possible to eliminate unnecessary GC overhead
+### Design goals ###
+
+1. Implement FIX protocol API with as low memory footprint as possible in order to eliminate unnecessary GC overhead
 thus improving overall application performance under high load.
+2. Provide FIX Protocol Codecs for Netty, making it possible to get rid of Apache [Mina][mina] which is used by [QuickFIX/J][quickfix] as a transport layer.
 
-Another design goal is to provide FIX Protocol Codecs for Netty, making it possible to get rid of Apache [Mina][mina] which is used by [QuickFIX/J][quickfix] as a transport layer.
-
-This API has a number of [limitations](#limitations), so it may be not suitable for any FIX application.
+This API has a number of [limitations](#Limitations), so it may be not suitable for any FIX application.
 
 # Getting Started #
 
-1. [Download ZIP arhhive](//github.com/kpavlov/fixio/archive/master.zip) or clone/fork the repository.
+1. [Download ZIP arhhive](archive/master.zip) or clone/fork the repository.
 2. Build and install project artifacts to your local maven repository:
-   `mvn clean install`
+`mvn clean install`
 3. Add the dependency to your project
 
 ~~~~~~~~~
@@ -29,7 +30,7 @@ This API has a number of [limitations](#limitations), so it may be not suitable 
 </dependency>
 ~~~~~~~~~
 
-You'll also need a [slf4j](http://slf4j.org) API implementation at runtime, so please add appropriate dependency, e.g.:
+You'll also need a slf4j API implementation at runtime, so please add appropriate dependency, e.g.:
 
 ~~~~~~~~~
 <dependency>
@@ -52,8 +53,8 @@ You may find working example of [client][client-example] and [server][server-exa
 3. Message encodings other than US-ASCII are not supported.
 4. ...
 
-[client-example]: //github.com/kpavlov/fixio/tree/master/examples/src/main/java/fixio/examples/priceclient
-[server-example]: //github.com/kpavlov/fixio/tree/master/examples/src/main/java/fixio/examples/priceserver
-[examples-module]: //github.com/kpavlov/fixio/tree/master/examples
+[client-example]: tree/master/examples/src/main/java/fixio/examples/priceclient
+[server-example]: tree/master/examples/src/main/java/fixio/examples/priceserver
+[examples-module]: tree/master/examples
 [quickfix]: http://www.quickfixj.org/ "Java Open Source FIX Engine"
 [mina]: http://directory.apache.org/subprojects/mina/ "Apache Mina"

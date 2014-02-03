@@ -18,6 +18,7 @@ package fixio.fixprotocol.fields;
 import fixio.fixprotocol.FieldType;
 import org.junit.Test;
 
+import java.math.BigDecimal;
 import java.util.Calendar;
 import java.util.Random;
 import java.util.TimeZone;
@@ -109,35 +110,36 @@ public class FieldFactoryTest {
 
     @Test
     public void testValueOfFloat() throws Exception {
-        float value = new Random().nextFloat();
+        BigDecimal value = BigDecimal.valueOf(new Random().nextInt()).movePointLeft(5);
 
-        FloatField field = FieldFactory.valueOf(FieldType.SettlCurrFxRate.tag(), String.valueOf(value).getBytes(US_ASCII));
+        FloatField field = FieldFactory.valueOf(FieldType.SettlCurrFxRate.tag(), value.toPlainString().getBytes(US_ASCII));
 
         assertEquals("tagnum", FieldType.SettlCurrFxRate.tag(), field.getTagNum());
-        assertEquals("value", value, field.getValue().floatValue(), 0.0);
-        assertEquals("value", value, field.floatValue(), 0.0);
+        assertEquals("value", value.doubleValue(), field.getValue().doubleValue(), 0.0);
+        assertEquals("value", value.floatValue(), field.floatValue(), 0.0);
+
     }
 
     @Test
     public void testValueOfQty() throws Exception {
-        float value = new Random().nextFloat();
+        BigDecimal value = BigDecimal.valueOf(new Random().nextInt()).movePointLeft(5);
 
-        FloatField field = FieldFactory.valueOf(FieldType.OrderQty.tag(), String.valueOf(value).getBytes(US_ASCII));
+        FloatField field = FieldFactory.valueOf(FieldType.OrderQty.tag(), value.toPlainString().getBytes(US_ASCII));
 
         assertEquals("tagnum", FieldType.OrderQty.tag(), field.getTagNum());
-        assertEquals("value", value, field.getValue().floatValue(), 0.0);
-        assertEquals("value", value, field.floatValue(), 0.0);
+        assertEquals("value", value.doubleValue(), field.getValue().doubleValue(), 0.0);
+        assertEquals("value", value.floatValue(), field.floatValue(), 0.0);
     }
 
     @Test
     public void testValueOfPrice() throws Exception {
-        float value = new Random().nextFloat();
+        BigDecimal value = BigDecimal.valueOf(new Random().nextInt()).movePointLeft(5);
 
-        FloatField field = FieldFactory.valueOf(FieldType.MktBidPx.tag(), String.valueOf(value).getBytes(US_ASCII));
+        FloatField field = FieldFactory.valueOf(FieldType.MktBidPx.tag(), value.toPlainString().getBytes(US_ASCII));
 
         assertEquals("tagnum", FieldType.MktBidPx.tag(), field.getTagNum());
-        assertEquals("value", value, field.getValue().floatValue(), 0.0);
-        assertEquals("value", value, field.floatValue(), 0.0);
+        assertEquals("value", value.doubleValue(), field.getValue().doubleValue(), 0.0);
+        assertEquals("value", value.floatValue(), field.floatValue(), 0.0);
     }
 
     @Test

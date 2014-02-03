@@ -15,32 +15,31 @@
  */
 package fixio.fixprotocol.fields;
 
-import java.math.BigDecimal;
-import java.nio.charset.StandardCharsets;
+import static java.nio.charset.StandardCharsets.US_ASCII;
 
-public class FloatField extends AbstractField<Float> {
+public class FloatField extends AbstractField<FixedPointNumber> {
 
-    private final BigDecimal value;
+    private final FixedPointNumber value;
 
-    protected FloatField(int tagNum, BigDecimal value) {
+    protected FloatField(int tagNum, FixedPointNumber value) {
         super(tagNum);
         this.value = value;
     }
 
     protected FloatField(int tagNum, byte[] value, int offset, int length) {
         super(tagNum);
-        String v = new String(value, offset, length, StandardCharsets.US_ASCII);
-        this.value = new BigDecimal(v.toCharArray());
+        this.value = new FixedPointNumber(value, offset, length);
     }
 
     @Override
-    public Float getValue() {
-        return value.floatValue();
+    public FixedPointNumber getValue() {
+        return value;
     }
 
     @Override
     public byte[] getBytes() {
-        return value.toPlainString().getBytes(StandardCharsets.US_ASCII);
+        String s = value.toString();
+        return s.getBytes(US_ASCII);
     }
 
     public float floatValue() {
