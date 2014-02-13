@@ -28,30 +28,30 @@ import static org.junit.Assert.assertEquals;
 public class UTCDateOnlyFieldTest {
 
     private static final String DATE_STR = "19980604";
-    private Calendar calendar = Calendar.getInstance(TimeZone.getTimeZone("UTC"));
+    private Calendar utcCalendar = Calendar.getInstance(TimeZone.getTimeZone("UTC"));
 
     @Before
     public void setUp() {
-        calendar.set(Calendar.YEAR, 1998);
-        calendar.set(Calendar.MONTH, Calendar.JUNE);
-        calendar.set(Calendar.DAY_OF_MONTH, 4);
-        calendar.clear(Calendar.HOUR_OF_DAY);
-        calendar.clear(Calendar.MINUTE);
-        calendar.clear(Calendar.SECOND);
-        calendar.clear(Calendar.MILLISECOND);
+        utcCalendar.set(Calendar.YEAR, 1998);
+        utcCalendar.set(Calendar.MONTH, Calendar.JUNE);
+        utcCalendar.set(Calendar.DAY_OF_MONTH, 4);
+        utcCalendar.clear(Calendar.HOUR_OF_DAY);
+        utcCalendar.clear(Calendar.MINUTE);
+        utcCalendar.clear(Calendar.SECOND);
+        utcCalendar.clear(Calendar.MILLISECOND);
     }
 
     @Test
     public void testParse() throws Exception {
-        assertEquals(calendar.getTimeInMillis(), UTCDateOnlyField.parse((DATE_STR.getBytes())));
+        assertEquals(utcCalendar.getTimeInMillis(), UTCDateOnlyField.parse((DATE_STR.getBytes())));
     }
 
     @Test
     public void testCreate() throws Exception {
         int tag = new Random().nextInt();
         UTCDateOnlyField field = new UTCDateOnlyField(tag, DATE_STR.getBytes());
-        assertEquals(calendar.getTimeInMillis(), field.getValue().longValue());
-        assertEquals(calendar.getTimeInMillis(), field.timestampMillis());
+        assertEquals(utcCalendar.getTimeInMillis(), field.getValue().longValue());
+        assertEquals(utcCalendar.getTimeInMillis(), field.timestampMillis());
     }
 
     @Test

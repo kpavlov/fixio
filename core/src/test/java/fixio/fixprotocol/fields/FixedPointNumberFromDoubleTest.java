@@ -75,6 +75,11 @@ public class FixedPointNumberFromDoubleTest {
     }
 
     @Test
+    public void testLongValue() {
+        assertEquals((long) source, value.longValue());
+    }
+
+    @Test
     public void testToString() {
         assertEquals(expectedToString, value.toString());
     }

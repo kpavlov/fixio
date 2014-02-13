@@ -20,48 +20,38 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.junit.runners.Parameterized;
 
-import java.math.BigDecimal;
 import java.util.Arrays;
 
-import static java.nio.charset.StandardCharsets.US_ASCII;
 import static org.junit.Assert.assertEquals;
 
 @RunWith(Parameterized.class)
-public class FixedPointNumberFromStringTest {
+public class FixedPointNumberFromLongTest {
 
-    private final String string;
-    private final int offset;
-    private final int length;
+    private final long source;
     private final long expectedScaledValue;
     private final int expectedScale;
     private final String expectedToString;
-
     private FixedPointNumber value;
 
-    public FixedPointNumberFromStringTest(String string, int offset, int length,
-                                          long expectedScaledValue, int expectedScale, String expectedToString) {
-        this.string = string;
-        this.offset = offset;
-        this.length = length;
-        this.expectedScaledValue = expectedScaledValue;
-        this.expectedScale = expectedScale;
+    public FixedPointNumberFromLongTest(long longValue, String expectedToString) {
+        this.source = longValue;
+        this.expectedScaledValue = longValue;
+        this.expectedScale = 0;
         this.expectedToString = expectedToString;
     }
 
-    @Parameterized.Parameters(name = "{index}: {0}")
+    @Parameterized.Parameters(name = "{index}: {0,number}")
     public static Iterable<Object[]> data() {
         return Arrays.asList(new Object[][]{
-                {"abc1234567890def", 3, 10, 1234567890L, 0, "1234567890"},
-                {"abc-1234567890def", 3, 11, -1234567890L, 0, "-1234567890"},
-                {"abc1.234567890def", 3, 11, 1234567890L, 9, "1.234567890"},
-                {"abc-1.234567890def", 3, 12, -1234567890L, 9, "-1.234567890"},
-                {"abc+1.234567890def", 3, 12, 1234567890L, 9, "1.234567890"}
+                {0L, "0"},
+                {1234567890L, "1234567890"},
+                {-1234567890L, "-1234567890"},
         });
     }
 
     @Before
     public void setUp() throws Exception {
-        value = new FixedPointNumber(string.getBytes(US_ASCII), offset, length);
+        value = new FixedPointNumber(source, expectedScale);
     }
 
     @Test
@@ -75,15 +65,13 @@ public class FixedPointNumberFromStringTest {
     }
 
     @Test
-    public void testDoubleValue() {
-        double expectedDouble = new BigDecimal(string.substring(offset, offset + length)).doubleValue();
-        assertEquals(expectedDouble, value.doubleValue(), 0.0);
+    public strictfp void testDoubleValue() {
+        assertEquals(source, value.doubleValue(), 0.0);
     }
 
     @Test
     public void testLongValue() {
-        long expectedLong = new BigDecimal(string.substring(offset, offset + length)).longValue();
-        assertEquals(expectedLong, value.longValue());
+        assertEquals(source, value.longValue());
     }
 
     @Test

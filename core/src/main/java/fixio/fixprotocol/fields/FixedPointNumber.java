@@ -94,6 +94,9 @@ public class FixedPointNumber extends Number {
 
     @Override
     public long longValue() {
+        if (scale == 0) {
+            return scaledValue;
+        }
         return scaledValue / ((long) Math.pow(10.0, scale));
     }
 

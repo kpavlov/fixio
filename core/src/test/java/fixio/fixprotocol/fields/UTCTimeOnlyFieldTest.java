@@ -32,28 +32,29 @@ public class UTCTimeOnlyFieldTest {
     private static final long MILLIS_PER_SECOND = 1000L;
     private static final long MILLIS_PER_MINUTE = 60 * MILLIS_PER_SECOND;
     private static final long MILLIS_PER_HOUR = 60 * MILLIS_PER_MINUTE;
-    private Calendar calendar = Calendar.getInstance(TimeZone.getTimeZone("UTC"));
+
+    private Calendar utcCalendar = Calendar.getInstance(TimeZone.getTimeZone("UTC"));
 
     @Before
     public void setUp() {
-        calendar.set(Calendar.YEAR, 1970);
-        calendar.set(Calendar.MONTH, 0);
-        calendar.set(Calendar.DAY_OF_MONTH, 1);
-        calendar.set(Calendar.HOUR_OF_DAY, 8);
-        calendar.set(Calendar.MINUTE, 3);
-        calendar.set(Calendar.SECOND, 31);
-        calendar.clear(Calendar.MILLISECOND);
+        utcCalendar.set(Calendar.YEAR, 1970);
+        utcCalendar.set(Calendar.MONTH, 0);
+        utcCalendar.set(Calendar.DAY_OF_MONTH, 1);
+        utcCalendar.set(Calendar.HOUR_OF_DAY, 8);
+        utcCalendar.set(Calendar.MINUTE, 3);
+        utcCalendar.set(Calendar.SECOND, 31);
+        utcCalendar.clear(Calendar.MILLISECOND);
     }
 
     @Test
     public void testParseNoMillis() throws Exception {
-        assertEquals(calendar.getTimeInMillis(), UTCTimeOnlyField.parse(TIMESTAMP_NO_MILLIS.getBytes()));
+        assertEquals(utcCalendar.getTimeInMillis(), UTCTimeOnlyField.parse(TIMESTAMP_NO_MILLIS.getBytes()));
     }
 
     @Test
     public void testParseWithMillis() throws Exception {
-        calendar.set(Calendar.MILLISECOND, 537);
-        assertEquals(calendar.getTimeInMillis(), UTCTimeOnlyField.parse((TIMESTAMP_WITH_MILLIS.getBytes())));
+        utcCalendar.set(Calendar.MILLISECOND, 537);
+        assertEquals(utcCalendar.getTimeInMillis(), UTCTimeOnlyField.parse((TIMESTAMP_WITH_MILLIS.getBytes())));
     }
 
     @Test
@@ -66,17 +67,17 @@ public class UTCTimeOnlyFieldTest {
     public void testCreateNoMillis() throws Exception {
         int tag = new Random().nextInt();
         UTCTimeOnlyField field = new UTCTimeOnlyField(tag, TIMESTAMP_NO_MILLIS.getBytes());
-        assertEquals(calendar.getTimeInMillis(), field.getValue().longValue());
-        assertEquals(calendar.getTimeInMillis(), field.timestampMillis());
+        assertEquals(utcCalendar.getTimeInMillis(), field.getValue().longValue());
+        assertEquals(utcCalendar.getTimeInMillis(), field.timestampMillis());
     }
 
     @Test
     public void testCreateWithMillis() throws Exception {
         int tag = new Random().nextInt();
-        calendar.set(Calendar.MILLISECOND, 537);
+        utcCalendar.set(Calendar.MILLISECOND, 537);
         UTCTimeOnlyField field = new UTCTimeOnlyField(tag, TIMESTAMP_WITH_MILLIS.getBytes());
-        assertEquals(calendar.getTimeInMillis(), field.getValue().longValue());
-        assertEquals(calendar.getTimeInMillis(), field.timestampMillis());
+        assertEquals(utcCalendar.getTimeInMillis(), field.getValue().longValue());
+        assertEquals(utcCalendar.getTimeInMillis(), field.timestampMillis());
     }
 
     @Test
