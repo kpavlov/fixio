@@ -9,15 +9,15 @@ This API is intended to be a replacement for well known [QuickFIX/J][quickfix] l
 
 ### Design goals ###
 
-1. Implement FIX protocol API with as low memory footprint as possible in order to eliminate unnecessary GC overhead
+1. Implement [FIX Protocol][fixprotocol] Java API with as low memory footprint as possible in order to eliminate unnecessary GC overhead,
 thus improving overall application performance under high load.
-2. Provide FIX Protocol Codecs for Netty, making it possible to get rid of Apache [Mina][mina] which is used by [QuickFIX/J][quickfix] as a transport layer.
+2. Provide [FIX Protocol][fixprotocol] Codecs for [Netty][netty], making it possible to get rid of Apache [Mina][mina] which is used by [QuickFIX/J][quickfix] as a transport layer.
 
 This API has a number of [limitations](#Limitations), so it may be not suitable for any FIX application.
 
 # Getting Started #
 
-1. [Download ZIP arhhive](archive/master.zip) or clone/fork the repository.
+1. [Download ZIP archive](archive/master.zip) or clone/fork the repository.
 2. Build and install project artifacts to your local maven repository:
 `mvn clean install`
 3. Add the dependency to your project
@@ -44,7 +44,10 @@ You'll also need a slf4j API implementation at runtime, so please add appropriat
 
 # Examples #
 
-You may find working example of [client][client-example] and [server][server-example] applications in module ["examples"][examples-module].
+You may find working example of [client][client-example]
+and [server][server-example] applications in module ["examples"][examples-module].
+
+I recommend running server with Concurrent Mark Sweep Collector enabled: `-XX:+UseConcMarkSweepGC`.
 
 # Limitations #
 
@@ -58,3 +61,5 @@ You may find working example of [client][client-example] and [server][server-exa
 [examples-module]: tree/master/examples
 [quickfix]: http://www.quickfixj.org/ "Java Open Source FIX Engine"
 [mina]: http://directory.apache.org/subprojects/mina/ "Apache Mina"
+[netty]: http://netty.io/ "Netty"
+[fixprotocol]: http://www.fixprotocol.org/ "FIX Protocol"

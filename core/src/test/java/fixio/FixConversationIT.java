@@ -1,5 +1,5 @@
 /*
- * Copyright 2013 The FIX.io Project
+ * Copyright 2014 The FIX.io Project
  *
  * The FIX.io Project licenses this file to you under the Apache License,
  * version 2.0 (the "License"); you may not use this file except in compliance
@@ -18,6 +18,7 @@ package fixio;
 import fixio.events.LogonEvent;
 import fixio.fixprotocol.FixMessage;
 import fixio.fixprotocol.FixMessageBuilderImpl;
+import fixio.fixprotocol.MessageTypes;
 import fixio.handlers.FixApplicationAdapter;
 import fixio.handlers.FixMessageHandlerAdapter;
 import io.netty.channel.ChannelFuture;
@@ -27,6 +28,7 @@ import org.junit.*;
 import java.util.ArrayList;
 import java.util.List;
 
+import static fixio.fixprotocol.FieldType.*;
 import static org.junit.Assert.assertEquals;
 
 public class FixConversationIT {
@@ -51,18 +53,18 @@ public class FixConversationIT {
 
     private static FixMessage createUserStatusRequest() {
         FixMessageBuilderImpl userRequest = new FixMessageBuilderImpl("BE");
-        userRequest.add(923, "UserRequestID");//UserRequestID
-        userRequest.add(924, 4);//UserRequestType=RequestIndividualUserStatus
-        userRequest.add(553, "user");//553 Username
+        userRequest.add(UserRequestID, "UserRequestID");//UserRequestID
+        userRequest.add(UserRequestType, 4);//UserRequestType=RequestIndividualUserStatus
+        userRequest.add(Username, "user");//553 Username
         return userRequest;
     }
 
     private static FixMessage createUserStatusReport() {
         FixMessageBuilderImpl userRequest = new FixMessageBuilderImpl("BF");
-        userRequest.add(923, "UserRequestID");//UserRequestID
-        userRequest.add(553, "user");//553 Username
-        userRequest.add(926, 1);
-        userRequest.add(927, "Active");
+        userRequest.add(UserRequestID, "UserRequestID");//UserRequestID
+        userRequest.add(Username, "user");//553 Username
+        userRequest.add(UserStatus, 1);
+        userRequest.add(UserStatusText, "Active");
         return userRequest;
     }
 
@@ -84,8 +86,8 @@ public class FixConversationIT {
         clientCloseFuture.sync();
 
         assertEquals(2, conversation.size());
-        assertEquals("BE", conversation.get(0).getMessageType());
-        assertEquals("BF", conversation.get(1).getMessageType());
+        assertEquals(MessageTypes.USER_REQUEST, conversation.get(0).getMessageType());
+        assertEquals(MessageTypes.USER_RESPONSE, conversation.get(1).getMessageType());
     }
 
     private static class ServerLogicHandler extends FixMessageHandlerAdapter {

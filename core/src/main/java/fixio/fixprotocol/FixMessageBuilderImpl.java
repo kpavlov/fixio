@@ -16,10 +16,10 @@
 package fixio.fixprotocol;
 
 import fixio.fixprotocol.fields.FieldFactory;
+import fixio.fixprotocol.fields.FixedPointNumber;
 import fixio.fixprotocol.fields.IntField;
 import fixio.fixprotocol.fields.StringField;
 
-import java.nio.charset.StandardCharsets;
 import java.util.LinkedList;
 import java.util.List;
 
@@ -38,46 +38,34 @@ public class FixMessageBuilderImpl implements FixMessage, FixMessageBuilder {
 
     public FixMessageBuilderImpl add(FieldType field, int value) {
         assert (field != null) : "Tag must be specified.";
+
         return add(field, String.valueOf(value));
     }
 
     public FixMessageBuilderImpl add(int tagNum, int value) {
         assert (tagNum > 0) : "Tag must be positive.";
-        return add(tagNum, String.valueOf(value));
+        body.add(FieldFactory.fromIntValue(tagNum, value));
+        return this;
     }
 
-    public FixMessageBuilderImpl add(FieldType field, String value) {
-        assert (field != null) : "Tag must be specified.";
+    public FixMessageBuilderImpl add(FieldType fieldType, FixedPointNumber value) {
+        assert (fieldType != null) : "Tag must be specified.";
         assert (value != null) : "Value must be specified.";
-        return add(field.tag(), value);
+        body.add(FieldFactory.fromFixedPointValue(fieldType, value));
+        return this;
+    }
+
+    public FixMessageBuilderImpl add(FieldType fieldType, String value) {
+        assert (fieldType != null) : "Tag must be specified.";
+        assert (value != null) : "Value must be specified.";
+        body.add(FieldFactory.fromStringValue(fieldType, value));
+        return this;
     }
 
     public FixMessageBuilderImpl add(int tagNum, String value) {
         assert (tagNum > 0) : "TagNum must be positive. Got " + tagNum;
         assert (value != null) : "Value must be specified.";
-        switch (tagNum) {
-            case 8:
-                header.setBeginString(value.intern());
-                break;
-            case 10:
-                trailer.setCheckSum(Integer.parseInt(value));
-                break;
-            case 49:
-                header.setSenderCompID(value);
-                break;
-            case 56:
-                header.setTargetCompID(value);
-                break;
-            case 34:
-                header.setMsgSeqNum(Integer.parseInt(value));
-                break;
-            case 35:
-                header.setMessageType(value.intern());
-                break;
-            default:
-                body.add(FieldFactory.valueOf(tagNum, value.getBytes(StandardCharsets.US_ASCII)));
-                break;
-        }
+        body.add(FieldFactory.fromStringValue(tagNum, value));
         return this;
     }
 

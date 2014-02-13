@@ -34,9 +34,4 @@ public class StringField extends AbstractField<String> {
     public byte[] getBytes() {
         return value.getBytes(StandardCharsets.US_ASCII);
     }
-
-    @Override
-    public String toString() {
-        return String.valueOf(getTagNum()) + '=' + value;
-    }
 }

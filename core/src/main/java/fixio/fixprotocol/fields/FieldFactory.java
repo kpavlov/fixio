@@ -15,6 +15,7 @@
  */
 package fixio.fixprotocol.fields;
 
+import fixio.fixprotocol.DataType;
 import fixio.fixprotocol.FieldType;
 
 import java.text.ParseException;
@@ -23,12 +24,12 @@ import static java.nio.charset.StandardCharsets.US_ASCII;
 
 public class FieldFactory {
 
-    public static <T extends AbstractField> T valueOf(int tagNum, byte[] value) {
+    public static <F extends AbstractField> F valueOf(int tagNum, byte[] value) {
         return valueOf(tagNum, value, 0, value.length);
     }
 
     @SuppressWarnings("unchecked")
-    public static <T extends AbstractField> T valueOf(int tagNum, byte[] value, int offset, int length) {
+    public static <F extends AbstractField> F valueOf(int tagNum, byte[] value, int offset, int length) {
         if (tagNum <= 0) {
             throw new IllegalArgumentException("Invalid tagNum=" + tagNum);
         }
@@ -36,28 +37,143 @@ public class FieldFactory {
         try {
             switch (fieldType.type()) {
                 case STRING:
-                    return (T) new StringField(tagNum, new String(value, offset, length, US_ASCII));
+                    return (F) new StringField(tagNum, new String(value, offset, length, US_ASCII));
                 case BOOLEAN:
-                    return (T) new BooleanField(tagNum, (value[offset] == 'Y'));
+                    return (F) new BooleanField(tagNum, (value[offset] == 'Y'));
                 case CHAR:
-                    return (T) new CharField(tagNum, (char) value[offset]);
+                    return (F) new CharField(tagNum, (char) value[offset]);
                 case FLOAT:
                 case PRICE:
                 case QTY:
-                    return (T) new FloatField(tagNum, value, offset, length);
+                    return (F) new FloatField(tagNum, value, offset, length);
                 case INT:
                 case LENGTH:
                 case SEQNUM:
                 case NUMINGROUP:
-                    return (T) new IntField(tagNum, Integer.parseInt(new String(value, offset, length, US_ASCII)));
+                    return (F) new IntField(tagNum, Integer.parseInt(new String(value, offset, length, US_ASCII)));
                 case UTCTIMESTAMP:
-                    return (T) new UTCTimestampField(tagNum, value, offset, length);
+                    return (F) new UTCTimestampField(tagNum, value, offset, length);
                 default:
                     throw new UnsupportedOperationException("Unsupported field type: " + fieldType
                             + '(' + fieldType.type() + ')');
             }
         } catch (ParseException | NumberFormatException e) {
             throw new IllegalArgumentException("Invalid value for field " + fieldType + ": " + e.getMessage(), e);
+        }
+    }
+
+    @SuppressWarnings("unchecked")
+    public static <F extends AbstractField<?>> F fromIntValue(int tagNum, int value) {
+        FieldType fieldType = FieldType.forTag(tagNum);
+        switch (fieldType.type()) {
+            case STRING:
+                return (F) new StringField(tagNum, String.valueOf(value));
+            case FLOAT:
+            case PRICE:
+            case QTY:
+                return (F) new FloatField(tagNum, new FixedPointNumber(value));
+            case INT:
+            case LENGTH:
+            case SEQNUM:
+            case NUMINGROUP:
+                return (F) new IntField(tagNum, value);
+            case UTCTIMESTAMP:
+                return (F) new UTCTimestampField(tagNum, value);
+            case UTCTIMEONLY:
+                return (F) new UTCTimeOnlyField(tagNum, value);
+            case UTCDATEONLY:
+                return (F) new UTCDateOnlyField(tagNum, value);
+            default:
+                throw new IllegalArgumentException("Value " + value + " is not applicable for field type: " + fieldType
+                        + '(' + fieldType.type() + ')');
+        }
+    }
+
+    public static <F extends AbstractField<?>> F fromLongValue(int tagNum, long value) {
+        FieldType fieldType = FieldType.forTag(tagNum);
+        return fromLongValue(fieldType, value);
+    }
+
+    public static <F extends AbstractField<?>> F fromLongValue(FieldType fieldType, long value) {
+        return fromLongValue(fieldType.type(), fieldType.tag(), value);
+    }
+
+    @SuppressWarnings("unchecked")
+    public static <F extends AbstractField<?>> F fromLongValue(DataType type, int tagNum, long value) {
+        switch (type) {
+            case STRING:
+                return (F) new StringField(tagNum, String.valueOf(value));
+            case FLOAT:
+            case PRICE:
+            case QTY:
+                return (F) new FloatField(tagNum, new FixedPointNumber(value));
+            case INT:
+            case LENGTH:
+            case SEQNUM:
+            case NUMINGROUP:
+                return (F) new IntField(tagNum, (int) value);
+            case UTCTIMESTAMP:
+                return (F) new UTCTimestampField(tagNum, value);
+            case UTCTIMEONLY:
+                return (F) new UTCTimeOnlyField(tagNum, value);
+            case UTCDATEONLY:
+                return (F) new UTCDateOnlyField(tagNum, value);
+            default:
+                throw new IllegalArgumentException("Value " + value + " is not applicable for field : " + tagNum
+                        + '(' + type + ')');
+        }
+    }
+
+    public static <F extends AbstractField<?>> F fromStringValue(int tagNum, String value) {
+        FieldType fieldType = FieldType.forTag(tagNum);
+        return fromStringValue(fieldType, value);
+    }
+
+    public static <F extends AbstractField<?>> F fromStringValue(FieldType fieldType, String value) {
+        return fromStringValue(fieldType.type(), fieldType.tag(), value);
+    }
+
+    @SuppressWarnings("unchecked")
+    public static <F extends AbstractField<?>> F fromStringValue(DataType type, int tagNum, String value) {
+        switch (type) {
+            case STRING:
+                return (F) new StringField(tagNum, value);
+            case FLOAT:
+            case PRICE:
+            case QTY:
+                return (F) new FloatField(tagNum, new FixedPointNumber(value));
+            case INT:
+            case LENGTH:
+            case SEQNUM:
+            case NUMINGROUP:
+                return (F) new IntField(tagNum, Integer.parseInt(value));
+            default:
+                throw new IllegalArgumentException("Value " + value + " is not applicable for field : " + tagNum
+                        + '(' + type + ')');
+        }
+    }
+
+    public static <T, F extends AbstractField<?>> F fromFixedPointValue(int tagNum, FixedPointNumber value) {
+        FieldType fieldType = FieldType.forTag(tagNum);
+        return fromFixedPointValue(fieldType, value);
+    }
+
+    public static <T, F extends AbstractField<?>> F fromFixedPointValue(FieldType fieldType, FixedPointNumber value) {
+        return fromFixedPointValue(fieldType.type(), fieldType.tag(), value);
+    }
+
+    @SuppressWarnings("unchecked")
+    public static <F extends AbstractField<?>> F fromFixedPointValue(DataType type, int tagNum, FixedPointNumber value) {
+        switch (type) {
+            case STRING:
+                return (F) new StringField(tagNum, value.toString());
+            case FLOAT:
+            case PRICE:
+            case QTY:
+                return (F) new FloatField(tagNum, value);
+            default:
+                throw new IllegalArgumentException("Value " + value + " is not applicable for field : " + tagNum
+                        + '(' + type + ')');
         }
     }
 }

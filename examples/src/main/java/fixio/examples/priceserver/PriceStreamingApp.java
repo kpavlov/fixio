@@ -18,6 +18,7 @@ package fixio.examples.priceserver;
 import fixio.events.LogonEvent;
 import fixio.events.LogoutEvent;
 import fixio.fixprotocol.*;
+import fixio.fixprotocol.fields.FixedPointNumber;
 import fixio.handlers.FixApplicationAdapter;
 import io.netty.channel.ChannelHandlerContext;
 import org.slf4j.Logger;
@@ -25,7 +26,6 @@ import org.slf4j.LoggerFactory;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Locale;
 import java.util.Map;
 import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.ConcurrentHashMap;
@@ -46,8 +46,10 @@ class PriceStreamingApp extends FixApplicationAdapter {
         FixMessageBuilderImpl message = new FixMessageBuilderImpl(MessageTypes.QUOTE);
         message.add(FieldType.QuoteReqID, reqId);
 
-        message.add(FieldType.MktBidPx, String.format(Locale.US, "%1$.5f", quote.getBid()));// MktBidPx
-        message.add(FieldType.MktOfferPx, String.format(Locale.US, "%1$.5f", quote.getOffer()));//MktOfferPx
+        message.add(FieldType.MktBidPx,
+                new FixedPointNumber(quote.getBid(), 2));// MktBidPx
+        message.add(FieldType.MktOfferPx,
+                new FixedPointNumber(quote.getOffer(), 2));//MktOfferPx
 
         return message;
     }
@@ -69,7 +71,7 @@ class PriceStreamingApp extends FixApplicationAdapter {
     }
 
     private void stopStreaming(ChannelHandlerContext ctx) {
-        ArrayList<String> requestsToCancel = new ArrayList<>();
+        ArrayList<String> requestsToCancel = new ArrayList<>(subscriptions.size());
         for (Map.Entry<String, ChannelHandlerContext> entry : subscriptions.entrySet()) {
             if (entry.getValue() == ctx) {
                 requestsToCancel.add(entry.getKey());
@@ -109,7 +111,7 @@ class PriceStreamingApp extends FixApplicationAdapter {
                 try {
                     quote = quoteQueue.take();
                 } catch (InterruptedException e) {
-
+                    LOGGER.error("Interrupted queue", e);
                 }
                 for (Map.Entry<String, ChannelHandlerContext> subscriptionEntry : subscriptions.entrySet()) {
                     publish(subscriptionEntry.getValue(), subscriptionEntry.getKey(), quote);
