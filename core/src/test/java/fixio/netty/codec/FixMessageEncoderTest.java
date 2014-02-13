@@ -1,5 +1,5 @@
 /*
- * Copyright 2013 The FIX.io Project
+ * Copyright 2014 The FIX.io Project
  *
  * The FIX.io Project licenses this file to you under the Apache License,
  * version 2.0 (the "License"); you may not use this file except in compliance
@@ -52,8 +52,7 @@ public class FixMessageEncoderTest {
     @Before
     public void setUp() throws Exception {
         when(ctx.alloc()).thenReturn(byteBufAllocator);
-        when(byteBufAllocator.buffer()).thenReturn(Unpooled.buffer());
-
+        when(byteBufAllocator.buffer()).thenReturn(Unpooled.buffer(), Unpooled.buffer());
 
         FixMessageBuilder fixMessage = new FixMessageBuilderImpl();
 

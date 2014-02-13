@@ -1,5 +1,5 @@
 /*
- * Copyright 2013 The FIX.io Project
+ * Copyright 2014 The FIX.io Project
  *
  * The FIX.io Project licenses this file to you under the Apache License,
  * version 2.0 (the "License"); you may not use this file except in compliance
@@ -23,6 +23,7 @@ import fixio.handlers.FixMessageHandler;
 import fixio.netty.pipeline.client.FixInitiatorChannelInitializer;
 import fixio.netty.pipeline.client.PropertyFixSessionSettingsProviderImpl;
 import io.netty.bootstrap.Bootstrap;
+import io.netty.buffer.PooledByteBufAllocator;
 import io.netty.channel.Channel;
 import io.netty.channel.ChannelFuture;
 import io.netty.channel.ChannelOption;
@@ -69,6 +70,7 @@ public class FixClient extends AbstractFixConnector {
                     .option(ChannelOption.TCP_NODELAY,
                             Boolean.parseBoolean(System.getProperty(
                                     "nfs.rpc.tcp.nodelay", "true")))
+                    .option(ChannelOption.ALLOCATOR, new PooledByteBufAllocator())
                     .handler(new FixInitiatorChannelInitializer<SocketChannel>(
                             workerGroup,
                             new PropertyFixSessionSettingsProviderImpl(settingsResource),

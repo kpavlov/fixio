@@ -1,5 +1,5 @@
 /*
- * Copyright 2013 The FIX.io Project
+ * Copyright 2014 The FIX.io Project
  *
  * The FIX.io Project licenses this file to you under the Apache License,
  * version 2.0 (the "License"); you may not use this file except in compliance
@@ -21,6 +21,7 @@ import fixio.handlers.FixApplicationAdapter;
 import fixio.handlers.FixMessageHandler;
 import fixio.netty.pipeline.server.FixAcceptorChannelInitializer;
 import io.netty.bootstrap.ServerBootstrap;
+import io.netty.buffer.PooledByteBufAllocator;
 import io.netty.channel.Channel;
 import io.netty.channel.ChannelFuture;
 import io.netty.channel.ChannelOption;
@@ -63,6 +64,7 @@ public class FixServer extends AbstractFixConnector {
                 .childOption(ChannelOption.TCP_NODELAY,
                         Boolean.parseBoolean(System.getProperty(
                                 "nfs.rpc.tcp.nodelay", "true")))
+                .childOption(ChannelOption.ALLOCATOR, new PooledByteBufAllocator())
                 .localAddress(new InetSocketAddress(port))
                 .childHandler(new FixAcceptorChannelInitializer<SocketChannel>(
                         workerGroup,

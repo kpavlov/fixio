@@ -20,7 +20,6 @@ import fixio.fixprotocol.*;
 import fixio.fixprotocol.fields.AbstractField;
 import io.netty.buffer.ByteBuf;
 import io.netty.buffer.ByteBufAllocator;
-import io.netty.buffer.Unpooled;
 import io.netty.channel.ChannelHandler;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.handler.codec.MessageToByteEncoder;
@@ -89,18 +88,17 @@ public class FixMessageEncoder extends MessageToByteEncoder<FixMessageBuilder> {
 
     @Override
     public void encode(ChannelHandlerContext ctx, FixMessageBuilder msg, ByteBuf out) throws Exception {
-        final int initialOffset = out.writerIndex();
         final FixMessageHeader header = msg.getHeader();
-
         validateRequiredFields(header);
 
-        ByteBufAllocator byteBufAllocator = ctx.alloc();
+        final int initialOffset = out.writerIndex();
 
-        final ByteBuf bodyBuf = createBodyBuf(msg, header);
+        final ByteBufAllocator byteBufAllocator = ctx.alloc();
 
-        int bodyLength = bodyBuf.writerIndex();
-
+        final ByteBuf bodyBuf = byteBufAllocator.buffer();
         final ByteBuf headBuf = byteBufAllocator.buffer();
+
+        int bodyLength = fillBodyBuf(bodyBuf, msg, header);
 
         // begin string
         writeField(8, header.getBeginString(), headBuf);
@@ -122,7 +120,7 @@ public class FixMessageEncoder extends MessageToByteEncoder<FixMessageBuilder> {
         assert (bodyBuf.refCnt() == 0);
     }
 
-    private void encodeHeader(FixMessageHeader header, ByteBuf out) {
+    private static void encodeHeader(FixMessageHeader header, ByteBuf out) {
 
         // message type
         writeField(35, header.getMessageType(), out);
@@ -141,8 +139,9 @@ public class FixMessageEncoder extends MessageToByteEncoder<FixMessageBuilder> {
         writeField(52, timeStr, out);
     }
 
-    private ByteBuf createBodyBuf(FixMessageBuilder msg, FixMessageHeader header) {
-        final ByteBuf payloadBuf = Unpooled.buffer();
+    private static int fillBodyBuf(final ByteBuf payloadBuf,
+                                   FixMessageBuilder msg,
+                                   FixMessageHeader header) {
 
         encodeHeader(header, payloadBuf);
 
@@ -150,10 +149,10 @@ public class FixMessageEncoder extends MessageToByteEncoder<FixMessageBuilder> {
         for (FixMessageFragment component : msg.getBody()) {
             encodeComponent(payloadBuf, component);
         }
-        return payloadBuf;
+        return payloadBuf.writerIndex();
     }
 
-    private void encodeComponent(ByteBuf payloadBuf, FixMessageFragment component) {
+    private static void encodeComponent(ByteBuf payloadBuf, FixMessageFragment component) {
         if (component instanceof AbstractField) {
             writeField(component.getTagNum(), (AbstractField) component, payloadBuf);
         } else if (component instanceof Group) {
