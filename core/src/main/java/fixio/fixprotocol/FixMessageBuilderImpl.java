@@ -20,19 +20,52 @@ import fixio.fixprotocol.fields.FixedPointNumber;
 import fixio.fixprotocol.fields.IntField;
 import fixio.fixprotocol.fields.StringField;
 
-import java.util.LinkedList;
+import java.util.ArrayList;
 import java.util.List;
 
 public class FixMessageBuilderImpl implements FixMessage, FixMessageBuilder {
 
+    private static final int DEFAULT_BODY_FIELD_COUNT = 16;
     private final FixMessageHeader header = new FixMessageHeader();
     private final FixMessageTrailer trailer = new FixMessageTrailer();
-    private final List<FixMessageFragment> body = new LinkedList<>();
+    private final List<FixMessageFragment> body;
 
-    public FixMessageBuilderImpl() {
+    /**
+     * Creates FixMessageBuilderImpl with expected body field count.
+     * <p/>
+     * Providing expected capacity eliminates unnecessary growing of internal ArrayList storing body fields.
+     */
+    public FixMessageBuilderImpl(int expectedBodyFieldCount) {
+        body = new ArrayList<>(expectedBodyFieldCount);
     }
 
+
+    /**
+     * Creates FixMessageBuilderImpl with default expected body field count.
+     *
+     * @see #DEFAULT_BODY_FIELD_COUNT
+     */
+    public FixMessageBuilderImpl() {
+        this(DEFAULT_BODY_FIELD_COUNT);
+    }
+
+    /**
+     * Creates FixMessageBuilderImpl with specified message type (tag 35)
+     * and default expected body field count.
+     *
+     * @see #DEFAULT_BODY_FIELD_COUNT
+     */
     public FixMessageBuilderImpl(String messageType) {
+        this();
+        header.setMessageType(messageType);
+    }
+
+    /**
+     * Creates FixMessageBuilderImpl with specified message type (tag 35)
+     * and expected body field count.
+     */
+    public FixMessageBuilderImpl(int expectedBodyFieldCount, String messageType) {
+        this(expectedBodyFieldCount);
         header.setMessageType(messageType);
     }
 
@@ -175,7 +208,8 @@ public class FixMessageBuilderImpl implements FixMessage, FixMessageBuilder {
     }
 
     private FixMessageFragment getFirst(int tagNum) {
-        for (FixMessageFragment item : body) {
+        for (int i = 0; i < body.size(); i++) {
+            FixMessageFragment item = body.get(i);
             if (item.getTagNum() == tagNum) {
                 return item;
             }

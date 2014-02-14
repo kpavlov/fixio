@@ -21,7 +21,7 @@ import fixio.fixprotocol.fields.FieldFactory;
 import fixio.fixprotocol.fields.IntField;
 import fixio.fixprotocol.fields.StringField;
 
-import java.util.LinkedList;
+import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -31,7 +31,7 @@ public class FixMessageImpl implements FixMessage {
 
     private final FixMessageHeader header = new FixMessageHeader();
     private final FixMessageTrailer trailer = new FixMessageTrailer();
-    private final List<FixMessageFragment> body = new LinkedList<>();
+    private final List<FixMessageFragment> body = new ArrayList<>();
 
     public FixMessageImpl add(int tagNum, byte[] value) {
         return add(tagNum, value, 0, value.length);

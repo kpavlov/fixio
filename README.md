@@ -12,6 +12,10 @@ This API is intended to be a replacement for well known [QuickFIX/J][quickfix] l
 1. Implement [FIX Protocol][fixprotocol] Java API with as low memory footprint as possible in order to eliminate unnecessary GC overhead,
 thus improving overall application performance under high load.
 2. Provide [FIX Protocol][fixprotocol] Codecs for [Netty][netty], making it possible to get rid of Apache [Mina][mina] which is used by [QuickFIX/J][quickfix] as a transport layer.
+3. Avoid using expensive operations:
+     - Avoid synchronization.
+     - Replace BigDecimals with custom [Fixed Point Number][FixedPointNumber] implementation for financial data.
+     - Reuse java.util.Calendar and java.util.TimeZone instances.
 
 This API has a number of [limitations](#Limitations), so it may be not suitable for any FIX application.
 
@@ -56,6 +60,7 @@ I recommend running server with Concurrent Mark Sweep Collector enabled: `-XX:+U
 3. Message encodings other than US-ASCII are not supported.
 4. ...
 
+[FixedPointNumber]: tree/master/core/src/main/java/fixio/fixprotocol/fields/FixedPointNumber.java
 [client-example]: tree/master/examples/src/main/java/fixio/examples/priceclient
 [server-example]: tree/master/examples/src/main/java/fixio/examples/priceserver
 [examples-module]: tree/master/examples

@@ -43,13 +43,13 @@ class PriceStreamingApp extends FixApplicationAdapter {
     }
 
     private static FixMessageBuilder createQuoteMessage(String reqId, Quote quote) {
-        FixMessageBuilderImpl message = new FixMessageBuilderImpl(MessageTypes.QUOTE);
+        FixMessageBuilderImpl message = new FixMessageBuilderImpl(3, MessageTypes.QUOTE);
         message.add(FieldType.QuoteReqID, reqId);
 
         message.add(FieldType.MktBidPx,
-                new FixedPointNumber(quote.getBid(), 2));// MktBidPx
+                new FixedPointNumber(quote.getBid(), 2));
         message.add(FieldType.MktOfferPx,
-                new FixedPointNumber(quote.getOffer(), 2));//MktOfferPx
+                new FixedPointNumber(quote.getOffer(), 2));
 
         return message;
     }

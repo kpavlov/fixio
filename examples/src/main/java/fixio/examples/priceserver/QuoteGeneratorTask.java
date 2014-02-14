@@ -48,7 +48,7 @@ class QuoteGeneratorTask implements Runnable {
                 }
 
             } catch (Throwable e) {
-                e.printStackTrace();
+                LOGGER.error("Unable to sumbit quote.", e);
             }
             Thread.yield();
         }
