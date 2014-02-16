@@ -57,7 +57,7 @@ public class FixServer extends AbstractFixConnector {
 
     public void start() throws InterruptedException {
         bossGroup = new NioEventLoopGroup();
-        workerGroup = new NioEventLoopGroup();
+        workerGroup = new NioEventLoopGroup(8);
         ServerBootstrap bootstrap = new ServerBootstrap();
         bootstrap.group(bossGroup, workerGroup)
                 .channel(NioServerSocketChannel.class)
@@ -74,8 +74,7 @@ public class FixServer extends AbstractFixConnector {
                 .validate();
 
         ChannelFuture f = bootstrap.bind().sync();
-        LOGGER.info(FixServer.class.getName() +
-                " started and listen on " + f.channel().localAddress());
+        LOGGER.info("FixServer is started at {}", f.channel().localAddress());
         channel = f.channel();
     }
 

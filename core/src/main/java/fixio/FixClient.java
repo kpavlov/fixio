@@ -62,7 +62,7 @@ public class FixClient extends AbstractFixConnector {
 
     public ChannelFuture connect(SocketAddress serverAddress) throws InterruptedException {
         Bootstrap b = new Bootstrap();
-        EventLoopGroup workerGroup = new NioEventLoopGroup(50);
+        EventLoopGroup workerGroup = new NioEventLoopGroup(8);
         try {
             b.group(new NioEventLoopGroup())
                     .channel(NioSocketChannel.class)
@@ -80,7 +80,7 @@ public class FixClient extends AbstractFixConnector {
                     .validate();
 
             channel = b.connect().sync().channel();
-            LOGGER.info(FixClient.class.getName() + " started and connected to " + channel.remoteAddress());
+            LOGGER.info("FixClient is started and connected to {}", channel.remoteAddress());
             return channel.closeFuture();
         } finally {
             // b.shutdown();
