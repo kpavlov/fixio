@@ -1,5 +1,5 @@
 /*
- * Copyright 2013 The FIX.io Project
+ * Copyright 2014 The FIX.io Project
  *
  * The FIX.io Project licenses this file to you under the Apache License,
  * version 2.0 (the "License"); you may not use this file except in compliance
@@ -15,11 +15,14 @@
  */
 package fixio.netty.pipeline;
 
+import fixio.events.LogoutEvent;
 import fixio.fixprotocol.FieldType;
 import fixio.fixprotocol.FixMessage;
 import fixio.fixprotocol.FixMessageBuilder;
 import fixio.fixprotocol.MessageTypes;
+import fixio.fixprotocol.session.FixSession;
 import io.netty.channel.ChannelHandlerContext;
+import io.netty.util.Attribute;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -40,12 +43,15 @@ import static org.mockito.Mockito.*;
 @RunWith(MockitoJUnitRunner.class)
 public class AbstractSessionHandlerTest {
 
-    private static final Logger LOGGER = LoggerFactory.getLogger(AbstractSessionHandlerTest.class);
     public static final Random RANDOM = new Random();
-
+    private static final Logger LOGGER = LoggerFactory.getLogger(AbstractSessionHandlerTest.class);
     private AbstractSessionHandler sessionHandler;
     @Mock
     private ChannelHandlerContext ctx;
+    @Mock
+    private FixSession fixSession;
+    @Mock
+    private Attribute<FixSession> sessonAttr;
     @Captor
     private ArgumentCaptor<FixMessage> rejectCaptor;
 
@@ -84,6 +90,25 @@ public class AbstractSessionHandlerTest {
         assertEquals(MessageTypes.REJECT, reject.getMessageType());
         assertEquals(msgType, reject.getString(FieldType.RefMsgType.tag()));
         assertEquals((Integer) originalMsgSeqNum, reject.getInt(FieldType.RefSeqNum.tag()));
+    }
 
+    @Test
+    public void testChannelInactiveSessionExists() throws Exception {
+        when(ctx.attr(AbstractSessionHandler.FIX_SESSION_KEY)).thenReturn(sessonAttr);
+        when(sessonAttr.getAndRemove()).thenReturn(fixSession);
+
+        sessionHandler.channelInactive(ctx);
+
+        verify(ctx).fireChannelRead(any(LogoutEvent.class));
+        verify(sessonAttr).getAndRemove();
+    }
+
+    @Test
+    public void testChannelInactiveSessionNotExists() throws Exception {
+        when(ctx.attr(AbstractSessionHandler.FIX_SESSION_KEY)).thenReturn(null);
+
+        sessionHandler.channelInactive(ctx);
+
+        verify(ctx, never()).fireChannelRead(any(LogoutEvent.class));
     }
 }

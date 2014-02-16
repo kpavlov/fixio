@@ -1,5 +1,5 @@
 /*
- * Copyright 2013 The FIX.io Project
+ * Copyright 2014 The FIX.io Project
  *
  * The FIX.io Project licenses this file to you under the Apache License,
  * version 2.0 (the "License"); you may not use this file except in compliance
@@ -94,7 +94,7 @@ public class ServerSessionHandler extends AbstractSessionHandler {
                         ctx.write(resendRequest);
                     }
                     ctx.flush();
-                    out.add(new LogonEvent());
+                    out.add(new LogonEvent(fixSession));
 
                 } else {
                     //If the authentication (of the session initiator's logon message) fails,

@@ -1,5 +1,5 @@
 /*
- * Copyright 2013 The FIX.io Project
+ * Copyright 2014 The FIX.io Project
  *
  * The FIX.io Project licenses this file to you under the Apache License,
  * version 2.0 (the "License"); you may not use this file except in compliance
@@ -16,6 +16,7 @@
 
 package fixio.netty.pipeline;
 
+import fixio.events.LogoutEvent;
 import fixio.fixprotocol.*;
 import fixio.fixprotocol.session.FixSession;
 import io.netty.channel.ChannelFuture;
@@ -42,8 +43,11 @@ public abstract class AbstractSessionHandler extends MessageToMessageCodec<FixMe
     @Override
     public void channelInactive(ChannelHandlerContext ctx) throws Exception {
         Attribute<FixSession> fixSessionAttribute = ctx.attr(FIX_SESSION_KEY);
-        FixSession session = fixSessionAttribute.getAndRemove();
-        getLogger().info("Fix Session Closed. {}", session);
+        if (fixSessionAttribute != null) {
+            FixSession session = fixSessionAttribute.getAndRemove();
+            ctx.fireChannelRead(new LogoutEvent(session));
+            getLogger().info("Fix Session Closed. {}", session);
+        }
     }
 
     /**

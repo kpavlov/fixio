@@ -13,14 +13,37 @@
  * License for the specific language governing permissions and limitations
  * under the License.
  */
-
 package fixio.events;
 
 import fixio.fixprotocol.session.FixSession;
 
-public class LogonEvent extends AbstractAdminEvent {
+public abstract class AbstractAdminEvent implements AdminEvent {
 
-    public LogonEvent(FixSession session) {
-        super(session);
+    protected final FixSession session;
+
+    public AbstractAdminEvent(FixSession session) {
+        assert (session != null);
+        this.session = session;
+    }
+
+    public FixSession getSession() {
+        return session;
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+
+        AbstractAdminEvent that = (AbstractAdminEvent) o;
+
+        if (!session.equals(that.session)) return false;
+
+        return true;
+    }
+
+    @Override
+    public int hashCode() {
+        return session.hashCode();
     }
 }

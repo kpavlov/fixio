@@ -66,7 +66,7 @@ class PriceStreamingApp extends FixApplicationAdapter {
 
     @Override
     protected void onLogout(ChannelHandlerContext ctx, LogoutEvent msg) {
-        LOGGER.info("Logout.");
+        LOGGER.info("Logout. Session={}", msg.getSession());
         stopStreaming(ctx);
     }
 

@@ -1,5 +1,5 @@
 /*
- * Copyright 2013 The FIX.io Project
+ * Copyright 2014 The FIX.io Project
  *
  * The FIX.io Project licenses this file to you under the Apache License,
  * version 2.0 (the "License"); you may not use this file except in compliance
@@ -43,7 +43,7 @@ public class ClientSessionHandler extends AbstractSessionHandler {
             if (session != null) {
                 getLogger().info("Fix Session Established.");
                 if (session.checkIncomingSeqNum(header.getMsgSeqNum())) {
-                    LogonEvent logonEvent = new LogonEvent();
+                    LogonEvent logonEvent = new LogonEvent(session);
                     out.add(logonEvent);
                     return;
                 } else {
