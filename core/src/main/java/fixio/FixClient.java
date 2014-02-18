@@ -42,6 +42,8 @@ public class FixClient extends AbstractFixConnector {
     private static final Logger LOGGER = LoggerFactory.getLogger(FixClient.class);
     private Channel channel;
     private String settingsResource;
+    private EventLoopGroup bossEventLoopGroup;
+    private EventLoopGroup workerEventLoopGroup;
 
     public FixClient(FixApplicationAdapter fixApplication) {
         this(fixApplication, fixApplication);
@@ -62,9 +64,10 @@ public class FixClient extends AbstractFixConnector {
 
     public ChannelFuture connect(SocketAddress serverAddress) throws InterruptedException {
         Bootstrap b = new Bootstrap();
-        EventLoopGroup workerGroup = new NioEventLoopGroup(8);
+        bossEventLoopGroup = new NioEventLoopGroup();
+        workerEventLoopGroup = new NioEventLoopGroup(8);
         try {
-            b.group(new NioEventLoopGroup())
+            b.group(bossEventLoopGroup)
                     .channel(NioSocketChannel.class)
                     .remoteAddress(serverAddress)
                     .option(ChannelOption.TCP_NODELAY,
@@ -72,7 +75,7 @@ public class FixClient extends AbstractFixConnector {
                                     "nfs.rpc.tcp.nodelay", "true")))
                     .option(ChannelOption.ALLOCATOR, new PooledByteBufAllocator())
                     .handler(new FixInitiatorChannelInitializer<SocketChannel>(
-                            workerGroup,
+                            workerEventLoopGroup,
                             new PropertyFixSessionSettingsProviderImpl(settingsResource),
                             getAdminHandler(),
                             getAppMessageHandlers()
@@ -90,6 +93,10 @@ public class FixClient extends AbstractFixConnector {
     public void disconnect() throws InterruptedException {
         LOGGER.info("Closing connection to {}", channel.remoteAddress());
         channel.close().sync();
+        bossEventLoopGroup.shutdownGracefully();
+        workerEventLoopGroup.shutdownGracefully();
+        bossEventLoopGroup = null;
+        workerEventLoopGroup = null;
     }
 
     public void send(FixMessage fixMessage) throws InterruptedException {
