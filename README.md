@@ -51,7 +51,8 @@ You'll also need a slf4j API implementation at runtime, so please add appropriat
 You may find working example of [client][client-example]
 and [server][server-example] applications in module ["examples"][examples-module].
 
-I recommend running server with Concurrent Mark Sweep Collector enabled: `-XX:+UseConcMarkSweepGC`.
+I recommend running server with Concurrent Mark Sweep Collector enabled: `-XX:+UseConcMarkSweepGC`
+and increased Survivor spaces (`-XX:SurvivorRatio=4`).
 
 # Limitations #
 
