@@ -70,6 +70,12 @@ class PriceStreamingApp extends FixApplicationAdapter {
         stopStreaming(ctx);
     }
 
+    @Override
+    public void exceptionCaught(ChannelHandlerContext ctx, Throwable cause) throws Exception {
+        stopStreaming(ctx);
+        super.exceptionCaught(ctx, cause);
+    }
+
     private void stopStreaming(ChannelHandlerContext ctx) {
         ArrayList<String> requestsToCancel = new ArrayList<>(subscriptions.size());
         for (Map.Entry<String, ChannelHandlerContext> entry : subscriptions.entrySet()) {
