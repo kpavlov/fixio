@@ -26,8 +26,8 @@ import java.util.List;
 public class FixMessageBuilderImpl implements FixMessage, FixMessageBuilder {
 
     private static final int DEFAULT_BODY_FIELD_COUNT = 16;
-    private final FixMessageHeader header = new FixMessageHeader();
-    private final FixMessageTrailer trailer = new FixMessageTrailer();
+    private final FixMessageHeader header;
+    private final FixMessageTrailer trailer;
     private final List<FixMessageFragment> body;
 
     /**
@@ -36,9 +36,19 @@ public class FixMessageBuilderImpl implements FixMessage, FixMessageBuilder {
      * Providing expected capacity eliminates unnecessary growing of internal ArrayList storing body fields.
      */
     public FixMessageBuilderImpl(int expectedBodyFieldCount) {
+        header = new FixMessageHeader();
+        trailer = new FixMessageTrailer();
         body = new ArrayList<>(expectedBodyFieldCount);
     }
 
+    /**
+     * Creates FixMessageBuilderImpl with specified FixMessageHeader and  FixMessageTrailer.
+     */
+    public FixMessageBuilderImpl(FixMessageHeader header, FixMessageTrailer trailer) {
+        this.header = header;
+        this.trailer = trailer;
+        body = new ArrayList<>(DEFAULT_BODY_FIELD_COUNT);
+    }
 
     /**
      * Creates FixMessageBuilderImpl with default expected body field count.

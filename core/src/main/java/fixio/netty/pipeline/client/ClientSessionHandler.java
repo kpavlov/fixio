@@ -65,16 +65,19 @@ public class ClientSessionHandler extends AbstractSessionHandler {
 
         FixSession pendingSession = createSession(sessionSettingsProvider);
         setSession(ctx, pendingSession);
-        pendingSession.prepareOutgoing(logonRequest);
-        //updateFixMessageHeader(logonRequest);
+        updateFixMessageHeader(ctx, logonRequest);
+        compositeLogon(ctx, logonRequest);
         getLogger().info("Sending Logon: {}", logonRequest);
 
         ctx.writeAndFlush(logonRequest);
     }
 
+    protected void compositeLogon(ChannelHandlerContext ctx, FixMessageBuilder logonRequest) {
+    }
+
     private FixSession createSession(FixSessionSettingsProvider settingsProvider) {
 
-        int nextIncomingSeqNum = 0;
+        int nextIncomingSeqNum = settingsProvider.getMsgInSeqNum();
         if (settingsProvider.resetMsgSeqNum()) {
             nextIncomingSeqNum = 1;
         }
@@ -87,7 +90,7 @@ public class ClientSessionHandler extends AbstractSessionHandler {
                 .targetSubId(settingsProvider.getTargetSubID())
                 .nextIncomingSeqNum(nextIncomingSeqNum)
                 .build();
-        session.setNextOutgoingMessageSeqNum(settingsProvider.getMsgSeqNum());
+        session.setNextOutgoingMessageSeqNum(settingsProvider.getMsgOutSeqNum());
         return session;
     }
 
