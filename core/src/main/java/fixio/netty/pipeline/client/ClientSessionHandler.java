@@ -32,7 +32,8 @@ public class ClientSessionHandler extends AbstractSessionHandler {
     private final FixSessionSettingsProvider sessionSettingsProvider;
 
     public ClientSessionHandler(FixSessionSettingsProvider settingsProvider) {
-        sessionSettingsProvider = settingsProvider;
+        assert (settingsProvider != null) : "FixSessionSettingsProvider is expected.";
+        this.sessionSettingsProvider = settingsProvider;
     }
 
     @Override
@@ -72,7 +73,7 @@ public class ClientSessionHandler extends AbstractSessionHandler {
         ctx.writeAndFlush(logonRequest);
     }
 
-    private FixSession createSession(FixSessionSettingsProvider settingsProvider) {
+    private static FixSession createSession(FixSessionSettingsProvider settingsProvider) {
 
         int nextIncomingSeqNum = 0;
         if (settingsProvider.resetMsgSeqNum()) {

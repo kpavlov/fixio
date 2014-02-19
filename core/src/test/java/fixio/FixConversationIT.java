@@ -71,6 +71,7 @@ public class FixConversationIT {
     @Before
     public void beforeMethod() throws InterruptedException {
         client = new FixClient(new ClientApp());
+        client.setSettingsResource("/fixClient.properties");
         clientCloseFuture = client.connect(PORT);
         conversation.clear();
     }

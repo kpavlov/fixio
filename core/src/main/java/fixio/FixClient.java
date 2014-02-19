@@ -21,6 +21,7 @@ import fixio.handlers.AdminEventHandler;
 import fixio.handlers.FixApplicationAdapter;
 import fixio.handlers.FixMessageHandler;
 import fixio.netty.pipeline.client.FixInitiatorChannelInitializer;
+import fixio.netty.pipeline.client.FixSessionSettingsProvider;
 import fixio.netty.pipeline.client.PropertyFixSessionSettingsProviderImpl;
 import io.netty.bootstrap.Bootstrap;
 import io.netty.buffer.PooledByteBufAllocator;
@@ -41,9 +42,9 @@ public class FixClient extends AbstractFixConnector {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(FixClient.class);
     private Channel channel;
-    private String settingsResource;
     private EventLoopGroup bossEventLoopGroup;
     private EventLoopGroup workerEventLoopGroup;
+    private FixSessionSettingsProvider sessionSettingsProvider;
 
     public FixClient(FixApplicationAdapter fixApplication) {
         this(fixApplication, fixApplication);
@@ -51,11 +52,21 @@ public class FixClient extends AbstractFixConnector {
 
     public FixClient(AdminEventHandler adminEventHandler, FixMessageHandler... appMessageHandlers) {
         super(adminEventHandler, appMessageHandlers);
-        settingsResource = "/fixClient.properties";
     }
 
+    /**
+     * Initialize {@link #sessionSettingsProvider} with {@link PropertyFixSessionSettingsProviderImpl}
+     * using specified property file resource.
+     *
+     * @param settingsResource property file location related to classpath.
+     */
     public void setSettingsResource(String settingsResource) {
-        this.settingsResource = settingsResource;
+        this.sessionSettingsProvider = new PropertyFixSessionSettingsProviderImpl(settingsResource);
+    }
+
+    public void setSessionSettingsProvider(FixSessionSettingsProvider sessionSettingsProvider) {
+        assert sessionSettingsProvider != null;
+        this.sessionSettingsProvider = sessionSettingsProvider;
     }
 
     public ChannelFuture connect(int port) throws InterruptedException {
@@ -76,7 +87,7 @@ public class FixClient extends AbstractFixConnector {
                     .option(ChannelOption.ALLOCATOR, new PooledByteBufAllocator())
                     .handler(new FixInitiatorChannelInitializer<SocketChannel>(
                             workerEventLoopGroup,
-                            new PropertyFixSessionSettingsProviderImpl(settingsResource),
+                            sessionSettingsProvider,
                             getAdminHandler(),
                             getAppMessageHandlers()
                     ))

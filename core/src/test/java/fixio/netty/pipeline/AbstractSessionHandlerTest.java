@@ -104,8 +104,18 @@ public class AbstractSessionHandlerTest {
     }
 
     @Test
-    public void testChannelInactiveSessionNotExists() throws Exception {
+    public void testChannelInactiveNoKeyAttr() throws Exception {
         when(ctx.attr(AbstractSessionHandler.FIX_SESSION_KEY)).thenReturn(null);
+
+        sessionHandler.channelInactive(ctx);
+
+        verify(ctx, never()).fireChannelRead(any(LogoutEvent.class));
+    }
+
+    @Test
+    public void testChannelInactiveSessionNotExists() throws Exception {
+        when(ctx.attr(AbstractSessionHandler.FIX_SESSION_KEY)).thenReturn(sessonAttr);
+        when(sessonAttr.getAndRemove()).thenReturn(null);
 
         sessionHandler.channelInactive(ctx);
 

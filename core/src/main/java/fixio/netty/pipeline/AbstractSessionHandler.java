@@ -32,7 +32,6 @@ import java.util.List;
 public abstract class AbstractSessionHandler extends MessageToMessageCodec<FixMessage, FixMessageBuilder> {
 
     public static final AttributeKey<FixSession> FIX_SESSION_KEY = AttributeKey.valueOf("fixSession");
-
     private Clock clock = Clock.systemUTC();
 
     protected void updateFixMessageHeader(ChannelHandlerContext ctx, FixMessageBuilder response) {
@@ -45,8 +44,10 @@ public abstract class AbstractSessionHandler extends MessageToMessageCodec<FixMe
         Attribute<FixSession> fixSessionAttribute = ctx.attr(FIX_SESSION_KEY);
         if (fixSessionAttribute != null) {
             FixSession session = fixSessionAttribute.getAndRemove();
-            ctx.fireChannelRead(new LogoutEvent(session));
-            getLogger().info("Fix Session Closed. {}", session);
+            if (session != null) {
+                ctx.fireChannelRead(new LogoutEvent(session));
+                getLogger().info("Fix Session Closed. {}", session);
+            }
         }
     }
 

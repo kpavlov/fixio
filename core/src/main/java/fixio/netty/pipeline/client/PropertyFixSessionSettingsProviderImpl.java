@@ -1,5 +1,5 @@
 /*
- * Copyright 2013 The FIX.io Project
+ * Copyright 2014 The FIX.io Project
  *
  * The FIX.io Project licenses this file to you under the Apache License,
  * version 2.0 (the "License"); you may not use this file except in compliance
@@ -26,7 +26,6 @@ import java.util.Properties;
 public class PropertyFixSessionSettingsProviderImpl implements FixSessionSettingsProvider {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(PropertyFixSessionSettingsProviderImpl.class);
-
     private final Properties properties;
 
     public PropertyFixSessionSettingsProviderImpl(String resource) {
@@ -43,7 +42,9 @@ public class PropertyFixSessionSettingsProviderImpl implements FixSessionSetting
             }
             properties.load(inputStream);
         } catch (IOException e) {
-            e.printStackTrace();
+            String message = "Unable to load FixSessionSettings from " + resource;
+            LOGGER.error(message, e);
+            throw new IllegalArgumentException(message, e);
         }
     }
 
