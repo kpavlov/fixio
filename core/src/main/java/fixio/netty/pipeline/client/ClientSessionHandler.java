@@ -76,7 +76,7 @@ public class ClientSessionHandler extends AbstractSessionHandler {
     private static FixSession createSession(FixSessionSettingsProvider settingsProvider) {
 
         int nextIncomingSeqNum = 0;
-        if (settingsProvider.resetMsgSeqNum()) {
+        if (settingsProvider.isResetMsgSeqNum()) {
             nextIncomingSeqNum = 1;
         }
 

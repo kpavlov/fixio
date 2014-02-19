@@ -54,7 +54,7 @@ public class PropertyFixSessionSettingsProviderImpl implements FixSessionSetting
     }
 
     @Override
-    public boolean resetMsgSeqNum() {
+    public boolean isResetMsgSeqNum() {
         return Boolean.parseBoolean(properties.getProperty("ResetOnLogon", "true"));
     }
 
