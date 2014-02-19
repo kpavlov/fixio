@@ -24,10 +24,7 @@ import fixio.netty.pipeline.client.FixInitiatorChannelInitializer;
 import fixio.netty.pipeline.client.PropertyFixSessionSettingsProviderImpl;
 import io.netty.bootstrap.Bootstrap;
 import io.netty.buffer.PooledByteBufAllocator;
-import io.netty.channel.Channel;
-import io.netty.channel.ChannelFuture;
-import io.netty.channel.ChannelOption;
-import io.netty.channel.EventLoopGroup;
+import io.netty.channel.*;
 import io.netty.channel.nio.NioEventLoopGroup;
 import io.netty.channel.socket.SocketChannel;
 import io.netty.channel.socket.nio.NioSocketChannel;
@@ -42,6 +39,7 @@ public class FixClient extends AbstractFixConnector {
     private static final Logger LOGGER = LoggerFactory.getLogger(FixClient.class);
     private Channel channel;
     private String settingsResource;
+    private ChannelHandler channelHandler;
 
     public FixClient(FixApplicationAdapter fixApplication) {
         this(fixApplication, fixApplication);
@@ -56,13 +54,25 @@ public class FixClient extends AbstractFixConnector {
         this.settingsResource = settingsResource;
     }
 
+    public void setChannelHandler(ChannelHandler channelInitializer) {
+        this.channelHandler =  channelInitializer;
+    }
+
     public ChannelFuture connect(int port) throws InterruptedException {
+        if(channelHandler == null){
+            EventLoopGroup workerGroup = new NioEventLoopGroup(8);
+            channelHandler = new FixInitiatorChannelInitializer<SocketChannel>(
+                    workerGroup,
+                    new PropertyFixSessionSettingsProviderImpl(settingsResource),
+                    getAdminHandler(),
+                    getAppMessageHandlers()
+            );
+        }
         return connect(new InetSocketAddress(port));
     }
 
     public ChannelFuture connect(SocketAddress serverAddress) throws InterruptedException {
         Bootstrap b = new Bootstrap();
-        EventLoopGroup workerGroup = new NioEventLoopGroup(8);
         try {
             b.group(new NioEventLoopGroup())
                     .channel(NioSocketChannel.class)
@@ -71,12 +81,7 @@ public class FixClient extends AbstractFixConnector {
                             Boolean.parseBoolean(System.getProperty(
                                     "nfs.rpc.tcp.nodelay", "true")))
                     .option(ChannelOption.ALLOCATOR, new PooledByteBufAllocator())
-                    .handler(new FixInitiatorChannelInitializer<SocketChannel>(
-                            workerGroup,
-                            new PropertyFixSessionSettingsProviderImpl(settingsResource),
-                            getAdminHandler(),
-                            getAppMessageHandlers()
-                    ))
+                    .handler(channelHandler)
                     .validate();
 
             channel = b.connect().sync().channel();
