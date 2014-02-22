@@ -43,8 +43,8 @@
 
 <p>This API is intended to be a replacement for well known <a href="http://www.quickfixj.org/" title="Java Open Source FIX Engine">QuickFIX/J</a> library to be used for high-frequency trading cases.</p>
 
-<h3>
-<a name="design-goals" class="anchor" href="#design-goals"><span class="octicon octicon-link"></span></a>Design goals</h3>
+<h2>
+<a name="design-goals" class="anchor" href="#design-goals"><span class="octicon octicon-link"></span></a>Design goals</h2>
 
 <ol>
 <li>Implement <a href="http://www.fixprotocol.org/" title="FIX Protocol">FIX Protocol</a> Java API with as low memory footprint as possible in order to eliminate unnecessary GC overhead,
@@ -54,13 +54,21 @@ thus improving overall application performance under high load.</li>
 
 <ul>
 <li>Avoid synchronization.</li>
-<li>Replace BigDecimals with custom <a href="tree/master/core/src/main/java/fixio/fixprotocol/fields/FixedPointNumber.java">Fixed Point Number</a> implementation for financial data.</li>
+<li>Replace BigDecimals with custom <a href="https://github.com/kpavlov/fixio/treemaster/core/src/main/java/fixio/fixprotocol/fields/FixedPointNumber.java">Fixed Point Number</a> implementation for financial data.</li>
 <li>Reuse java.util.Calendar and java.util.TimeZone instances.</li>
 </ul>
 </li>
 </ol><p>This API has a number of <a href="#Limitations">limitations</a>, so it may be not suitable for any FIX application.</p>
 
-<h1>
+<h2>
+<a name="limitations" class="anchor" href="#limitations"><span class="octicon octicon-link"></span></a>Limitations</h2>
+
+<ol>
+<li>Logon message encryption is not supported. EncryptMethod(98)=0</li>
+<li>XmlData is not supported</li>
+<li>Message encodings other than US-ASCII are not supported.</li>
+<li>...</li>
+</ol><h1>
 <a name="getting-started" class="anchor" href="#getting-started"><span class="octicon octicon-link"></span></a>Getting Started</h1>
 
 <ol>
@@ -88,24 +96,42 @@ thus improving overall application performance under high load.</li>
 &lt;/dependency&gt;
 </code></pre>
 
-<h1>
-<a name="examples" class="anchor" href="#examples"><span class="octicon octicon-link"></span></a>Examples</h1>
+<h2>
+<a name="examples" class="anchor" href="#examples"><span class="octicon octicon-link"></span></a>Examples</h2>
 
-<p>You may find working example of <a href="tree/master/examples/src/main/java/fixio/examples/priceclient">client</a>
-and <a href="tree/master/examples/src/main/java/fixio/examples/priceserver">server</a> applications in module <a href="tree/master/examples">"examples"</a>.</p>
+<p>You may find working example of <a href="https://github.com/kpavlov/fixio/treemaster/examples/src/main/java/fixio/examples/priceclient">client</a>
+and <a href="https://github.com/kpavlov/fixio/treemaster/examples/src/main/java/fixio/examples/priceserver">server</a> applications in module <a href="https://github.com/kpavlov/fixio/treemaster/examples">"examples"</a>.</p>
 
 <p>I recommend running server with Concurrent Mark Sweep Collector enabled: <code>-XX:+UseConcMarkSweepGC</code>
 and increased Survivor spaces (<code>-XX:SurvivorRatio=4</code>).</p>
 
-<h1>
-<a name="limitations" class="anchor" href="#limitations"><span class="octicon octicon-link"></span></a>Limitations</h1>
+<h2>
+<a name="creating-simple-fix-client" class="anchor" href="#creating-simple-fix-client"><span class="octicon octicon-link"></span></a>Creating Simple FIX Client</h2>
+
+<p>To create a simple FIX client you need to:</p>
 
 <ol>
-<li>Logon message encryption is not supported. EncryptMethod(98)=0</li>
-<li>XmlData is not supported</li>
-<li>Message encodings other than US-ASCII are not supported.</li>
-<li>...</li>
-</ol>
+<li><p>Implement <a href="https://github.com/kpavlov/fixio/treemaster/core/src/main/java/fixio/handlers/FixClientApplication.java">FixClientApplication</a>.
+You may extend <a href="https://github.com/kpavlov/fixio/treemaster/core/src/main/java/fixio/handlers/FixClientApplicationAdapter.java">FixClientApplicationAdapter</a> as a quick start.</p></li>
+<li><p>Create an instance of <a href="https://github.com/kpavlov/fixio/treemaster/core/src/main/java/fixio/FixClient.java">FixClient</a> and initialize if with <a href="https://github.com/kpavlov/fixio/treemaster/core/src/main/java/fixio/handlers/FixClientApplication.java">FixClientApplication</a> you've just created and classpath reference to FIX session settings property file.</p></li>
+<li><p>Invoke <code>FixClient.connect(host, port)</code> to initiate connection.
+Method <code>connect(...)</code> returns a <a href="http://netty.io/5.0/api/io/netty/channel/ChannelFuture.html">ChannelFeature</a> which which will be notified when a channel is closed,
+so you may invoke the method <code>sync()</code> on it if you wish to wait for connection to be closed.</p></li>
+</ol><pre><code>    FixClientApplication app = new FixClientApplicationAdapter();
+    client = new FixClient(app);
+
+    // set settings file location related to classpath
+    client.setSettingsResource("/client.properties");
+
+    // connect to specified host and port
+    ChannelFeature closeFeature = client.connect("localhost", 10201);
+
+    // wait until FIX Session is closed
+    closeFeature.sync();
+
+    // Shutdown FIX client
+    client.disconnect();
+</code></pre>
         </section>
 
         <footer>
