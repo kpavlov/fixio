@@ -30,10 +30,17 @@ public class ClientSessionHandler extends AbstractSessionHandler {
 
     private final static Logger LOGGER = LoggerFactory.getLogger(ClientSessionHandler.class);
     private final FixSessionSettingsProvider sessionSettingsProvider;
+    private final MessageSequenceProvider messageSequenceProvider;
 
-    public ClientSessionHandler(FixSessionSettingsProvider settingsProvider) {
+    public ClientSessionHandler(FixSessionSettingsProvider settingsProvider,
+                                MessageSequenceProvider messageSequenceProvider) {
         assert (settingsProvider != null) : "FixSessionSettingsProvider is expected.";
         this.sessionSettingsProvider = settingsProvider;
+        this.messageSequenceProvider = messageSequenceProvider;
+    }
+
+    public ClientSessionHandler(FixSessionSettingsProvider settingsProvider) {
+        this(settingsProvider, StatelessMessageSequenceProvider.getInstance());
     }
 
     @Override
@@ -66,22 +73,31 @@ public class ClientSessionHandler extends AbstractSessionHandler {
 
         FixSession pendingSession = createSession(sessionSettingsProvider);
         setSession(ctx, pendingSession);
-        pendingSession.prepareOutgoing(logonRequest);
-        //updateFixMessageHeader(logonRequest);
+        updateFixMessageHeader(pendingSession, logonRequest);
+
+        // callback
+        onLogonRequest(ctx, logonRequest);
+
         getLogger().info("Sending Logon: {}", logonRequest);
 
         ctx.writeAndFlush(logonRequest);
     }
 
-
-    protected void prepareLogonRequest(ChannelHandlerContext ctx, FixMessageBuilder logonRequest) {
+    /**
+     * Callback method to set additional fields to LogonRequest before sending.
+     * <p/>
+     * Default implementation does nothing.
+     */
+    protected void onLogonRequest(ChannelHandlerContext ctx, FixMessageBuilder logonRequest) {
     }
-    
+
     private FixSession createSession(FixSessionSettingsProvider settingsProvider) {
 
-        int nextIncomingSeqNum = settingsProvider.getMsgInSeqNum();
+        int nextIncomingSeqNum;
         if (settingsProvider.isResetMsgSeqNum()) {
             nextIncomingSeqNum = 1;
+        } else {
+            nextIncomingSeqNum = messageSequenceProvider.getMsgInSeqNum();
         }
 
         FixSession session = FixSession.newBuilder()
@@ -92,7 +108,7 @@ public class ClientSessionHandler extends AbstractSessionHandler {
                 .targetSubId(settingsProvider.getTargetSubID())
                 .nextIncomingSeqNum(nextIncomingSeqNum)
                 .build();
-        session.setNextOutgoingMessageSeqNum(settingsProvider.getMsgOutSeqNum());
+        session.setNextOutgoingMessageSeqNum(messageSequenceProvider.getMsgOutSeqNum());
         return session;
     }
 

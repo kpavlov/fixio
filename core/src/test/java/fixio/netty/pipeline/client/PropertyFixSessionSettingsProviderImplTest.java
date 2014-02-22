@@ -30,8 +30,13 @@ public class PropertyFixSessionSettingsProviderImplTest {
     }
 
     @Test
-    public void testGetMsgSeqNumber() {
-        assertEquals(1, provider.getMsgSeqNum());
+    public void testGetMsgInSeqNumber() {
+        assertEquals(10, provider.getMsgInSeqNum());
+    }
+
+    @Test
+    public void testGetMsgOutSeqNumber() {
+        assertEquals(20, provider.getMsgOutSeqNum());
     }
 
     @Test
@@ -63,7 +68,6 @@ public class PropertyFixSessionSettingsProviderImplTest {
     public void testIsResetMsgSeqNum() {
         assertEquals(true, provider.isResetMsgSeqNum());
     }
-
 
 }
 

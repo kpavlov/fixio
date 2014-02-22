@@ -1,5 +1,5 @@
 /*
- * Copyright 2013 The FIX.io Project
+ * Copyright 2014 The FIX.io Project
  *
  * The FIX.io Project licenses this file to you under the Apache License,
  * version 2.0 (the "License"); you may not use this file except in compliance
@@ -24,7 +24,6 @@ import io.netty.channel.ChannelFuture;
 import io.netty.channel.ChannelFutureListener;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.util.Attribute;
-import io.netty.util.AttributeKey;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -64,9 +63,8 @@ public class ServerSessionHandlerTest {
         header.setSenderCompID(randomAscii(3));
         header.setTargetCompID(randomAscii(4));
 
-        AttributeKey<FixSession> fixSessionKey = AbstractSessionHandler.FIX_SESSION_KEY;
         Attribute<FixSession> sessionAttribute = new AttributeMock<>();
-        when(ctx.attr(fixSessionKey)).thenReturn(sessionAttribute);
+        when(ctx.attr(AbstractSessionHandler.FIX_SESSION_KEY)).thenReturn(sessionAttribute);
     }
 
     @Test

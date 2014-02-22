@@ -1,5 +1,5 @@
 /*
- * Copyright 2013 The FIX.io Project
+ * Copyright 2014 The FIX.io Project
  *
  * The FIX.io Project licenses this file to you under the Apache License,
  * version 2.0 (the "License"); you may not use this file except in compliance
@@ -16,7 +16,6 @@
 
 package fixio.fixprotocol;
 
-import java.util.Collections;
 import java.util.List;
 
 public class FixMessageHeader {
@@ -29,7 +28,7 @@ public class FixMessageHeader {
     private String senderSubID;
     private String targetCompID;
     private String targetSubID;
-    private List<FixMessageFragment> custField = Collections.emptyList();
+    private List<FixMessageFragment> customFields;
 
     public String getBeginString() {
         return beginString;
@@ -95,12 +94,12 @@ public class FixMessageHeader {
         this.sendingTime = sendingTime;
     }
 
-    public List<FixMessageFragment> getCustField() {
-        return custField;
+    public List<FixMessageFragment> getCustomFields() {
+        return customFields;
     }
 
-    public void setCustField(List<FixMessageFragment> custField) {
-        this.custField = custField;
+    public void setCustomFields(List<FixMessageFragment> customFields) {
+        this.customFields = customFields;
     }
 
     @Override
@@ -117,7 +116,9 @@ public class FixMessageHeader {
         if (targetSubID != null) {
             sb.append(", targetSubID='").append(targetSubID).append('\'');
         }
-        sb.append(custField);
+        if (customFields != null) {
+            sb.append(customFields);
+        }
         sb.append('}');
         return sb.toString();
     }

@@ -16,6 +16,7 @@
 package fixio.netty.codec;
 
 import fixio.fixprotocol.*;
+import fixio.fixprotocol.fields.FieldFactory;
 import io.netty.buffer.ByteBuf;
 import io.netty.buffer.ByteBufAllocator;
 import io.netty.buffer.Unpooled;
@@ -26,6 +27,8 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.Mock;
 import org.mockito.runners.MockitoJUnitRunner;
+
+import java.util.Arrays;
 
 import static java.nio.charset.StandardCharsets.US_ASCII;
 import static org.junit.Assert.assertEquals;
@@ -109,6 +112,22 @@ public class FixMessageEncoderTest {
         verify(ctx).flush();
 
         String expectedString = "8=FIX.4.2\u00019=89\u000135=0\u000149=SenderCompID\u000156=TargetCompID\u000134=2\u000152=19700102-10:17:36.789\u00011001=test2\u00011000=test1\u000110=204\u0001";
+
+        assertResult(expectedString);
+    }
+
+    @Test
+    public void testEncodeWithCustomHeader() throws Exception {
+        messageBuilder.getHeader().setCustomFields(Arrays.asList(
+                FieldFactory.fromIntValue(1128, 9),
+                (FixMessageFragment) FieldFactory.fromStringValue(1129, "1.0")
+        ));
+
+        encoder.encode(ctx, messageBuilder, out);
+
+        verify(ctx).flush();
+
+        String expectedString = "8=FIX.4.2\u00019=105\u000135=0\u000149=SenderCompID\u000156=TargetCompID\u000134=2\u000152=19700102-10:17:36.789\u00011128=9\u00011129=1.0\u00011001=test2\u00011000=test1\u000110=206\u0001";
 
         assertResult(expectedString);
     }

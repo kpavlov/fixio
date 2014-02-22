@@ -96,7 +96,7 @@ public class FixMessageEncoder extends MessageToByteEncoder<FixMessageBuilder> {
         writeField(49, header.getSenderCompID(), out);
 
         // SenderCompSubID
-        if(header.getSenderSubID()!=null && !"".equals(header.getSenderSubID())){
+        if (header.getSenderSubID() != null && !"".equals(header.getSenderSubID())) {
             writeField(50, header.getSenderSubID(), out);
         }
 
@@ -104,7 +104,7 @@ public class FixMessageEncoder extends MessageToByteEncoder<FixMessageBuilder> {
         writeField(56, header.getTargetCompID(), out);
 
         // TargetCompSubID
-        if(header.getTargetSubID()!=null && !"".equals(header.getTargetSubID())){
+        if (header.getTargetSubID() != null && !"".equals(header.getTargetSubID())) {
             writeField(57, header.getTargetSubID(), out);
         }
 
@@ -116,8 +116,11 @@ public class FixMessageEncoder extends MessageToByteEncoder<FixMessageBuilder> {
         writeField(52, timeStr, out);
 
         // customize tag
-        for (FixMessageFragment component : header.getCustField()) {
-            encodeComponent(out, component);
+        List<FixMessageFragment> customFields = header.getCustomFields();
+        if (customFields != null) {
+            for (int i = 0; i < customFields.size(); i++) {
+                encodeMessageFragment(out, customFields.get(i));
+            }
         }
     }
 

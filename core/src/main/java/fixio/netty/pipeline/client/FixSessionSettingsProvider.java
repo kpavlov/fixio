@@ -28,15 +28,6 @@ public interface FixSessionSettingsProvider {
 
     String getBeginString();
 
-    int getMsgOutSeqNum();
-
-    int getMsgInSeqNum();
-
-    void setMsgOutSeqNum(int seqOut);
-
-    void setMsgInSeqNum(int seqIn);
-
-    void save();
 
     boolean isResetMsgSeqNum();
 }
