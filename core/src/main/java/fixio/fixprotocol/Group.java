@@ -17,44 +17,43 @@ package fixio.fixprotocol;
 
 import fixio.fixprotocol.fields.StringField;
 
-import java.util.Collection;
-import java.util.LinkedHashMap;
+import java.util.ArrayList;
+import java.util.List;
 
-public class Group extends FixMessageFragment {
+/**
+ * Represents FIX Protocol field Group or Component - a sequence of Fields or other Groups.
+ */
+public class Group {
 
-    private final LinkedHashMap<Integer, FixMessageFragment> contents = new LinkedHashMap<>();
+    public static final int DEFAULT_GROUP_SIZE = 8;
+    private final ArrayList<FixMessageFragment> contents;
 
-    public Group(int tagNum) {
-        super(tagNum);
+    public Group(int expectedSize) {
+        this.contents = new ArrayList<>(expectedSize);
     }
 
-    public Group(FieldType fieldType) {
-        super(fieldType.tag());
-    }
-
-    public String getValue() {
-        return String.valueOf(contents.size());
+    public Group() {
+        this.contents = new ArrayList<>(DEFAULT_GROUP_SIZE);
     }
 
     public void add(FixMessageFragment element) {
-        contents.put(element.getTagNum(), element);
+        contents.add(element);
     }
 
     public Group add(FieldType fieldType, String value) {
-        return add(fieldType.tag(), value);
+        contents.add(new StringField(fieldType.tag(), value));
+        return this;
     }
 
     public Group add(int tagNum, String value) {
         assert (tagNum > 0) : "Tag must be positive.";
         assert (value != null) : "Value  must be specified.";
-
-        contents.put(tagNum, new StringField(tagNum, value));
-
+        contents.add(new StringField(tagNum, value));
         return this;
     }
 
-    public Collection<FixMessageFragment> getContents() {
-        return contents.values();
+    public List<FixMessageFragment> getContents() {
+        return contents;
     }
 
 }

@@ -40,7 +40,7 @@ public class FixMessageEncoderTest {
     private ChannelHandlerContext ctx;
     @Mock
     private ByteBufAllocator byteBufAllocator;
-    private FixMessageBuilder fixMessage;
+    private FixMessageBuilder messageBuilder;
     private ByteBuf out;
     private long timestamp = 123456789;
 
@@ -67,7 +67,7 @@ public class FixMessageEncoderTest {
         fixMessage.add(1001, "test2");
         fixMessage.add(1000, "test1");
 
-        this.fixMessage = fixMessage;
+        this.messageBuilder = fixMessage;
         fixMessage.getHeader().setSendingTime(timestamp);
 
         out = Unpooled.buffer();
@@ -75,36 +75,36 @@ public class FixMessageEncoderTest {
 
     @Test(expected = IllegalArgumentException.class)
     public void testFailIfNoBeginStringCompID() throws Exception {
-        fixMessage.getHeader().setBeginString(null);
+        messageBuilder.getHeader().setBeginString(null);
 
-        encoder.encode(ctx, fixMessage, out);
+        encoder.encode(ctx, messageBuilder, out);
     }
 
     @Test(expected = IllegalArgumentException.class)
     public void testFailIfNoMsgType() throws Exception {
-        fixMessage.getHeader().setMessageType(null);
+        messageBuilder.getHeader().setMessageType(null);
 
-        encoder.encode(ctx, fixMessage, out);
+        encoder.encode(ctx, messageBuilder, out);
     }
 
     @Test(expected = IllegalArgumentException.class)
     public void testFailIfNoSenderCompID() throws Exception {
-        fixMessage.getHeader().setSenderCompID(null);
+        messageBuilder.getHeader().setSenderCompID(null);
 
-        encoder.encode(ctx, fixMessage, out);
+        encoder.encode(ctx, messageBuilder, out);
     }
 
     @Test(expected = IllegalArgumentException.class)
     public void testFailIfNoTargetCompID() throws Exception {
-        fixMessage.getHeader().setTargetCompID(null);
+        messageBuilder.getHeader().setTargetCompID(null);
 
-        encoder.encode(ctx, fixMessage, out);
+        encoder.encode(ctx, messageBuilder, out);
     }
 
     @Test
     public void testEncode() throws Exception {
 
-        encoder.encode(ctx, fixMessage, out);
+        encoder.encode(ctx, messageBuilder, out);
 
         verify(ctx).flush();
 
@@ -116,15 +116,15 @@ public class FixMessageEncoderTest {
     @Test
     public void testEncodeWithGroup() throws Exception {
 
-        Group group1 = fixMessage.newGroup(1002);
+        Group group1 = messageBuilder.newGroup(1002, 2);
         group1.add(1003, "g1-1");
         group1.add(1004, "g1-2");
 
-        Group group2 = fixMessage.newGroup(1002);
+        Group group2 = messageBuilder.newGroup(1002);
         group2.add(1003, "g2-1");
         group2.add(1004, "g2-2");
 
-        encoder.encode(ctx, fixMessage, out);
+        encoder.encode(ctx, messageBuilder, out);
 
         verify(ctx).flush();
 
@@ -135,8 +135,6 @@ public class FixMessageEncoderTest {
 
     private void assertResult(String expectedString) {
         final String string = new String(out.array(), out.arrayOffset(), out.readableBytes(), US_ASCII);
-        assertEquals(expectedString.length(), string.length());
-
         assertEquals(expectedString, string);
     }
 }

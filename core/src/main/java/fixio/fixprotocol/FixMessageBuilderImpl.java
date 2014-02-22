@@ -64,17 +64,19 @@ public class FixMessageBuilderImpl implements FixMessage, FixMessageBuilder {
      * Creates FixMessageBuilderImpl with specified message type (tag 35)
      * and expected body field count.
      */
-    public FixMessageBuilderImpl(int expectedBodyFieldCount, String messageType) {
+    public FixMessageBuilderImpl(String messageType, int expectedBodyFieldCount) {
         this(expectedBodyFieldCount);
         header.setMessageType(messageType);
     }
 
+    @Override
     public FixMessageBuilderImpl add(FieldType field, int value) {
         assert (field != null) : "Tag must be specified.";
 
         return add(field, String.valueOf(value));
     }
 
+    @Override
     public FixMessageBuilderImpl add(int tagNum, int value) {
         assert (tagNum > 0) : "Tag must be positive.";
         body.add(FieldFactory.fromIntValue(tagNum, value));
@@ -88,6 +90,7 @@ public class FixMessageBuilderImpl implements FixMessage, FixMessageBuilder {
         return this;
     }
 
+    @Override
     public FixMessageBuilderImpl add(FieldType fieldType, String value) {
         assert (fieldType != null) : "Tag must be specified.";
         assert (value != null) : "Value must be specified.";
@@ -95,6 +98,7 @@ public class FixMessageBuilderImpl implements FixMessage, FixMessageBuilder {
         return this;
     }
 
+    @Override
     public FixMessageBuilderImpl add(int tagNum, String value) {
         assert (tagNum > 0) : "TagNum must be positive. Got " + tagNum;
         assert (value != null) : "Value must be specified.";
@@ -102,18 +106,22 @@ public class FixMessageBuilderImpl implements FixMessage, FixMessageBuilder {
         return this;
     }
 
+    @Override
     public Group newGroup(FieldType fieldType) {
         return newGroup(fieldType.tag());
     }
 
+    @Override
     public Group newGroup(int tagNum) {
-        Group group = new Group(tagNum);
-        GroupField g = (GroupField) getFirst(tagNum);
-        if (g == null) {
-            g = new GroupField(tagNum);
-            body.add(g);
-        }
-        g.add(group);
+        Group group = new Group();
+        addGroup(tagNum, group);
+        return group;
+    }
+
+    @Override
+    public Group newGroup(int tagNum, int expectedGroupSize) {
+        Group group = new Group(expectedGroupSize);
+        addGroup(tagNum, group);
         return group;
     }
 
@@ -137,7 +145,7 @@ public class FixMessageBuilderImpl implements FixMessage, FixMessageBuilder {
 
     @Override
     public <T> T getValue(FieldType field) {
-        return null;
+        throw new UnsupportedOperationException("Not implemented yet.");
     }
 
     @Override
@@ -189,6 +197,14 @@ public class FixMessageBuilderImpl implements FixMessage, FixMessageBuilder {
         header.setMessageType(messageType);
     }
 
+    public List<Group> getGroups(int tagNum) {
+        FixMessageFragment fragment = getFirst(tagNum);
+        if (fragment instanceof GroupField) {
+            return ((GroupField) fragment).getGroups();
+        }
+        return null;
+    }
+
     @Override
     public String toString() {
         final StringBuilder sb = new StringBuilder("FixMessageBuilderImpl{");
@@ -199,14 +215,6 @@ public class FixMessageBuilderImpl implements FixMessage, FixMessageBuilder {
         return sb.toString();
     }
 
-    public List<Group> getGroups(int tagNum) {
-        FixMessageFragment fragment = getFirst(tagNum);
-        if (fragment instanceof GroupField) {
-            return ((GroupField) fragment).getGroups();
-        }
-        return null;
-    }
-
     private FixMessageFragment getFirst(int tagNum) {
         for (int i = 0; i < body.size(); i++) {
             FixMessageFragment item = body.get(i);
@@ -215,5 +223,24 @@ public class FixMessageBuilderImpl implements FixMessage, FixMessageBuilder {
             }
         }
         return null;
+    }
+
+    private FixMessageFragment getLast(int tagNum) {
+        for (int i = body.size() - 1; i >= 0; i--) {
+            FixMessageFragment item = body.get(i);
+            if (item.getTagNum() == tagNum) {
+                return item;
+            }
+        }
+        return null;
+    }
+
+    private void addGroup(int tagNum, Group group) {
+        GroupField g = (GroupField) getLast(tagNum);
+        if (g == null) {
+            g = new GroupField(tagNum);
+            body.add(g);
+        }
+        g.add(group);
     }
 }

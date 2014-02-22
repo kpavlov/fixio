@@ -42,18 +42,6 @@ class PriceStreamingApp extends FixApplicationAdapter {
         new Thread(streamingWorker, "StreamingWorker").start();
     }
 
-    private static FixMessageBuilder createQuoteMessage(String reqId, Quote quote) {
-        FixMessageBuilderImpl message = new FixMessageBuilderImpl(3, MessageTypes.QUOTE);
-        message.add(FieldType.QuoteReqID, reqId);
-
-        message.add(FieldType.MktBidPx,
-                new FixedPointNumber(quote.getBid(), 2));
-        message.add(FieldType.MktOfferPx,
-                new FixedPointNumber(quote.getOffer(), 2));
-
-        return message;
-    }
-
     private static void publish(final ChannelHandlerContext ctx, String reqId, Quote quote) {
         FixMessageBuilder message = createQuoteMessage(reqId, quote);
         ctx.writeAndFlush(message);
@@ -104,6 +92,18 @@ class PriceStreamingApp extends FixApplicationAdapter {
                 LOGGER.debug("Unsubscribed with QuoteReqID={}", reqId);
                 break;
         }
+    }
+
+    private static FixMessageBuilder createQuoteMessage(String reqId, Quote quote) {
+        FixMessageBuilderImpl message = new FixMessageBuilderImpl(MessageTypes.QUOTE, 3);
+        message.add(FieldType.QuoteReqID, reqId);
+
+        message.add(FieldType.MktBidPx,
+                new FixedPointNumber(quote.getBid(), 2));
+        message.add(FieldType.MktOfferPx,
+                new FixedPointNumber(quote.getOffer(), 2));
+
+        return message;
     }
 
     private class StreamingWorker implements Runnable {

@@ -30,6 +30,7 @@ import java.text.DateFormat;
 import java.text.DateFormatSymbols;
 import java.text.SimpleDateFormat;
 import java.util.Date;
+import java.util.List;
 import java.util.Locale;
 import java.util.TimeZone;
 
@@ -86,8 +87,58 @@ public class FixMessageEncoder extends MessageToByteEncoder<FixMessageBuilder> {
         return sum % 256;
     }
 
+    private static void encodeHeader(FixMessageHeader header, ByteBuf out) {
+
+        // message type
+        writeField(35, header.getMessageType(), out);
+
+        // SenderCompID
+        writeField(49, header.getSenderCompID(), out);
+
+        // TargetCompID
+        writeField(56, header.getTargetCompID(), out);
+
+        // MsgSeqNum
+        writeField(34, String.valueOf(header.getMsgSeqNum()), out);
+
+        // SendingTime
+        String timeStr = sdf.get().format(new Date(header.getSendingTime()));
+        writeField(52, timeStr, out);
+    }
+
+    private static int fillBodyBuf(final ByteBuf payloadBuf,
+                                   FixMessageBuilder msg,
+                                   FixMessageHeader header) {
+
+        encodeHeader(header, payloadBuf);
+
+        // message body
+        for (FixMessageFragment component : msg.getBody()) {
+            encodeMessageFragment(payloadBuf, component);
+        }
+        return payloadBuf.writerIndex();
+    }
+
+    private static void encodeMessageFragment(ByteBuf payloadBuf,
+                                              FixMessageFragment messageFragment) {
+        if (messageFragment instanceof AbstractField) {
+            writeField(messageFragment.getTagNum(), (AbstractField) messageFragment, payloadBuf);
+        } else if (messageFragment instanceof GroupField) {
+            GroupField groupField = (GroupField) messageFragment;
+            writeField(groupField.getTagNum(), String.valueOf(groupField.getGroupCount()), payloadBuf);
+            for (Group c : groupField.getGroups()) {
+                List<FixMessageFragment> contents = c.getContents();
+                for (int j = 0; j < contents.size(); j++) {
+                    encodeMessageFragment(payloadBuf, contents.get(j));
+                }
+            }
+        }
+    }
+
     @Override
-    public void encode(ChannelHandlerContext ctx, FixMessageBuilder msg, ByteBuf out) throws Exception {
+    public void encode(ChannelHandlerContext ctx,
+                       FixMessageBuilder msg,
+                       ByteBuf out) throws Exception {
         final FixMessageHeader header = msg.getHeader();
         validateRequiredFields(header);
 
@@ -118,54 +169,5 @@ public class FixMessageEncoder extends MessageToByteEncoder<FixMessageBuilder> {
         bodyBuf.release();
         assert (headBuf.refCnt() == 0);
         assert (bodyBuf.refCnt() == 0);
-    }
-
-    private static void encodeHeader(FixMessageHeader header, ByteBuf out) {
-
-        // message type
-        writeField(35, header.getMessageType(), out);
-
-        // SenderCompID
-        writeField(49, header.getSenderCompID(), out);
-
-        // TargetCompID
-        writeField(56, header.getTargetCompID(), out);
-
-        // MsgSeqNum
-        writeField(34, String.valueOf(header.getMsgSeqNum()), out);
-
-        // SendingTime
-        String timeStr = sdf.get().format(new Date(header.getSendingTime()));
-        writeField(52, timeStr, out);
-    }
-
-    private static int fillBodyBuf(final ByteBuf payloadBuf,
-                                   FixMessageBuilder msg,
-                                   FixMessageHeader header) {
-
-        encodeHeader(header, payloadBuf);
-
-        // message body
-        for (FixMessageFragment component : msg.getBody()) {
-            encodeComponent(payloadBuf, component);
-        }
-        return payloadBuf.writerIndex();
-    }
-
-    private static void encodeComponent(ByteBuf payloadBuf, FixMessageFragment component) {
-        if (component instanceof AbstractField) {
-            writeField(component.getTagNum(), (AbstractField) component, payloadBuf);
-        } else if (component instanceof Group) {
-            Group group = (Group) component;
-            for (FixMessageFragment fixMessageFragment : group.getContents()) {
-                encodeComponent(payloadBuf, fixMessageFragment);
-            }
-        } else if (component instanceof GroupField) {
-            GroupField groupField = (GroupField) component;
-            writeField(groupField.getTagNum(), String.valueOf(groupField.getGroupCount()), payloadBuf);
-            for (Group group : groupField.getGroups()) {
-                encodeComponent(payloadBuf, group);
-            }
-        }
     }
 }

@@ -66,8 +66,6 @@ public class FixMessageDecoder extends MessageToMessageDecoder<ByteBuf> {
         }
         int offset = arrayIndex + 1;
         int valueLength = length - arrayIndex - 1;
-//        byte[] value = Arrays.copyOfRange(bytes, offset, length);
-//        String value = new String(bytes, arrayIndex + 1, length - arrayIndex - 1, US_ASCII);
 
         int sumBytes = 0;
         if (tagNum != 10) {
@@ -77,7 +75,7 @@ public class FixMessageDecoder extends MessageToMessageDecoder<ByteBuf> {
             sumBytes += 1; // SOH value
         }
         switch (tagNum) {
-            case 8:
+            case 8: // begin string
                 if (message != null) {
                     throw new DecoderException("Unexpected BeginString(8)");
                 }
@@ -85,7 +83,7 @@ public class FixMessageDecoder extends MessageToMessageDecoder<ByteBuf> {
                 checksum = sumBytes;
                 message.add(tagNum, bytes, offset, valueLength);
                 break;
-            case 10:
+            case 10: // checksum
                 appendField(tagNum, bytes, offset, valueLength);
                 verifyChecksum(message.getChecksum());
                 out.add(message);

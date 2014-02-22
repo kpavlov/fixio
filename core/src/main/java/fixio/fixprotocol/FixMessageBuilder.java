@@ -29,6 +29,8 @@ public interface FixMessageBuilder {
 
     Group newGroup(int tagNum);
 
+    Group newGroup(int tagNum, int expectedGroupSize);
+
     FixMessageBuilder add(FieldType quoteReqID, String quoteRequestId);
 
     FixMessageBuilder add(FieldType field, int value);
