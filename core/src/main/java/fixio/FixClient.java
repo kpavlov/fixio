@@ -16,7 +16,7 @@
 
 package fixio;
 
-import fixio.fixprotocol.FixMessage;
+import fixio.fixprotocol.FixMessageBuilder;
 import fixio.handlers.FixClientApplication;
 import fixio.netty.pipeline.client.FixInitiatorChannelInitializer;
 import fixio.netty.pipeline.client.FixSessionSettingsProvider;
@@ -63,35 +63,34 @@ public class FixClient extends AbstractFixConnector<FixClientApplication> {
         this.sessionSettingsProvider = sessionSettingsProvider;
     }
 
-    public ChannelFuture connect(int port) throws InterruptedException {
-        return connect(new InetSocketAddress(port));
+    /**
+     * Connect and start FIX session to specified host and port.
+     */
+    public ChannelFuture connect(String host, int port) throws InterruptedException {
+        return connect(new InetSocketAddress(host, port));
     }
 
     public ChannelFuture connect(SocketAddress serverAddress) throws InterruptedException {
         Bootstrap b = new Bootstrap();
         bossEventLoopGroup = new NioEventLoopGroup();
         workerEventLoopGroup = new NioEventLoopGroup(8);
-        try {
-            b.group(bossEventLoopGroup)
-                    .channel(NioSocketChannel.class)
-                    .remoteAddress(serverAddress)
-                    .option(ChannelOption.TCP_NODELAY,
-                            Boolean.parseBoolean(System.getProperty(
-                                    "nfs.rpc.tcp.nodelay", "true")))
-                    .option(ChannelOption.ALLOCATOR, new PooledByteBufAllocator())
-                    .handler(new FixInitiatorChannelInitializer<SocketChannel>(
-                            workerEventLoopGroup,
-                            sessionSettingsProvider,
-                            getFixApplication()
-                    ))
-                    .validate();
+        b.group(bossEventLoopGroup)
+                .channel(NioSocketChannel.class)
+                .remoteAddress(serverAddress)
+                .option(ChannelOption.TCP_NODELAY,
+                        Boolean.parseBoolean(System.getProperty(
+                                "nfs.rpc.tcp.nodelay", "true")))
+                .option(ChannelOption.ALLOCATOR, new PooledByteBufAllocator())
+                .handler(new FixInitiatorChannelInitializer<SocketChannel>(
+                        workerEventLoopGroup,
+                        sessionSettingsProvider,
+                        getFixApplication()
+                ))
+                .validate();
 
-            channel = b.connect().sync().channel();
-            LOGGER.info("FixClient is started and connected to {}", channel.remoteAddress());
-            return channel.closeFuture();
-        } finally {
-            // b.shutdown();
-        }
+        channel = b.connect().sync().channel();
+        LOGGER.info("FixClient is started and connected to {}", channel.remoteAddress());
+        return channel.closeFuture();
     }
 
     public void disconnect() throws InterruptedException {
@@ -103,7 +102,7 @@ public class FixClient extends AbstractFixConnector<FixClientApplication> {
         workerEventLoopGroup = null;
     }
 
-    public void send(FixMessage fixMessage) throws InterruptedException {
-        channel.writeAndFlush(fixMessage);
+    public void send(FixMessageBuilder fixMessageBuilder) throws InterruptedException {
+        channel.writeAndFlush(fixMessageBuilder);
     }
 }

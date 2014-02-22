@@ -122,6 +122,13 @@ public class FixMessageBuilderImpl implements FixMessage, FixMessageBuilder {
     }
 
     @Override
+    public Group newGroup(FieldType fieldType, int expectedGroupSize) {
+        Group group = new Group(expectedGroupSize);
+        addGroup(fieldType.tag(), group);
+        return group;
+    }
+
+    @Override
     public Group newGroup(int tagNum) {
         Group group = new Group();
         addGroup(tagNum, group);

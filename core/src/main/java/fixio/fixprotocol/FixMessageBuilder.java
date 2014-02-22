@@ -27,17 +27,19 @@ public interface FixMessageBuilder {
 
     List<FixMessageFragment> getBody();
 
-    Group newGroup(int tagNum);
-
-    Group newGroup(int tagNum, int expectedGroupSize);
-
     FixMessageBuilder add(FieldType quoteReqID, String quoteRequestId);
 
     FixMessageBuilder add(FieldType field, int value);
 
-    Group newGroup(FieldType fieldType);
-
     FixMessageBuilder add(int tagNum, String value);
 
     FixMessageBuilder add(int tagNum, int value);
+
+    Group newGroup(int tagNum);
+
+    Group newGroup(int tagNum, int expectedGroupSize);
+
+    Group newGroup(FieldType fieldType);
+
+    Group newGroup(FieldType fieldType, int expectedGroupSize);
 }

@@ -3,11 +3,11 @@ fixio - FIX Protocol Support for Netty [![Build Status](https://travis-ci.org/kp
 
 # Overview #
 
-## Why One More FIX Protocol API ##
+## Why One More FIX Protocol API
 
 This API is intended to be a replacement for well known [QuickFIX/J][quickfix] library to be used for high-frequency trading cases.
 
-### Design goals ###
+## Design goals
 
 1. Implement [FIX Protocol][fixprotocol] Java API with as low memory footprint as possible in order to eliminate unnecessary GC overhead,
 thus improving overall application performance under high load.
@@ -19,7 +19,14 @@ thus improving overall application performance under high load.
 
 This API has a number of [limitations](#Limitations), so it may be not suitable for any FIX application.
 
-# Getting Started #
+## Limitations
+
+1. Logon message encryption is not supported. EncryptMethod(98)=0
+2. XmlData is not supported
+3. Message encodings other than US-ASCII are not supported.
+4. ...
+
+# Getting Started
 
 1. [Download ZIP archive](archive/master.zip) or clone/fork the repository.
 2. Build and install project artifacts to your local maven repository:
@@ -46,7 +53,7 @@ You'll also need a slf4j API implementation at runtime, so please add appropriat
 </dependency>
 ~~~~~~~~~
 
-# Examples #
+## Examples
 
 You may find working example of [client][client-example]
 and [server][server-example] applications in module ["examples"][examples-module].
@@ -54,17 +61,45 @@ and [server][server-example] applications in module ["examples"][examples-module
 I recommend running server with Concurrent Mark Sweep Collector enabled: `-XX:+UseConcMarkSweepGC`
 and increased Survivor spaces (`-XX:SurvivorRatio=4`).
 
-# Limitations #
+## Creating Simple FIX Client
 
-1. Logon message encryption is not supported. EncryptMethod(98)=0
-2. XmlData is not supported
-3. Message encodings other than US-ASCII are not supported.
-4. ...
+To create a simple FIX client you need to:
 
-[FixedPointNumber]: tree/master/core/src/main/java/fixio/fixprotocol/fields/FixedPointNumber.java
-[client-example]: tree/master/examples/src/main/java/fixio/examples/priceclient
-[server-example]: tree/master/examples/src/main/java/fixio/examples/priceserver
-[examples-module]: tree/master/examples
+1. Implement [FixClientApplication][FixClientApplication].
+   You may extend [FixClientApplicationAdapter][FixClientApplicationAdapter] as a quick start.
+
+2. Create an instance of [FixClient][FixClient] and initialize if with [FixClientApplication][FixClientApplication] you've just created and classpath reference to FIX session settings property file.
+
+3. Invoke `FixClient.connect(host, port)` to initiate connection.
+   Method `connect(...)` returns a [ChannelFeature][ChannelFeature] which which will be notified when a channel is closed,
+    so you may invoke the method `sync()` on it if you wish to wait for connection to be closed.
+
+~~~~~~~~~
+    FixClientApplication app = new FixClientApplicationAdapter();
+    client = new FixClient(app);
+
+    // set settings file location related to classpath
+    client.setSettingsResource("/client.properties");
+
+    // connect to specified host and port
+    ChannelFeature closeFeature = client.connect("localhost", 10201);
+
+    // wait until FIX Session is closed
+    closeFeature.sync();
+
+    // Shutdown FIX client
+    client.disconnect();
+~~~~~~~~~
+
+[FixedPointNumber]: https://github.com/kpavlov/fixio/treemaster/core/src/main/java/fixio/fixprotocol/fields/FixedPointNumber.java
+[FixClientApplication]: https://github.com/kpavlov/fixio/treemaster/core/src/main/java/fixio/handlers/FixClientApplication.java
+[FixClientApplicationAdapter]: https://github.com/kpavlov/fixio/treemaster/core/src/main/java/fixio/handlers/FixClientApplicationAdapter.java
+[FixClient]: https://github.com/kpavlov/fixio/treemaster/core/src/main/java/fixio/FixClient.java
+[ChannelFeature]: http://netty.io/5.0/api/io/netty/channel/ChannelFuture.html
+
+[client-example]: https://github.com/kpavlov/fixio/treemaster/examples/src/main/java/fixio/examples/priceclient
+[server-example]: https://github.com/kpavlov/fixio/treemaster/examples/src/main/java/fixio/examples/priceserver
+[examples-module]: https://github.com/kpavlov/fixio/treemaster/examples
 [quickfix]: http://www.quickfixj.org/ "Java Open Source FIX Engine"
 [mina]: http://directory.apache.org/subprojects/mina/ "Apache Mina"
 [netty]: http://netty.io/ "Netty"

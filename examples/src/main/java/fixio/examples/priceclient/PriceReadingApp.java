@@ -68,24 +68,24 @@ class PriceReadingApp extends FixClientApplicationAdapter {
     }
 
     private FixMessageBuilder createQuoteCancel() {
-        FixMessageBuilder quoteCancel = new FixMessageBuilderImpl(MessageTypes.QUOTE_CANCEL);//QuoteCancel
+        FixMessageBuilder quoteCancel = new FixMessageBuilderImpl(MessageTypes.QUOTE_CANCEL);
         quoteCancel.add(FieldType.QuoteRequestType, "4"); //QuoteRequestType=AUTOMATIC
-        quoteCancel.add(FieldType.QuoteReqID, quoteRequestId); //quoteReqId
+        quoteCancel.add(FieldType.QuoteReqID, quoteRequestId);
         return quoteCancel;
     }
 
     private FixMessageBuilder createQuoteRequest() {
         FixMessageBuilder quoteRequest = new FixMessageBuilderImpl(MessageTypes.QUOTE_REQUEST);
         quoteRequestId = Long.toHexString(System.currentTimeMillis());
-        quoteRequest.add(FieldType.QuoteReqID, quoteRequestId); //quoteReqId
+        quoteRequest.add(FieldType.QuoteReqID, quoteRequestId);
         String clientReqId = quoteRequestId + counter;
         quoteRequest.add(11, clientReqId);
 
-        Group instrument1 = quoteRequest.newGroup(FieldType.NoRelatedSym);//noRelatedSym
+        Group instrument1 = quoteRequest.newGroup(FieldType.NoRelatedSym, 2);
         instrument1.add(FieldType.Symbol, "EUR/USD");
         instrument1.add(FieldType.SecurityType, "CURRENCY");
 
-        Group instrument2 = quoteRequest.newGroup(FieldType.NoRelatedSym);//noRelatedSym
+        Group instrument2 = quoteRequest.newGroup(FieldType.NoRelatedSym, 2);
         instrument2.add(FieldType.Symbol, "EUR/CHF");
         instrument2.add(FieldType.SecurityType, "CURRENCY");
 

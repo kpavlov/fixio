@@ -72,7 +72,7 @@ public class FixConversationIT {
     public void beforeMethod() throws InterruptedException {
         client = new FixClient(new ClientApp());
         client.setSettingsResource("/fixClient.properties");
-        clientCloseFuture = client.connect(PORT);
+        clientCloseFuture = client.connect("127.0.0.1", PORT);
         conversation.clear();
     }
 
