@@ -16,6 +16,9 @@
 
 package fixio.fixprotocol;
 
+import java.util.Collections;
+import java.util.List;
+
 public class FixMessageHeader {
 
     private String beginString;
@@ -26,6 +29,7 @@ public class FixMessageHeader {
     private String senderSubID;
     private String targetCompID;
     private String targetSubID;
+    private List<FixMessageFragment> custField = Collections.emptyList();
 
     public String getBeginString() {
         return beginString;
@@ -91,6 +95,14 @@ public class FixMessageHeader {
         this.sendingTime = sendingTime;
     }
 
+    public List<FixMessageFragment> getCustField() {
+        return custField;
+    }
+
+    public void setCustField(List<FixMessageFragment> custField) {
+        this.custField = custField;
+    }
+
     @Override
     public String toString() {
         StringBuilder sb = new StringBuilder("FixMessageHeader{");
@@ -105,6 +117,7 @@ public class FixMessageHeader {
         if (targetSubID != null) {
             sb.append(", targetSubID='").append(targetSubID).append('\'');
         }
+        sb.append(custField);
         sb.append('}');
         return sb.toString();
     }

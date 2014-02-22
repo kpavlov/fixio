@@ -95,8 +95,18 @@ public class FixMessageEncoder extends MessageToByteEncoder<FixMessageBuilder> {
         // SenderCompID
         writeField(49, header.getSenderCompID(), out);
 
+        // SenderCompSubID
+        if(header.getSenderSubID()!=null && !"".equals(header.getSenderSubID())){
+            writeField(50, header.getSenderSubID(), out);
+        }
+
         // TargetCompID
         writeField(56, header.getTargetCompID(), out);
+
+        // TargetCompSubID
+        if(header.getTargetSubID()!=null && !"".equals(header.getTargetSubID())){
+            writeField(57, header.getTargetSubID(), out);
+        }
 
         // MsgSeqNum
         writeField(34, String.valueOf(header.getMsgSeqNum()), out);
@@ -104,6 +114,11 @@ public class FixMessageEncoder extends MessageToByteEncoder<FixMessageBuilder> {
         // SendingTime
         String timeStr = sdf.get().format(new Date(header.getSendingTime()));
         writeField(52, timeStr, out);
+
+        // customize tag
+        for (FixMessageFragment component : header.getCustField()) {
+            encodeComponent(out, component);
+        }
     }
 
     private static int fillBodyBuf(final ByteBuf payloadBuf,

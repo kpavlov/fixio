@@ -73,9 +73,13 @@ public class ClientSessionHandler extends AbstractSessionHandler {
         ctx.writeAndFlush(logonRequest);
     }
 
-    private static FixSession createSession(FixSessionSettingsProvider settingsProvider) {
 
-        int nextIncomingSeqNum = 0;
+    protected void prepareLogonRequest(ChannelHandlerContext ctx, FixMessageBuilder logonRequest) {
+    }
+    
+    private FixSession createSession(FixSessionSettingsProvider settingsProvider) {
+
+        int nextIncomingSeqNum = settingsProvider.getMsgInSeqNum();
         if (settingsProvider.isResetMsgSeqNum()) {
             nextIncomingSeqNum = 1;
         }
@@ -88,7 +92,7 @@ public class ClientSessionHandler extends AbstractSessionHandler {
                 .targetSubId(settingsProvider.getTargetSubID())
                 .nextIncomingSeqNum(nextIncomingSeqNum)
                 .build();
-        session.setNextOutgoingMessageSeqNum(settingsProvider.getMsgSeqNum());
+        session.setNextOutgoingMessageSeqNum(settingsProvider.getMsgOutSeqNum());
         return session;
     }
 

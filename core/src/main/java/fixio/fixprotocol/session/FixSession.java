@@ -76,6 +76,10 @@ public class FixSession {
         this.nextOutgoingMessageSeqNum.set(nextOutgoingMessageSeqNum);
     }
 
+    public void setNextIncomingMessageSeqNum(int nextIncomingMessageSeqNum) {
+        this.nextIncomingMessageSeqNum = nextIncomingMessageSeqNum;
+    }
+
     public int getNextIncomingMessageSeqNum() {
         return nextIncomingMessageSeqNum;
     }
