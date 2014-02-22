@@ -1,0 +1,130 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset='utf-8'>
+    <meta http-equiv="X-UA-Compatible" content="chrome=1">
+    <link href='https://fonts.googleapis.com/css?family=Chivo:900' rel='stylesheet' type='text/css'>
+    <link rel="stylesheet" type="text/css" href="stylesheets/stylesheet.css" media="screen" />
+    <link rel="stylesheet" type="text/css" href="stylesheets/pygment_trac.css" media="screen" />
+    <link rel="stylesheet" type="text/css" href="stylesheets/print.css" media="print" />
+    <!--[if lt IE 9]>
+    <script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script>
+    <![endif]-->
+    <title>Fixio by kpavlov</title>
+  </head>
+
+  <body>
+    <div id="container">
+      <div class="inner">
+
+        <header>
+          <h1>Fixio</h1>
+          <h2>FIX Protocol Support for Netty</h2>
+        </header>
+
+        <section id="downloads" class="clearfix">
+          <a href="https://github.com/kpavlov/fixio/zipball/master" id="download-zip" class="button"><span>Download .zip</span></a>
+          <a href="https://github.com/kpavlov/fixio/tarball/master" id="download-tar-gz" class="button"><span>Download .tar.gz</span></a>
+          <a href="https://github.com/kpavlov/fixio" id="view-on-github" class="button"><span>View on GitHub</span></a>
+        </section>
+
+        <hr>
+
+        <section id="main_content">
+          <h1>
+<a name="fixio---fix-protocol-support-for-netty-" class="anchor" href="#fixio---fix-protocol-support-for-netty-"><span class="octicon octicon-link"></span></a>fixio - FIX Protocol Support for Netty <a href="https://travis-ci.org/kpavlov/fixio"><img src="https://travis-ci.org/kpavlov/fixio.png?branch=master" alt="Build Status"></a>
+</h1>
+
+<h1>
+<a name="overview" class="anchor" href="#overview"><span class="octicon octicon-link"></span></a>Overview</h1>
+
+<h2>
+<a name="why-one-more-fix-protocol-api" class="anchor" href="#why-one-more-fix-protocol-api"><span class="octicon octicon-link"></span></a>Why One More FIX Protocol API</h2>
+
+<p>This API is intended to be a replacement for well known <a href="http://www.quickfixj.org/" title="Java Open Source FIX Engine">QuickFIX/J</a> library to be used for high-frequency trading cases.</p>
+
+<h3>
+<a name="design-goals" class="anchor" href="#design-goals"><span class="octicon octicon-link"></span></a>Design goals</h3>
+
+<ol>
+<li>Implement <a href="http://www.fixprotocol.org/" title="FIX Protocol">FIX Protocol</a> Java API with as low memory footprint as possible in order to eliminate unnecessary GC overhead,
+thus improving overall application performance under high load.</li>
+<li>Provide <a href="http://www.fixprotocol.org/" title="FIX Protocol">FIX Protocol</a> Codecs for <a href="http://netty.io/" title="Netty">Netty</a>, making it possible to get rid of Apache <a href="http://directory.apache.org/subprojects/mina/" title="Apache Mina">Mina</a> which is used by <a href="http://www.quickfixj.org/" title="Java Open Source FIX Engine">QuickFIX/J</a> as a transport layer.</li>
+<li>Avoid using expensive operations:
+
+<ul>
+<li>Avoid synchronization.</li>
+<li>Replace BigDecimals with custom <a href="tree/master/core/src/main/java/fixio/fixprotocol/fields/FixedPointNumber.java">Fixed Point Number</a> implementation for financial data.</li>
+<li>Reuse java.util.Calendar and java.util.TimeZone instances.</li>
+</ul>
+</li>
+</ol><p>This API has a number of <a href="#Limitations">limitations</a>, so it may be not suitable for any FIX application.</p>
+
+<h1>
+<a name="getting-started" class="anchor" href="#getting-started"><span class="octicon octicon-link"></span></a>Getting Started</h1>
+
+<ol>
+<li>
+<a href="archive/master.zip">Download ZIP archive</a> or clone/fork the repository.</li>
+<li>Build and install project artifacts to your local maven repository:
+<code>mvn clean install</code>
+</li>
+<li>Add the dependency to your project</li>
+</ol><pre><code>&lt;dependency&gt;
+    &lt;groupId&gt;kpavlov.fixio&lt;/groupId&gt;
+    &lt;artifactId&gt;core&lt;/artifactId&gt;
+    &lt;version&gt;1.0-SNAPSHOT&lt;/version&gt;
+&lt;/dependency&gt;
+</code></pre>
+
+<p>You'll also need a slf4j API implementation at runtime, so please add appropriate dependency, e.g.:</p>
+
+<pre><code>&lt;dependency&gt;
+    &lt;groupId&gt;org.slf4j&lt;/groupId&gt;
+    &lt;artifactId&gt;slf4j-simple&lt;/artifactId&gt;
+    &lt;version&gt;1.7.5&lt;/version&gt;
+    &lt;scope&gt;runtime&lt;/scope&gt;
+    &lt;optional&gt;true&lt;/optional&gt;
+&lt;/dependency&gt;
+</code></pre>
+
+<h1>
+<a name="examples" class="anchor" href="#examples"><span class="octicon octicon-link"></span></a>Examples</h1>
+
+<p>You may find working example of <a href="tree/master/examples/src/main/java/fixio/examples/priceclient">client</a>
+and <a href="tree/master/examples/src/main/java/fixio/examples/priceserver">server</a> applications in module <a href="tree/master/examples">"examples"</a>.</p>
+
+<p>I recommend running server with Concurrent Mark Sweep Collector enabled: <code>-XX:+UseConcMarkSweepGC</code>
+and increased Survivor spaces (<code>-XX:SurvivorRatio=4</code>).</p>
+
+<h1>
+<a name="limitations" class="anchor" href="#limitations"><span class="octicon octicon-link"></span></a>Limitations</h1>
+
+<ol>
+<li>Logon message encryption is not supported. EncryptMethod(98)=0</li>
+<li>XmlData is not supported</li>
+<li>Message encodings other than US-ASCII are not supported.</li>
+<li>...</li>
+</ol>
+        </section>
+
+        <footer>
+          Fixio is maintained by <a href="https://github.com/kpavlov">kpavlov</a><br>
+          This page was generated by <a href="http://pages.github.com">GitHub Pages</a>. Tactile theme by <a href="https://twitter.com/jasonlong">Jason Long</a>.
+        </footer>
+
+                  <script type="text/javascript">
+            var gaJsHost = (("https:" == document.location.protocol) ? "https://ssl." : "http://www.");
+            document.write(unescape("%3Cscript src='" + gaJsHost + "google-analytics.com/ga.js' type='text/javascript'%3E%3C/script%3E"));
+          </script>
+          <script type="text/javascript">
+            try {
+              var pageTracker = _gat._getTracker("UA-2530248-20");
+            pageTracker._trackPageview();
+            } catch(err) {}
+          </script>
+
+      </div>
+    </div>
+  </body>
+</html>
