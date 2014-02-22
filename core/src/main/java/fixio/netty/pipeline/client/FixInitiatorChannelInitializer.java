@@ -1,5 +1,5 @@
 /*
- * Copyright 2013 The FIX.io Project
+ * Copyright 2014 The FIX.io Project
  *
  * The FIX.io Project licenses this file to you under the Apache License,
  * version 2.0 (the "License"); you may not use this file except in compliance
@@ -18,8 +18,7 @@ package fixio.netty.pipeline.client;
 
 import fixio.fixprotocol.FixMessage;
 import fixio.fixprotocol.FixMessageBuilder;
-import fixio.handlers.AdminEventHandler;
-import fixio.handlers.FixMessageHandler;
+import fixio.handlers.FixClientApplication;
 import fixio.netty.pipeline.FixChannelInitializer;
 import io.netty.channel.Channel;
 import io.netty.channel.EventLoopGroup;
@@ -31,14 +30,13 @@ public class FixInitiatorChannelInitializer<C extends Channel> extends FixChanne
 
     public FixInitiatorChannelInitializer(EventLoopGroup workerGroup,
                                           FixSessionSettingsProvider settingsProvider,
-                                          AdminEventHandler adminEventHandler,
-                                          FixMessageHandler... appMessageHandlers) {
-        super(workerGroup, adminEventHandler, appMessageHandlers);
+                                          FixClientApplication fixApplication) {
+        super(workerGroup, fixApplication);
         this.settingsProvider = settingsProvider;
     }
 
     @Override
     protected MessageToMessageCodec<FixMessage, FixMessageBuilder> createSessionHandler() {
-        return new ClientSessionHandler(settingsProvider);
+        return new ClientSessionHandler(settingsProvider, (FixClientApplication) getFixApplication());
     }
 }

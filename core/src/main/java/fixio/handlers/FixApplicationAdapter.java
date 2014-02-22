@@ -28,7 +28,7 @@ import org.slf4j.LoggerFactory;
 import java.util.List;
 
 @ChannelHandler.Sharable
-public class FixApplicationAdapter extends MessageToMessageDecoder<Object> implements AdminEventHandler, FixMessageHandler {
+public class FixApplicationAdapter extends MessageToMessageDecoder<Object> implements FixApplication {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(FixApplicationAdapter.class);
 
@@ -47,16 +47,16 @@ public class FixApplicationAdapter extends MessageToMessageDecoder<Object> imple
         }
     }
 
-    protected void onLogon(ChannelHandlerContext ctx, LogonEvent msg) {
-
+    @Override
+    public void onLogon(ChannelHandlerContext ctx, LogonEvent msg) {
     }
 
-    protected void onLogout(ChannelHandlerContext ctx, LogoutEvent msg) {
-
+    @Override
+    public void onLogout(ChannelHandlerContext ctx, LogoutEvent msg) {
     }
 
-    protected void onMessage(ChannelHandlerContext ctx, FixMessage msg, List<Object> out) throws Exception {
-
+    @Override
+    public void onMessage(ChannelHandlerContext ctx, FixMessage msg, List<Object> out) throws Exception {
     }
 
     @Override

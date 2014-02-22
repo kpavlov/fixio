@@ -1,5 +1,5 @@
 /*
- * Copyright 2013 The FIX.io Project
+ * Copyright 2014 The FIX.io Project
  *
  * The FIX.io Project licenses this file to you under the Apache License,
  * version 2.0 (the "License"); you may not use this file except in compliance
@@ -19,7 +19,7 @@ import fixio.fixprotocol.FieldType;
 import fixio.fixprotocol.FixMessage;
 import fixio.fixprotocol.FixMessageBuilderImpl;
 import fixio.fixprotocol.MessageTypes;
-import fixio.handlers.FixMessageHandlerAdapter;
+import fixio.handlers.FixApplicationAdapter;
 import fixio.netty.pipeline.server.FixAcceptorChannelInitializer;
 import fixio.netty.pipeline.server.FixAuthenticator;
 import io.netty.bootstrap.ServerBootstrap;
@@ -47,8 +47,6 @@ public class ServerChannelPipelineIntegrationTest {
     private FixAuthenticator authenticator;
     private LocalServerChannel serverChannel;
     private ChannelPipeline pipeline;
-    //    private LocalChannel clientChannel;
-//    private Channel channel;
 
     @Before
     public void setUp() throws Exception {
@@ -63,7 +61,7 @@ public class ServerChannelPipelineIntegrationTest {
         serverChannel = (LocalServerChannel) b.group(new DefaultEventLoopGroup())
                 .channel(LocalServerChannel.class)
                 .handler(channelInitializer)
-                .childHandler(new FixMessageHandlerAdapter())
+                .childHandler(new FixApplicationAdapter())
                 .validate()
                 .bind(address)
                 .sync()

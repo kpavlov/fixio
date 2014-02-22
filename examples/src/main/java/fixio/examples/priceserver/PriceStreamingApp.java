@@ -48,12 +48,12 @@ class PriceStreamingApp extends FixApplicationAdapter {
     }
 
     @Override
-    protected void onLogon(ChannelHandlerContext ctx, LogonEvent msg) {
+    public void onLogon(ChannelHandlerContext ctx, LogonEvent msg) {
         LOGGER.info("Client Connected.");
     }
 
     @Override
-    protected void onLogout(ChannelHandlerContext ctx, LogoutEvent msg) {
+    public void onLogout(ChannelHandlerContext ctx, LogoutEvent msg) {
         LOGGER.info("Logout. Session={}", msg.getSession());
         stopStreaming(ctx);
     }
@@ -78,7 +78,7 @@ class PriceStreamingApp extends FixApplicationAdapter {
     }
 
     @Override
-    protected void onMessage(ChannelHandlerContext ctx, FixMessage msg, List<Object> out) throws Exception {
+    public void onMessage(ChannelHandlerContext ctx, FixMessage msg, List<Object> out) throws Exception {
         String reqId;
         switch (msg.getMessageType()) {
             case MessageTypes.QUOTE_REQUEST:

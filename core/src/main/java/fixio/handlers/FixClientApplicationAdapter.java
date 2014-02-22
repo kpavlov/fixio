@@ -1,5 +1,5 @@
 /*
- * Copyright 2013 The FIX.io Project
+ * Copyright 2014 The FIX.io Project
  *
  * The FIX.io Project licenses this file to you under the Apache License,
  * version 2.0 (the "License"); you may not use this file except in compliance
@@ -15,7 +15,15 @@
  */
 package fixio.handlers;
 
-import io.netty.channel.ChannelHandler;
 
-public interface FixMessageHandler extends ChannelHandler {
+import fixio.fixprotocol.FixMessageBuilder;
+import io.netty.channel.ChannelHandler;
+import io.netty.channel.ChannelHandlerContext;
+
+@ChannelHandler.Sharable
+public class FixClientApplicationAdapter extends FixApplicationAdapter implements FixClientApplication {
+
+    public void onBeforeLogin(ChannelHandlerContext ctx, FixMessageBuilder logonMessage) {
+        // noop
+    }
 }

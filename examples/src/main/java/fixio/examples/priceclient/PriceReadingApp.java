@@ -17,7 +17,7 @@ package fixio.examples.priceclient;
 
 import fixio.events.LogonEvent;
 import fixio.fixprotocol.*;
-import fixio.handlers.FixApplicationAdapter;
+import fixio.handlers.FixClientApplicationAdapter;
 import io.netty.channel.ChannelFutureListener;
 import io.netty.channel.ChannelHandlerContext;
 import org.slf4j.Logger;
@@ -25,9 +25,9 @@ import org.slf4j.LoggerFactory;
 
 import java.util.List;
 
-class PriceReadingApp extends FixApplicationAdapter {
+class PriceReadingApp extends FixClientApplicationAdapter {
 
-    public static final int MAX_QUOTE_COUNT = 200_000;
+    public static final int MAX_QUOTE_COUNT = 300_000;
     private static final Logger LOGGER = LoggerFactory.getLogger(PriceReadingApp.class);
     private int counter;
     private long startTimeNanos;
@@ -35,14 +35,14 @@ class PriceReadingApp extends FixApplicationAdapter {
     private String quoteRequestId;
 
     @Override
-    protected void onLogon(ChannelHandlerContext ctx, LogonEvent msg) {
+    public void onLogon(ChannelHandlerContext ctx, LogonEvent msg) {
         counter = 0;
         ctx.writeAndFlush(createQuoteRequest());
         startTimeNanos = System.nanoTime();
     }
 
     @Override
-    protected void onMessage(ChannelHandlerContext ctx, FixMessage msg, List<Object> out) throws Exception {
+    public void onMessage(ChannelHandlerContext ctx, FixMessage msg, List<Object> out) throws Exception {
         assert (msg != null) : "Message can't be null";
         switch (msg.getMessageType()) {
             case MessageTypes.QUOTE:
@@ -92,4 +92,5 @@ class PriceReadingApp extends FixApplicationAdapter {
         quoteRequest.add(FieldType.QuoteRequestType, 2); //QuoteRequestType=AUTOMATIC
         return quoteRequest;
     }
+
 }

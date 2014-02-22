@@ -20,7 +20,7 @@ import fixio.fixprotocol.FixMessage;
 import fixio.fixprotocol.FixMessageBuilderImpl;
 import fixio.fixprotocol.MessageTypes;
 import fixio.handlers.FixApplicationAdapter;
-import fixio.handlers.FixMessageHandlerAdapter;
+import fixio.handlers.FixClientApplicationAdapter;
 import io.netty.channel.ChannelFuture;
 import io.netty.channel.ChannelHandlerContext;
 import org.junit.*;
@@ -91,7 +91,7 @@ public class FixConversationIT {
         assertEquals(MessageTypes.USER_RESPONSE, conversation.get(1).getMessageType());
     }
 
-    private static class ServerLogicHandler extends FixMessageHandlerAdapter {
+    private static class ServerLogicHandler extends FixApplicationAdapter {
 
         @Override
         public void channelRead(ChannelHandlerContext ctx, Object msg) throws Exception {
@@ -99,7 +99,7 @@ public class FixConversationIT {
         }
 
         @Override
-        protected void decode(ChannelHandlerContext ctx, FixMessage msg, List<Object> out) throws Exception {
+        public void onMessage(ChannelHandlerContext ctx, FixMessage msg, List<Object> out) throws Exception {
             if ("BE".equals(msg.getMessageType())) {
                 conversation.add(msg);
                 ctx.writeAndFlush(createUserStatusReport());
@@ -107,10 +107,10 @@ public class FixConversationIT {
         }
     }
 
-    private class ClientApp extends FixApplicationAdapter {
+    private class ClientApp extends FixClientApplicationAdapter {
 
         @Override
-        protected void onMessage(ChannelHandlerContext ctx, FixMessage msg, List<Object> out) throws Exception {
+        public void onMessage(ChannelHandlerContext ctx, FixMessage msg, List<Object> out) throws Exception {
             if ("BF".equals(msg.getMessageType())) {
                 conversation.add(msg);
                 client.disconnect();
@@ -118,7 +118,7 @@ public class FixConversationIT {
         }
 
         @Override
-        protected void onLogon(ChannelHandlerContext ctx, LogonEvent msg) {
+        public void onLogon(ChannelHandlerContext ctx, LogonEvent msg) {
             ctx.writeAndFlush(createUserStatusRequest());
         }
     }

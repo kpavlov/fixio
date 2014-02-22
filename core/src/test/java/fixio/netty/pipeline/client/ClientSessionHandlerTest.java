@@ -19,6 +19,7 @@ import fixio.fixprotocol.FixMessageBuilder;
 import fixio.fixprotocol.FixMessageHeader;
 import fixio.fixprotocol.MessageTypes;
 import fixio.fixprotocol.session.FixSession;
+import fixio.handlers.FixClientApplication;
 import fixio.netty.AttributeMock;
 import fixio.netty.pipeline.AbstractSessionHandler;
 import io.netty.channel.ChannelHandlerContext;
@@ -49,6 +50,8 @@ public class ClientSessionHandlerTest {
     private MessageSequenceProvider sequenceProvider;
     @Mock
     private ChannelHandlerContext ctx;
+    @Mock
+    private FixClientApplication fixApplication;
     @Captor
     private ArgumentCaptor<FixMessageBuilder> messageCaptor;
     private int inMsgSeqNum;
@@ -56,7 +59,7 @@ public class ClientSessionHandlerTest {
 
     @Before
     public void setUp() {
-        handler = spy(new ClientSessionHandler(settingsProvider, sequenceProvider));
+        handler = spy(new ClientSessionHandler(settingsProvider, sequenceProvider, fixApplication));
 
         Random random = new Random();
         inMsgSeqNum = random.nextInt();
@@ -79,7 +82,7 @@ public class ClientSessionHandlerTest {
         FixMessageBuilder sentMessage = messageCaptor.getValue();
         FixMessageHeader header = sentMessage.getHeader();
 
-        verify(handler).onLogonRequest(same(ctx), same(sentMessage));
+        verify(fixApplication).onBeforeLogin(same(ctx), same(sentMessage));
 
         assertEquals("LOGON expected", MessageTypes.LOGON, header.getMessageType());
         assertEquals(outMsgSeqNum, header.getMsgSeqNum());

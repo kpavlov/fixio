@@ -1,5 +1,5 @@
 /*
- * Copyright 2013 The FIX.io Project
+ * Copyright 2014 The FIX.io Project
  *
  * The FIX.io Project licenses this file to you under the Apache License,
  * version 2.0 (the "License"); you may not use this file except in compliance
@@ -16,8 +16,7 @@
 
 package fixio;
 
-import fixio.handlers.AdminEventHandler;
-import fixio.handlers.FixMessageHandler;
+import fixio.handlers.FixApplication;
 import io.netty.util.internal.logging.InternalLoggerFactory;
 import io.netty.util.internal.logging.Slf4JLoggerFactory;
 
@@ -26,25 +25,19 @@ import io.netty.util.internal.logging.Slf4JLoggerFactory;
  *
  * @author Konstantin Pavlov
  */
-public abstract class AbstractFixConnector {
+public abstract class AbstractFixConnector<T extends FixApplication> {
 
-    private final AdminEventHandler adminHandler;
-    private final FixMessageHandler[] appMessageHandlers;
+    private final T fixApplication;
 
     static {
         InternalLoggerFactory.setDefaultFactory(new Slf4JLoggerFactory());
     }
 
-    public AbstractFixConnector(AdminEventHandler adminHandler, FixMessageHandler... appMessageHandlers) {
-        this.adminHandler = adminHandler;
-        this.appMessageHandlers = appMessageHandlers;
+    public AbstractFixConnector(T fixApplication) {
+        this.fixApplication = fixApplication;
     }
 
-    protected FixMessageHandler[] getAppMessageHandlers() {
-        return appMessageHandlers;
-    }
-
-    protected AdminEventHandler getAdminHandler() {
-        return adminHandler;
+    protected T getFixApplication() {
+        return fixApplication;
     }
 }

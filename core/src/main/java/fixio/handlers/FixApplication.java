@@ -1,5 +1,5 @@
 /*
- * Copyright 2013 The FIX.io Project
+ * Copyright 2014 The FIX.io Project
  *
  * The FIX.io Project licenses this file to you under the Apache License,
  * version 2.0 (the "License"); you may not use this file except in compliance
@@ -15,30 +15,19 @@
  */
 package fixio.handlers;
 
-import fixio.events.AdminEvent;
 import fixio.events.LogonEvent;
 import fixio.events.LogoutEvent;
+import fixio.fixprotocol.FixMessage;
+import io.netty.channel.ChannelHandler;
 import io.netty.channel.ChannelHandlerContext;
-import io.netty.handler.codec.MessageToMessageDecoder;
 
 import java.util.List;
 
-public class AdminEventHandlerAdapter extends MessageToMessageDecoder<AdminEvent> implements AdminEventHandler {
+public interface FixApplication extends ChannelHandler {
 
-    @Override
-    protected void decode(ChannelHandlerContext ctx, AdminEvent msg, List<Object> out) throws Exception {
-        if (msg instanceof LogonEvent) {
-            onLogon(ctx, (LogonEvent) msg);
-        } else if (msg instanceof LogoutEvent) {
-            onLogout(ctx, (LogoutEvent) msg);
-        }
-    }
+    void onLogon(ChannelHandlerContext ctx, LogonEvent msg);
 
-    protected void onLogon(ChannelHandlerContext ctx, LogonEvent msg) {
+    void onLogout(ChannelHandlerContext ctx, LogoutEvent msg);
 
-    }
-
-    protected void onLogout(ChannelHandlerContext ctx, LogoutEvent msg) {
-
-    }
+    void onMessage(ChannelHandlerContext ctx, FixMessage msg, List<Object> out) throws Exception;
 }

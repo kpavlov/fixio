@@ -16,9 +16,7 @@
 
 package fixio;
 
-import fixio.handlers.AdminEventHandler;
-import fixio.handlers.FixApplicationAdapter;
-import fixio.handlers.FixMessageHandler;
+import fixio.handlers.FixApplication;
 import fixio.netty.pipeline.server.FixAcceptorChannelInitializer;
 import io.netty.bootstrap.ServerBootstrap;
 import io.netty.buffer.PooledByteBufAllocator;
@@ -34,7 +32,7 @@ import org.slf4j.LoggerFactory;
 
 import java.net.InetSocketAddress;
 
-public class FixServer extends AbstractFixConnector {
+public class FixServer extends AbstractFixConnector<FixApplication> {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(FixServer.class);
     private final int port;
@@ -42,16 +40,8 @@ public class FixServer extends AbstractFixConnector {
     private EventLoopGroup bossGroup;
     private EventLoopGroup workerGroup;
 
-    public FixServer(int port, FixApplicationAdapter fixApplication) {
-        this(port, (AdminEventHandler) fixApplication, fixApplication);
-    }
-
-    public FixServer(int port, FixMessageHandler... appMessageHandlers) {
-        this(port, null, appMessageHandlers);
-    }
-
-    public FixServer(int port, AdminEventHandler adminEventHandler, FixMessageHandler... appMessageHandlers) {
-        super(adminEventHandler, appMessageHandlers);
+    public FixServer(int port, FixApplication fixApplication) {
+        super(fixApplication);
         this.port = port;
     }
 
@@ -68,8 +58,7 @@ public class FixServer extends AbstractFixConnector {
                 .localAddress(new InetSocketAddress(port))
                 .childHandler(new FixAcceptorChannelInitializer<SocketChannel>(
                         workerGroup,
-                        getAdminHandler(),
-                        getAppMessageHandlers()
+                        getFixApplication()
                 ))
                 .validate();
 

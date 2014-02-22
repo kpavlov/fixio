@@ -1,5 +1,5 @@
 /*
- * Copyright 2013 The FIX.io Project
+ * Copyright 2014 The FIX.io Project
  *
  * The FIX.io Project licenses this file to you under the Apache License,
  * version 2.0 (the "License"); you may not use this file except in compliance
@@ -18,8 +18,7 @@ package fixio.netty.pipeline.server;
 
 import fixio.fixprotocol.FixMessage;
 import fixio.fixprotocol.FixMessageBuilder;
-import fixio.handlers.AdminEventHandler;
-import fixio.handlers.FixMessageHandler;
+import fixio.handlers.FixApplication;
 import fixio.netty.pipeline.FixChannelInitializer;
 import io.netty.channel.Channel;
 import io.netty.channel.EventLoopGroup;
@@ -29,14 +28,13 @@ public class FixAcceptorChannelInitializer<C extends Channel> extends FixChannel
 
     private FixAuthenticator authenticator = new AcceptAllAuthenticator();
 
-    public FixAcceptorChannelInitializer(EventLoopGroup workerGroup, AdminEventHandler adminEventHandler, FixMessageHandler... appMessageHandlers) {
-        super(workerGroup, adminEventHandler, appMessageHandlers);
+    public FixAcceptorChannelInitializer(EventLoopGroup workerGroup, FixApplication fixApplication) {
+        super(workerGroup, fixApplication);
     }
 
     public void setAuthenticator(FixAuthenticator authenticator) {
         this.authenticator = authenticator;
     }
-
 
     @Override
     protected MessageToMessageCodec<FixMessage, FixMessageBuilder> createSessionHandler() {

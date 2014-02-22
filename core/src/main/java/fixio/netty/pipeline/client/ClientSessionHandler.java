@@ -19,6 +19,7 @@ package fixio.netty.pipeline.client;
 import fixio.events.LogonEvent;
 import fixio.fixprotocol.*;
 import fixio.fixprotocol.session.FixSession;
+import fixio.handlers.FixClientApplication;
 import fixio.netty.pipeline.AbstractSessionHandler;
 import io.netty.channel.ChannelHandlerContext;
 import org.slf4j.Logger;
@@ -31,16 +32,18 @@ public class ClientSessionHandler extends AbstractSessionHandler {
     private final static Logger LOGGER = LoggerFactory.getLogger(ClientSessionHandler.class);
     private final FixSessionSettingsProvider sessionSettingsProvider;
     private final MessageSequenceProvider messageSequenceProvider;
+    private final FixClientApplication fixClientApplication;
 
     public ClientSessionHandler(FixSessionSettingsProvider settingsProvider,
-                                MessageSequenceProvider messageSequenceProvider) {
+                                MessageSequenceProvider messageSequenceProvider, FixClientApplication fixClientApplication) {
+        this.fixClientApplication = fixClientApplication;
         assert (settingsProvider != null) : "FixSessionSettingsProvider is expected.";
         this.sessionSettingsProvider = settingsProvider;
         this.messageSequenceProvider = messageSequenceProvider;
     }
 
-    public ClientSessionHandler(FixSessionSettingsProvider settingsProvider) {
-        this(settingsProvider, StatelessMessageSequenceProvider.getInstance());
+    public ClientSessionHandler(FixSessionSettingsProvider settingsProvider, FixClientApplication fixClientApplication) {
+        this(settingsProvider, StatelessMessageSequenceProvider.getInstance(), fixClientApplication);
     }
 
     @Override
@@ -76,19 +79,11 @@ public class ClientSessionHandler extends AbstractSessionHandler {
         updateFixMessageHeader(pendingSession, logonRequest);
 
         // callback
-        onLogonRequest(ctx, logonRequest);
+        fixClientApplication.onBeforeLogin(ctx, logonRequest);
 
         getLogger().info("Sending Logon: {}", logonRequest);
 
         ctx.writeAndFlush(logonRequest);
-    }
-
-    /**
-     * Callback method to set additional fields to LogonRequest before sending.
-     * <p/>
-     * Default implementation does nothing.
-     */
-    protected void onLogonRequest(ChannelHandlerContext ctx, FixMessageBuilder logonRequest) {
     }
 
     private FixSession createSession(FixSessionSettingsProvider settingsProvider) {

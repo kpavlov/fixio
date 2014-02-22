@@ -18,8 +18,7 @@ package fixio.netty.pipeline;
 
 import fixio.fixprotocol.FixMessage;
 import fixio.fixprotocol.FixMessageBuilder;
-import fixio.handlers.AdminEventHandler;
-import fixio.handlers.FixMessageHandler;
+import fixio.handlers.FixApplication;
 import fixio.netty.codec.FixMessageDecoder;
 import fixio.netty.codec.FixMessageEncoder;
 import io.netty.buffer.Unpooled;
@@ -40,16 +39,15 @@ import io.netty.handler.logging.LoggingHandler;
 public abstract class FixChannelInitializer<C extends Channel> extends ChannelInitializer<C> {
 
     private static final FixMessageEncoder ENCODER = new FixMessageEncoder();
-
     private final EventLoopGroup workerGroup;
-    private final AdminEventHandler adminEventHandler;
-    private final FixMessageHandler[] appMessageHandlers;
+
+    private final FixApplication fixApplication;
+
     private final TestRequestHandler testRequestHandler = new TestRequestHandler();
 
-    protected FixChannelInitializer(EventLoopGroup workerGroup, AdminEventHandler adminEventHandler, FixMessageHandler... appMessageHandlers) {
+    protected FixChannelInitializer(EventLoopGroup workerGroup, FixApplication fixApplication) {
         this.workerGroup = workerGroup;
-        this.adminEventHandler = adminEventHandler;
-        this.appMessageHandlers = appMessageHandlers;
+        this.fixApplication = fixApplication;
     }
 
     @Override
@@ -61,13 +59,15 @@ public abstract class FixChannelInitializer<C extends Channel> extends ChannelIn
         pipeline.addLast("logging", new LoggingHandler("fix", LogLevel.DEBUG));
         pipeline.addLast("session", createSessionHandler()); // handle fix session
         pipeline.addLast("testRequest", testRequestHandler); // process test requests
-        if (adminEventHandler != null) {
-            pipeline.addLast(workerGroup, "admin", adminEventHandler); // process admin events
+        if (fixApplication != null) {
+            pipeline.addLast(workerGroup, "app", fixApplication); // process application events events
         }
-        if (appMessageHandlers != null && appMessageHandlers.length > 0) {
-            pipeline.addLast(workerGroup, appMessageHandlers);
-        }
+
     }
 
     protected abstract MessageToMessageCodec<FixMessage, FixMessageBuilder> createSessionHandler();
+
+    protected FixApplication getFixApplication() {
+        return fixApplication;
+    }
 }

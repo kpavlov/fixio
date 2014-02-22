@@ -50,6 +50,42 @@ public class FixMessageEncoder extends MessageToByteEncoder<FixMessageBuilder> {
         }
     };
 
+    @Override
+    public void encode(ChannelHandlerContext ctx,
+                       FixMessageBuilder msg,
+                       ByteBuf out) throws Exception {
+        final FixMessageHeader header = msg.getHeader();
+        validateRequiredFields(header);
+
+        final int initialOffset = out.writerIndex();
+
+        final ByteBufAllocator byteBufAllocator = ctx.alloc();
+
+        final ByteBuf bodyBuf = byteBufAllocator.buffer(256);
+        final ByteBuf headBuf = byteBufAllocator.buffer(64);
+
+        int bodyLength = fillBodyBuf(bodyBuf, msg, header);
+
+        // begin string
+        writeField(8, header.getBeginString(), headBuf);
+        // body length
+        writeField(9, String.valueOf(bodyLength), headBuf);
+
+        out.writeBytes(headBuf);
+        out.writeBytes(bodyBuf);
+
+        int checksum = calculateChecksum(out, initialOffset);
+
+        // Checksum
+        writeField(10, String.format("%1$03d", checksum), out);
+        ctx.flush();
+
+        headBuf.release();
+        bodyBuf.release();
+        assert (headBuf.refCnt() == 0);
+        assert (bodyBuf.refCnt() == 0);
+    }
+
     private static void validateRequiredFields(FixMessageHeader header) {
         if (header.getBeginString() == null) {
             throw new IllegalArgumentException("BeginString is required.");
@@ -151,41 +187,5 @@ public class FixMessageEncoder extends MessageToByteEncoder<FixMessageBuilder> {
                 }
             }
         }
-    }
-
-    @Override
-    public void encode(ChannelHandlerContext ctx,
-                       FixMessageBuilder msg,
-                       ByteBuf out) throws Exception {
-        final FixMessageHeader header = msg.getHeader();
-        validateRequiredFields(header);
-
-        final int initialOffset = out.writerIndex();
-
-        final ByteBufAllocator byteBufAllocator = ctx.alloc();
-
-        final ByteBuf bodyBuf = byteBufAllocator.buffer();
-        final ByteBuf headBuf = byteBufAllocator.buffer();
-
-        int bodyLength = fillBodyBuf(bodyBuf, msg, header);
-
-        // begin string
-        writeField(8, header.getBeginString(), headBuf);
-        // body length
-        writeField(9, String.valueOf(bodyLength), headBuf);
-
-        out.writeBytes(headBuf);
-        out.writeBytes(bodyBuf);
-
-        int checksum = calculateChecksum(out, initialOffset);
-
-        // Checksum
-        writeField(10, String.format("%1$03d", checksum), out);
-        ctx.flush();
-
-        headBuf.release();
-        bodyBuf.release();
-        assert (headBuf.refCnt() == 0);
-        assert (bodyBuf.refCnt() == 0);
     }
 }

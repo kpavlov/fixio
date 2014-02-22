@@ -1,5 +1,5 @@
 /*
- * Copyright 2013 The FIX.io Project
+ * Copyright 2014 The FIX.io Project
  *
  * The FIX.io Project licenses this file to you under the Apache License,
  * version 2.0 (the "License"); you may not use this file except in compliance
@@ -15,7 +15,14 @@
  */
 package fixio.handlers;
 
-import io.netty.channel.ChannelHandler;
 
-public interface AdminEventHandler extends ChannelHandler {
+import fixio.fixprotocol.FixMessageBuilder;
+import io.netty.channel.ChannelHandlerContext;
+
+public interface FixClientApplication extends FixApplication {
+
+    /**
+     * Callback method to set additional fields to LogonRequest before sending.
+     */
+    public void onBeforeLogin(ChannelHandlerContext ctx, FixMessageBuilder logonMessage);
 }
