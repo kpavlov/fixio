@@ -66,14 +66,14 @@ public class FixMessageEncoder extends MessageToByteEncoder<FixMessageBuilder> {
     }
 
     private static void writeField(int fieldNum, AbstractField field, ByteBuf out) {
-        out.writeBytes(String.valueOf(fieldNum).getBytes(CHARSET));
+        out.writeBytes(Integer.toString(fieldNum).getBytes(CHARSET));
         out.writeByte('=');
         out.writeBytes(field.getBytes());
         out.writeByte(1);
     }
 
     private static void writeField(int fieldNum, String stringValue, ByteBuf out) {
-        out.writeBytes(String.valueOf(fieldNum).getBytes(CHARSET));
+        out.writeBytes(Integer.toString(fieldNum).getBytes(CHARSET));
         out.writeByte('=');
         out.writeBytes(stringValue.getBytes(CHARSET));
         out.writeByte(1);
@@ -109,7 +109,7 @@ public class FixMessageEncoder extends MessageToByteEncoder<FixMessageBuilder> {
         }
 
         // MsgSeqNum
-        writeField(34, String.valueOf(header.getMsgSeqNum()), out);
+        writeField(34, Integer.toString(header.getMsgSeqNum()), out);
 
         // SendingTime
         String timeStr = sdf.get().format(new Date(header.getSendingTime()));
@@ -143,7 +143,7 @@ public class FixMessageEncoder extends MessageToByteEncoder<FixMessageBuilder> {
             writeField(messageFragment.getTagNum(), (AbstractField) messageFragment, payloadBuf);
         } else if (messageFragment instanceof GroupField) {
             GroupField groupField = (GroupField) messageFragment;
-            writeField(groupField.getTagNum(), String.valueOf(groupField.getGroupCount()), payloadBuf);
+            writeField(groupField.getTagNum(), Integer.toString(groupField.getGroupCount()), payloadBuf);
             for (Group c : groupField.getGroups()) {
                 List<FixMessageFragment> contents = c.getContents();
                 for (int j = 0; j < contents.size(); j++) {
@@ -172,7 +172,7 @@ public class FixMessageEncoder extends MessageToByteEncoder<FixMessageBuilder> {
         // begin string
         writeField(8, header.getBeginString(), headBuf);
         // body length
-        writeField(9, String.valueOf(bodyLength), headBuf);
+        writeField(9, Integer.toString(bodyLength), headBuf);
 
         out.writeBytes(headBuf);
         out.writeBytes(bodyBuf);

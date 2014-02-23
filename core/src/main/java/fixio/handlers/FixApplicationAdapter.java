@@ -18,6 +18,7 @@ package fixio.handlers;
 import fixio.events.LogonEvent;
 import fixio.events.LogoutEvent;
 import fixio.fixprotocol.FixMessage;
+import fixio.fixprotocol.FixMessageBuilder;
 import io.netty.channel.ChannelHandler;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.handler.codec.MessageToMessageDecoder;
@@ -57,6 +58,10 @@ public class FixApplicationAdapter extends MessageToMessageDecoder<Object> imple
 
     @Override
     public void onMessage(ChannelHandlerContext ctx, FixMessage msg, List<Object> out) throws Exception {
+    }
+
+    @Override
+    public void beforeSendMessage(ChannelHandlerContext ctx, FixMessageBuilder messageBuilder) throws Exception {
     }
 
     @Override

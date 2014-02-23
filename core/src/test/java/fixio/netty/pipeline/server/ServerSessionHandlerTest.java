@@ -18,6 +18,7 @@ package fixio.netty.pipeline.server;
 import fixio.events.LogonEvent;
 import fixio.fixprotocol.*;
 import fixio.fixprotocol.session.FixSession;
+import fixio.handlers.FixApplication;
 import fixio.netty.AttributeMock;
 import fixio.netty.pipeline.AbstractSessionHandler;
 import io.netty.channel.ChannelFuture;
@@ -46,15 +47,17 @@ public class ServerSessionHandlerTest {
     @Mock
     private FixAuthenticator authenticator;
     @Mock
+    private FixApplication fixApplication;
+    @Mock
     private ChannelHandlerContext ctx;
     @Captor
-    private ArgumentCaptor<FixMessage> messageCaptor;
+    private ArgumentCaptor<FixMessageBuilderImpl> messageCaptor;
     private FixMessage logonMsg;
     private List<Object> outgoingMessages;
 
     @Before
     public void setUp() {
-        handler = new ServerSessionHandler(authenticator);
+        handler = new ServerSessionHandler(authenticator, fixApplication);
         outgoingMessages = new ArrayList<>();
 
         logonMsg = new FixMessageBuilderImpl(MessageTypes.LOGON);
@@ -81,7 +84,8 @@ public class ServerSessionHandlerTest {
         verify(ctx).flush();
         verifyNoMoreInteractions(ctx);
 
-        FixMessage logonAck = messageCaptor.getValue();
+        FixMessageBuilderImpl logonAck = messageCaptor.getValue();
+        verify(fixApplication).beforeSendMessage(same(ctx), same(logonAck));
         assertLogonAck(logonAck);
     }
 
@@ -111,7 +115,7 @@ public class ServerSessionHandlerTest {
         verify(ctx).flush();
         verifyNoMoreInteractions(ctx);
 
-        final List<FixMessage> sentMessages = messageCaptor.getAllValues();
+        final List<FixMessageBuilderImpl> sentMessages = messageCaptor.getAllValues();
         assertLogonAck(sentMessages.get(0));
         assertResendRequest(sentMessages.get(1));
     }
@@ -136,19 +140,20 @@ public class ServerSessionHandlerTest {
         assertLogout(messageCaptor.getValue());
     }
 
-    private void assertLogout(FixMessage fixMessage) {
-        assertEquals("Logout message type", MessageTypes.LOGOUT, fixMessage.getMessageType());
+    private void assertLogout(FixMessageBuilder fixMessage) {
+        assertEquals("Logout message type", MessageTypes.LOGOUT, fixMessage.getHeader().getMessageType());
     }
 
-    private void assertResendRequest(FixMessage fixMessage) {
-        assertEquals("ResendRequest message type", MessageTypes.RESEND_REQUEST, fixMessage.getMessageType());
+    private void assertResendRequest(FixMessageBuilder fixMessage) {
+        assertEquals("ResendRequest message type", MessageTypes.RESEND_REQUEST, fixMessage.getHeader().getMessageType());
     }
 
     private void assertLogonAck(FixMessage logonAck) {
-        assertEquals("logon ack message type", MessageTypes.LOGON, logonAck.getMessageType());
+        FixMessageHeader header = logonAck.getHeader();
+        assertEquals("logon ack message type", MessageTypes.LOGON, header.getMessageType());
         assertNull("Username not expected in response.", logonAck.getString(FieldType.Username));
         assertNull("Password not expected in response", logonAck.getString(FieldType.Password));
         assertNotNull("Heartbeat interval", logonAck.getInt(FieldType.HeartBtInt));
-        assertEquals("message SeqNum", 1, logonAck.getHeader().getMsgSeqNum());
+        assertEquals("message SeqNum", 1, header.getMsgSeqNum());
     }
 }

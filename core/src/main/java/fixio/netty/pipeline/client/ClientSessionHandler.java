@@ -19,7 +19,7 @@ package fixio.netty.pipeline.client;
 import fixio.events.LogonEvent;
 import fixio.fixprotocol.*;
 import fixio.fixprotocol.session.FixSession;
-import fixio.handlers.FixClientApplication;
+import fixio.handlers.FixApplication;
 import fixio.netty.pipeline.AbstractSessionHandler;
 import io.netty.channel.ChannelHandlerContext;
 import org.slf4j.Logger;
@@ -32,18 +32,18 @@ public class ClientSessionHandler extends AbstractSessionHandler {
     private final static Logger LOGGER = LoggerFactory.getLogger(ClientSessionHandler.class);
     private final FixSessionSettingsProvider sessionSettingsProvider;
     private final MessageSequenceProvider messageSequenceProvider;
-    private final FixClientApplication fixClientApplication;
 
     public ClientSessionHandler(FixSessionSettingsProvider settingsProvider,
-                                MessageSequenceProvider messageSequenceProvider, FixClientApplication fixClientApplication) {
-        this.fixClientApplication = fixClientApplication;
+                                MessageSequenceProvider messageSequenceProvider,
+                                FixApplication fixApplication) {
+        super(fixApplication);
         assert (settingsProvider != null) : "FixSessionSettingsProvider is expected.";
         this.sessionSettingsProvider = settingsProvider;
         this.messageSequenceProvider = messageSequenceProvider;
     }
 
-    public ClientSessionHandler(FixSessionSettingsProvider settingsProvider, FixClientApplication fixClientApplication) {
-        this(settingsProvider, StatelessMessageSequenceProvider.getInstance(), fixClientApplication);
+    public ClientSessionHandler(FixSessionSettingsProvider settingsProvider, FixApplication fixApplication) {
+        this(settingsProvider, StatelessMessageSequenceProvider.getInstance(), fixApplication);
     }
 
     @Override
@@ -76,10 +76,7 @@ public class ClientSessionHandler extends AbstractSessionHandler {
 
         FixSession pendingSession = createSession(sessionSettingsProvider);
         setSession(ctx, pendingSession);
-        updateFixMessageHeader(pendingSession, logonRequest);
-
-        // callback
-        fixClientApplication.onBeforeLogin(ctx, logonRequest);
+        prepareMessageToSend(ctx, pendingSession, logonRequest);
 
         getLogger().info("Sending Logon: {}", logonRequest);
 

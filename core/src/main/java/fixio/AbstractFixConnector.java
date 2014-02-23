@@ -25,19 +25,19 @@ import io.netty.util.internal.logging.Slf4JLoggerFactory;
  *
  * @author Konstantin Pavlov
  */
-public abstract class AbstractFixConnector<T extends FixApplication> {
+public abstract class AbstractFixConnector {
 
-    private final T fixApplication;
+    private final FixApplication fixApplication;
 
     static {
         InternalLoggerFactory.setDefaultFactory(new Slf4JLoggerFactory());
     }
 
-    public AbstractFixConnector(T fixApplication) {
+    public AbstractFixConnector(FixApplication fixApplication) {
         this.fixApplication = fixApplication;
     }
 
-    protected T getFixApplication() {
+    protected FixApplication getFixApplication() {
         return fixApplication;
     }
 }

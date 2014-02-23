@@ -18,6 +18,7 @@ package fixio.handlers;
 import fixio.events.LogonEvent;
 import fixio.events.LogoutEvent;
 import fixio.fixprotocol.FixMessage;
+import fixio.fixprotocol.FixMessageBuilder;
 import io.netty.channel.ChannelHandler;
 import io.netty.channel.ChannelHandlerContext;
 
@@ -25,9 +26,23 @@ import java.util.List;
 
 public interface FixApplication extends ChannelHandler {
 
+    /**
+     * Invoked after FIX session was successfully established.
+     */
     void onLogon(ChannelHandlerContext ctx, LogonEvent msg);
 
+    /**
+     * Invoked after FIX session was closed.
+     */
     void onLogout(ChannelHandlerContext ctx, LogoutEvent msg);
 
+    /**
+     * Invoked when message arrived
+     */
     void onMessage(ChannelHandlerContext ctx, FixMessage msg, List<Object> out) throws Exception;
+
+    /**
+     * Invoked before {@link FixMessageBuilder} is sent.
+     */
+    void beforeSendMessage(ChannelHandlerContext ctx, FixMessageBuilder messageBuilder) throws Exception;
 }

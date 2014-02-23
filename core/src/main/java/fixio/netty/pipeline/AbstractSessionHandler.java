@@ -19,6 +19,7 @@ package fixio.netty.pipeline;
 import fixio.events.LogoutEvent;
 import fixio.fixprotocol.*;
 import fixio.fixprotocol.session.FixSession;
+import fixio.handlers.FixApplication;
 import io.netty.channel.ChannelFuture;
 import io.netty.channel.ChannelFutureListener;
 import io.netty.channel.ChannelHandlerContext;
@@ -32,7 +33,12 @@ import java.util.List;
 public abstract class AbstractSessionHandler extends MessageToMessageCodec<FixMessage, FixMessageBuilder> {
 
     public static final AttributeKey<FixSession> FIX_SESSION_KEY = AttributeKey.valueOf("fixSession");
+    private final FixApplication fixApplication;
     private Clock clock = Clock.systemUTC();
+
+    protected AbstractSessionHandler(FixApplication fixApplication) {
+        this.fixApplication = fixApplication;
+    }
 
     @Override
     public void channelInactive(ChannelHandlerContext ctx) throws Exception {
@@ -46,12 +52,13 @@ public abstract class AbstractSessionHandler extends MessageToMessageCodec<FixMe
         }
     }
 
-    protected void updateFixMessageHeader(ChannelHandlerContext ctx, FixMessageBuilder response) {
-        updateFixMessageHeader(getSession(ctx), response);
+    protected void prepareMessageToSend(ChannelHandlerContext ctx, FixMessageBuilder response) throws Exception {
+        prepareMessageToSend(ctx, getSession(ctx), response);
     }
 
-    protected void updateFixMessageHeader(FixSession session, FixMessageBuilder response) {
+    protected void prepareMessageToSend(ChannelHandlerContext ctx, FixSession session, FixMessageBuilder response) throws Exception {
         session.prepareOutgoing(response);
+        getFixApplication().beforeSendMessage(ctx, response);
         response.getHeader().setSendingTime(clock.millis());
     }
 
@@ -73,7 +80,7 @@ public abstract class AbstractSessionHandler extends MessageToMessageCodec<FixMe
 
     @Override
     protected void encode(ChannelHandlerContext ctx, FixMessageBuilder msg, List<Object> out) throws Exception {
-        updateFixMessageHeader(ctx, msg);
+        prepareMessageToSend(ctx, msg);
         getLogger().trace("Sending outbound: {}", msg);
         out.add(msg);
     }
@@ -116,5 +123,9 @@ public abstract class AbstractSessionHandler extends MessageToMessageCodec<FixMe
 
     public void setClock(Clock clock) {
         this.clock = clock;
+    }
+
+    protected FixApplication getFixApplication() {
+        return fixApplication;
     }
 }

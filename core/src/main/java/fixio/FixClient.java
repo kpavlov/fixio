@@ -17,7 +17,7 @@
 package fixio;
 
 import fixio.fixprotocol.FixMessageBuilder;
-import fixio.handlers.FixClientApplication;
+import fixio.handlers.FixApplication;
 import fixio.netty.pipeline.client.FixInitiatorChannelInitializer;
 import fixio.netty.pipeline.client.FixSessionSettingsProvider;
 import fixio.netty.pipeline.client.PropertyFixSessionSettingsProviderImpl;
@@ -36,7 +36,7 @@ import org.slf4j.LoggerFactory;
 import java.net.InetSocketAddress;
 import java.net.SocketAddress;
 
-public class FixClient extends AbstractFixConnector<FixClientApplication> {
+public class FixClient extends AbstractFixConnector {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(FixClient.class);
     private Channel channel;
@@ -44,7 +44,7 @@ public class FixClient extends AbstractFixConnector<FixClientApplication> {
     private EventLoopGroup workerEventLoopGroup;
     private FixSessionSettingsProvider sessionSettingsProvider;
 
-    public FixClient(FixClientApplication fixApplication) {
+    public FixClient(FixApplication fixApplication) {
         super(fixApplication);
     }
 

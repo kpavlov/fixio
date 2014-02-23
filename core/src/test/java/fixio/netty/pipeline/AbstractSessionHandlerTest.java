@@ -21,6 +21,7 @@ import fixio.fixprotocol.FixMessage;
 import fixio.fixprotocol.FixMessageBuilder;
 import fixio.fixprotocol.MessageTypes;
 import fixio.fixprotocol.session.FixSession;
+import fixio.handlers.FixApplication;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.util.Attribute;
 import org.junit.Before;
@@ -51,13 +52,15 @@ public class AbstractSessionHandlerTest {
     @Mock
     private FixSession fixSession;
     @Mock
+    private FixApplication fixApplication;
+    @Mock
     private Attribute<FixSession> sessonAttr;
     @Captor
     private ArgumentCaptor<FixMessage> rejectCaptor;
 
     @Before
     public void setUp() {
-        sessionHandler = new AbstractSessionHandler() {
+        sessionHandler = new AbstractSessionHandler(fixApplication) {
             @Override
             protected void encode(ChannelHandlerContext ctx, FixMessageBuilder msg, List<Object> out) throws Exception {
             }

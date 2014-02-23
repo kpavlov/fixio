@@ -32,7 +32,7 @@ import org.slf4j.LoggerFactory;
 
 import java.net.InetSocketAddress;
 
-public class FixServer extends AbstractFixConnector<FixApplication> {
+public class FixServer extends AbstractFixConnector {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(FixServer.class);
     private final int port;

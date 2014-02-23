@@ -18,7 +18,7 @@ package fixio.netty.pipeline.client;
 
 import fixio.fixprotocol.FixMessage;
 import fixio.fixprotocol.FixMessageBuilder;
-import fixio.handlers.FixClientApplication;
+import fixio.handlers.FixApplication;
 import fixio.netty.pipeline.FixChannelInitializer;
 import io.netty.channel.Channel;
 import io.netty.channel.EventLoopGroup;
@@ -30,13 +30,13 @@ public class FixInitiatorChannelInitializer<C extends Channel> extends FixChanne
 
     public FixInitiatorChannelInitializer(EventLoopGroup workerGroup,
                                           FixSessionSettingsProvider settingsProvider,
-                                          FixClientApplication fixApplication) {
+                                          FixApplication fixApplication) {
         super(workerGroup, fixApplication);
         this.settingsProvider = settingsProvider;
     }
 
     @Override
     protected MessageToMessageCodec<FixMessage, FixMessageBuilder> createSessionHandler() {
-        return new ClientSessionHandler(settingsProvider, (FixClientApplication) getFixApplication());
+        return new ClientSessionHandler(settingsProvider, getFixApplication());
     }
 }

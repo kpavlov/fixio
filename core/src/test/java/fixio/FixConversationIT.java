@@ -17,10 +17,10 @@ package fixio;
 
 import fixio.events.LogonEvent;
 import fixio.fixprotocol.FixMessage;
+import fixio.fixprotocol.FixMessageBuilder;
 import fixio.fixprotocol.FixMessageBuilderImpl;
 import fixio.fixprotocol.MessageTypes;
 import fixio.handlers.FixApplicationAdapter;
-import fixio.handlers.FixClientApplicationAdapter;
 import io.netty.channel.ChannelFuture;
 import io.netty.channel.ChannelHandlerContext;
 import org.junit.*;
@@ -51,16 +51,16 @@ public class FixConversationIT {
         server.stop();
     }
 
-    private static FixMessage createUserStatusRequest() {
-        FixMessageBuilderImpl userRequest = new FixMessageBuilderImpl("BE");
-        userRequest.add(UserRequestID, "UserRequestID");//UserRequestID
+    private static FixMessageBuilder createUserStatusRequest() {
+        FixMessageBuilder userRequest = new FixMessageBuilderImpl(MessageTypes.USER_REQUEST);
+        userRequest.add(UserRequestID, "UserRequestID");
         userRequest.add(UserRequestType, 4);//UserRequestType=RequestIndividualUserStatus
-        userRequest.add(Username, "user");//553 Username
+        userRequest.add(Username, "user");
         return userRequest;
     }
 
-    private static FixMessage createUserStatusReport() {
-        FixMessageBuilderImpl userRequest = new FixMessageBuilderImpl("BF");
+    private static FixMessageBuilder createUserStatusReport() {
+        FixMessageBuilder userRequest = new FixMessageBuilderImpl(MessageTypes.USER_RESPONSE);
         userRequest.add(UserRequestID, "UserRequestID");//UserRequestID
         userRequest.add(Username, "user");//553 Username
         userRequest.add(UserStatus, 1);
@@ -100,14 +100,14 @@ public class FixConversationIT {
 
         @Override
         public void onMessage(ChannelHandlerContext ctx, FixMessage msg, List<Object> out) throws Exception {
-            if ("BE".equals(msg.getMessageType())) {
+            if (MessageTypes.USER_REQUEST.equals(msg.getMessageType())) {
                 conversation.add(msg);
                 ctx.writeAndFlush(createUserStatusReport());
             }
         }
     }
 
-    private class ClientApp extends FixClientApplicationAdapter {
+    private class ClientApp extends FixApplicationAdapter {
 
         @Override
         public void onMessage(ChannelHandlerContext ctx, FixMessage msg, List<Object> out) throws Exception {

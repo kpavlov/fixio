@@ -17,7 +17,7 @@ package fixio.examples.priceclient;
 
 import fixio.events.LogonEvent;
 import fixio.fixprotocol.*;
-import fixio.handlers.FixClientApplicationAdapter;
+import fixio.handlers.FixApplicationAdapter;
 import io.netty.channel.ChannelFutureListener;
 import io.netty.channel.ChannelHandlerContext;
 import org.slf4j.Logger;
@@ -25,7 +25,7 @@ import org.slf4j.LoggerFactory;
 
 import java.util.List;
 
-class PriceReadingApp extends FixClientApplicationAdapter {
+class PriceReadingApp extends FixApplicationAdapter {
 
     public static final int MAX_QUOTE_COUNT = 300_000;
     private static final Logger LOGGER = LoggerFactory.getLogger(PriceReadingApp.class);

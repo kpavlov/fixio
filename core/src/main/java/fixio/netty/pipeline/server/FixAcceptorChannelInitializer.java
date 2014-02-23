@@ -38,7 +38,7 @@ public class FixAcceptorChannelInitializer<C extends Channel> extends FixChannel
 
     @Override
     protected MessageToMessageCodec<FixMessage, FixMessageBuilder> createSessionHandler() {
-        return new ServerSessionHandler(authenticator);
+        return new ServerSessionHandler(authenticator, getFixApplication());
     }
 
 }

@@ -19,6 +19,7 @@ package fixio.netty.pipeline.server;
 import fixio.events.LogonEvent;
 import fixio.fixprotocol.*;
 import fixio.fixprotocol.session.FixSession;
+import fixio.handlers.FixApplication;
 import fixio.netty.pipeline.AbstractSessionHandler;
 import fixio.netty.pipeline.SessionRepository;
 import io.netty.channel.ChannelFutureListener;
@@ -34,7 +35,8 @@ public class ServerSessionHandler extends AbstractSessionHandler {
     private final FixAuthenticator authenticator;
     private int heartbeatIntervalSec = 30;
 
-    public ServerSessionHandler(FixAuthenticator authenticator) {
+    public ServerSessionHandler(FixAuthenticator authenticator, FixApplication fixApplication) {
+        super(fixApplication);
         assert (authenticator != null) : "FixAuthenticator is required for ServerSessionHandler";
         this.authenticator = authenticator;
     }
@@ -76,7 +78,7 @@ public class ServerSessionHandler extends AbstractSessionHandler {
                     if (!fixSession.checkIncomingSeqNum(msgSeqNum)) {
                         final int expectedMsgSeqNum = fixSession.getNextIncomingMessageSeqNum();
                         if (msgSeqNum < expectedMsgSeqNum) {
-                            sendLogoutAndClose(ctx, "Sequence Number Too Low. Expected = " + expectedMsgSeqNum);
+                            sendLogoutAndClose(ctx, fixSession, "Sequence Number Too Low. Expected = " + expectedMsgSeqNum);
                             return;
                         } else {
                             seqTooHigh = true;
@@ -84,13 +86,13 @@ public class ServerSessionHandler extends AbstractSessionHandler {
                     }
 
                     final FixMessageBuilder logonResponse = createLogonResponse();
-                    updateFixMessageHeader(ctx, logonResponse);
+                    prepareMessageToSend(ctx, logonResponse);
                     LOGGER.info("Sending Logon Response: {}", logonResponse);
                     ctx.write(logonResponse);
 
                     if (seqTooHigh) {
                         FixMessageBuilder resendRequest = new FixMessageBuilderImpl(MessageTypes.RESEND_REQUEST);
-                        updateFixMessageHeader(ctx, resendRequest);
+                        prepareMessageToSend(ctx, resendRequest);
                         ctx.write(resendRequest);
                     }
                     ctx.flush();
@@ -117,13 +119,15 @@ public class ServerSessionHandler extends AbstractSessionHandler {
         return session;
     }
 
-    private void sendLogoutAndClose(ChannelHandlerContext ctx, String text) {
+    private void sendLogoutAndClose(ChannelHandlerContext ctx, FixSession session, String text) throws Exception {
         //rejected logon
 
         FixMessageBuilderImpl logout = new FixMessageBuilderImpl(MessageTypes.LOGOUT);
         if (text != null) {
             logout.add(58, text);
         }
+
+        prepareMessageToSend(ctx, session, logout);
         ctx.writeAndFlush(logout).addListener(ChannelFutureListener.CLOSE);
     }
 }

@@ -65,37 +65,66 @@ and increased Survivor spaces (`-XX:SurvivorRatio=4`).
 
 To create a simple FIX client you need to:
 
-1. Implement [FixClientApplication][FixClientApplication].
-   You may extend [FixClientApplicationAdapter][FixClientApplicationAdapter] as a quick start.
+1. Implement [FixApplication][FixApplication].
+   You may extend [FixApplicationAdapter][FixApplicationAdapter] as a quick start.
 
-2. Create an instance of [FixClient][FixClient] and initialize if with [FixClientApplication][FixClientApplication] you've just created and classpath reference to FIX session settings property file.
+2. Create an instance of [FixClient][FixClient] and initialize if with [FixApplication][FixApplication] you've just created and classpath reference to FIX session settings property file.
 
 3. Invoke `FixClient.connect(host, port)` to initiate connection.
    Method `connect(...)` returns a [ChannelFeature][ChannelFeature] which which will be notified when a channel is closed,
     so you may invoke the method `sync()` on it if you wish to wait for connection to be closed.
 
 ~~~~~~~~~
-    FixClientApplication app = new FixClientApplicationAdapter();
-    client = new FixClient(app);
+FixApplication app = new FixApplicationAdapter();
+client = new FixClient(app);
 
-    // set settings file location related to classpath
-    client.setSettingsResource("/client.properties");
+// set settings file location related to classpath
+client.setSettingsResource("/client.properties");
 
-    // connect to specified host and port
-    ChannelFeature closeFeature = client.connect("localhost", 10201);
+// connect to specified host and port
+ChannelFeature closeFeature = client.connect("localhost", 10201);
 
-    // wait until FIX Session is closed
-    closeFeature.sync();
+// wait until FIX Session is closed
+closeFeature.sync();
 
-    // Shutdown FIX client
-    client.disconnect();
+// Shutdown FIX client
+client.disconnect();
 ~~~~~~~~~
 
+## Working With FIX Messages
+
+There are two API interfaces to represent FIX messages: [FixMessage][FixMessage] and [FixMessageBuilder][FixMessageBuilder].
+
+[FixMessage][FixMessage] represents received message, whereas [FixMessageBuilder][FixMessageBuilder] represents a message to be sent.
+
+Example of using FixMessageBuilder:
+
+~~~~~~~~~
+FixMessageBuilder userRequest = new FixMessageBuilderImpl(MessageTypes.USER_REQUEST);
+userRequest.add(UserRequestID, "UserRequestID");
+userRequest.add(UserRequestType, 4);//UserRequestType=RequestIndividualUserStatus
+userRequest.add(Username, "user");
+~~~~~~~~~
+
+## FixApplication
+
+[FixApplication][FixApplication] interface should be implemented to handle application business logic.
+It is a callback interface which handles FIX session events, incoming and outgoing messages.
+
+[FixApplication][FixApplication] has a callback methods
+
+- to handle session events (`onLogon(...)` and `onLogout(...)`),
+- to process incoming messages (`onMessage(...)`)
+- to pre-process outgoing message (`beforeSendMessage(...)`). You may add custom fields to FixMessageHeader in this method.
+
 [FixedPointNumber]: https://github.com/kpavlov/fixio/treemaster/core/src/main/java/fixio/fixprotocol/fields/FixedPointNumber.java
-[FixClientApplication]: https://github.com/kpavlov/fixio/treemaster/core/src/main/java/fixio/handlers/FixClientApplication.java
-[FixClientApplicationAdapter]: https://github.com/kpavlov/fixio/treemaster/core/src/main/java/fixio/handlers/FixClientApplicationAdapter.java
+[FixApplication]: https://github.com/kpavlov/fixio/treemaster/core/src/main/java/fixio/handlers/FixApplication.java
+[FixApplicationAdapter]: https://github.com/kpavlov/fixio/treemaster/core/src/main/java/fixio/handlers/FixApplicationAdapter.java
 [FixClient]: https://github.com/kpavlov/fixio/treemaster/core/src/main/java/fixio/FixClient.java
 [ChannelFeature]: http://netty.io/5.0/api/io/netty/channel/ChannelFuture.html
+
+[FixMessage]: https://github.com/kpavlov/fixio/treemaster/core/src/main/java/fixio/fixprotocol/FixMessage.java
+[FixMessageBuilder]: https://github.com/kpavlov/fixio/treemaster/core/src/main/java/fixio/fixprotocol/FixMessageBuilder.java
 
 [client-example]: https://github.com/kpavlov/fixio/treemaster/examples/src/main/java/fixio/examples/priceclient
 [server-example]: https://github.com/kpavlov/fixio/treemaster/examples/src/main/java/fixio/examples/priceserver
