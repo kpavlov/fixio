@@ -37,6 +37,7 @@ public abstract class AbstractSessionHandler extends MessageToMessageCodec<FixMe
     private Clock clock = Clock.systemUTC();
 
     protected AbstractSessionHandler(FixApplication fixApplication) {
+        assert (fixApplication != null) : "FixApplication is required";
         this.fixApplication = fixApplication;
     }
 
