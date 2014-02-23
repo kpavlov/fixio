@@ -33,7 +33,7 @@ This API has a number of [limitations](#Limitations), so it may be not suitable 
 `mvn clean install`
 3. Add the dependency to your project
 
-~~~~~~~~~
+~~~~~~~~~xml
 <dependency>
     <groupId>kpavlov.fixio</groupId>
     <artifactId>core</artifactId>
@@ -43,7 +43,7 @@ This API has a number of [limitations](#Limitations), so it may be not suitable 
 
 You'll also need a slf4j API implementation at runtime, so please add appropriate dependency, e.g.:
 
-~~~~~~~~~
+~~~~~~~~~xml
 <dependency>
     <groupId>org.slf4j</groupId>
     <artifactId>slf4j-simple</artifactId>
@@ -74,7 +74,7 @@ To create a simple FIX client you need to:
    Method `connect(...)` returns a [ChannelFeature][ChannelFeature] which which will be notified when a channel is closed,
     so you may invoke the method `sync()` on it if you wish to wait for connection to be closed.
 
-~~~~~~~~~
+~~~~~~~~~java
 FixApplication app = new FixApplicationAdapter();
 client = new FixClient(app);
 
@@ -99,7 +99,7 @@ There are two API interfaces to represent FIX messages: [FixMessage][FixMessage]
 
 Example of using FixMessageBuilder:
 
-~~~~~~~~~
+~~~~~~~~~java
 FixMessageBuilder userRequest = new FixMessageBuilderImpl(MessageTypes.USER_REQUEST);
 userRequest.add(UserRequestID, "UserRequestID");
 userRequest.add(UserRequestType, 4);//UserRequestType=RequestIndividualUserStatus
