@@ -111,27 +111,56 @@ and increased Survivor spaces (<code>-XX:SurvivorRatio=4</code>).</p>
 <p>To create a simple FIX client you need to:</p>
 
 <ol>
-<li><p>Implement <a href="https://github.com/kpavlov/fixio/treemaster/core/src/main/java/fixio/handlers/FixClientApplication.java">FixClientApplication</a>.
-You may extend <a href="https://github.com/kpavlov/fixio/treemaster/core/src/main/java/fixio/handlers/FixClientApplicationAdapter.java">FixClientApplicationAdapter</a> as a quick start.</p></li>
-<li><p>Create an instance of <a href="https://github.com/kpavlov/fixio/treemaster/core/src/main/java/fixio/FixClient.java">FixClient</a> and initialize if with <a href="https://github.com/kpavlov/fixio/treemaster/core/src/main/java/fixio/handlers/FixClientApplication.java">FixClientApplication</a> you've just created and classpath reference to FIX session settings property file.</p></li>
+<li><p>Implement <a href="https://github.com/kpavlov/fixio/treemaster/core/src/main/java/fixio/handlers/FixApplication.java">FixApplication</a>.
+You may extend <a href="https://github.com/kpavlov/fixio/treemaster/core/src/main/java/fixio/handlers/FixApplicationAdapter.java">FixApplicationAdapter</a> as a quick start.</p></li>
+<li><p>Create an instance of <a href="https://github.com/kpavlov/fixio/treemaster/core/src/main/java/fixio/FixClient.java">FixClient</a> and initialize if with <a href="https://github.com/kpavlov/fixio/treemaster/core/src/main/java/fixio/handlers/FixApplication.java">FixApplication</a> you've just created and classpath reference to FIX session settings property file.</p></li>
 <li><p>Invoke <code>FixClient.connect(host, port)</code> to initiate connection.
 Method <code>connect(...)</code> returns a <a href="http://netty.io/5.0/api/io/netty/channel/ChannelFuture.html">ChannelFeature</a> which which will be notified when a channel is closed,
 so you may invoke the method <code>sync()</code> on it if you wish to wait for connection to be closed.</p></li>
-</ol><pre><code>    FixClientApplication app = new FixClientApplicationAdapter();
-    client = new FixClient(app);
+</ol><pre><code>FixApplication app = new FixApplicationAdapter();
+client = new FixClient(app);
 
-    // set settings file location related to classpath
-    client.setSettingsResource("/client.properties");
+// set settings file location related to classpath
+client.setSettingsResource("/client.properties");
 
-    // connect to specified host and port
-    ChannelFeature closeFeature = client.connect("localhost", 10201);
+// connect to specified host and port
+ChannelFeature closeFeature = client.connect("localhost", 10201);
 
-    // wait until FIX Session is closed
-    closeFeature.sync();
+// wait until FIX Session is closed
+closeFeature.sync();
 
-    // Shutdown FIX client
-    client.disconnect();
+// Shutdown FIX client
+client.disconnect();
 </code></pre>
+
+<h2>
+<a name="working-with-fix-messages" class="anchor" href="#working-with-fix-messages"><span class="octicon octicon-link"></span></a>Working With FIX Messages</h2>
+
+<p>There are two API interfaces to represent FIX messages: <a href="https://github.com/kpavlov/fixio/treemaster/core/src/main/java/fixio/fixprotocol/FixMessage.java">FixMessage</a> and <a href="https://github.com/kpavlov/fixio/treemaster/core/src/main/java/fixio/fixprotocol/FixMessageBuilder.java">FixMessageBuilder</a>.</p>
+
+<p><a href="https://github.com/kpavlov/fixio/treemaster/core/src/main/java/fixio/fixprotocol/FixMessage.java">FixMessage</a> represents received message, whereas <a href="https://github.com/kpavlov/fixio/treemaster/core/src/main/java/fixio/fixprotocol/FixMessageBuilder.java">FixMessageBuilder</a> represents a message to be sent.</p>
+
+<p>Example of using FixMessageBuilder:</p>
+
+<pre><code>FixMessageBuilder userRequest = new FixMessageBuilderImpl(MessageTypes.USER_REQUEST);
+userRequest.add(UserRequestID, "UserRequestID");
+userRequest.add(UserRequestType, 4);//UserRequestType=RequestIndividualUserStatus
+userRequest.add(Username, "user");
+</code></pre>
+
+<h2>
+<a name="fixapplication" class="anchor" href="#fixapplication"><span class="octicon octicon-link"></span></a>FixApplication</h2>
+
+<p><a href="https://github.com/kpavlov/fixio/treemaster/core/src/main/java/fixio/handlers/FixApplication.java">FixApplication</a> interface should be implemented to handle application business logic.
+It is a callback interface which handles FIX session events, incoming and outgoing messages.</p>
+
+<p><a href="https://github.com/kpavlov/fixio/treemaster/core/src/main/java/fixio/handlers/FixApplication.java">FixApplication</a> has a callback methods</p>
+
+<ul>
+<li>to handle session events (<code>onLogon(...)</code> and <code>onLogout(...)</code>),</li>
+<li>to process incoming messages (<code>onMessage(...)</code>)</li>
+<li>to pre-process outgoing message (<code>beforeSendMessage(...)</code>). You may add custom fields to FixMessageHeader in this method.</li>
+</ul>
         </section>
 
         <footer>
