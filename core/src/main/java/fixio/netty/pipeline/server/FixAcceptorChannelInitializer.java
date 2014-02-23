@@ -26,13 +26,12 @@ import io.netty.handler.codec.MessageToMessageCodec;
 
 public class FixAcceptorChannelInitializer<C extends Channel> extends FixChannelInitializer<C> {
 
-    private FixAuthenticator authenticator = new AcceptAllAuthenticator();
+    private final FixAuthenticator authenticator;
 
-    public FixAcceptorChannelInitializer(EventLoopGroup workerGroup, FixApplication fixApplication) {
+    public FixAcceptorChannelInitializer(EventLoopGroup workerGroup,
+                                         FixAuthenticator authenticator,
+                                         FixApplication fixApplication) {
         super(workerGroup, fixApplication);
-    }
-
-    public void setAuthenticator(FixAuthenticator authenticator) {
         this.authenticator = authenticator;
     }
 

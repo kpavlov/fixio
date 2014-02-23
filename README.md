@@ -5,7 +5,7 @@ fixio - FIX Protocol Support for Netty [![Build Status](https://travis-ci.org/kp
 
 ## Why One More FIX Protocol API
 
-This API is intended to be a replacement for well known [QuickFIX/J][quickfix] library to be used for high-frequency trading cases.
+This API is intended to be a replacement for well known [QuickFIX/J][quickfix] library to be used for high-frequency cases.
 
 ## Design goals
 
@@ -111,7 +111,7 @@ userRequest.add(Username, "user");
 [FixApplication][FixApplication] interface should be implemented to handle application business logic.
 It is a callback interface which handles FIX session events, incoming and outgoing messages.
 
-[FixApplication][FixApplication] has a callback methods
+[FixApplication][FixApplication] has the following methods:
 
 - to handle session events (`onLogon(...)` and `onLogout(...)`),
 - to process incoming messages (`onMessage(...)`)

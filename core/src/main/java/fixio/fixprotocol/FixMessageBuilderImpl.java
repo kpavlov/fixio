@@ -45,6 +45,8 @@ public class FixMessageBuilderImpl implements FixMessage, FixMessageBuilder {
      * Creates FixMessageBuilderImpl with specified FixMessageHeader and  FixMessageTrailer.
      */
     public FixMessageBuilderImpl(FixMessageHeader header, FixMessageTrailer trailer) {
+        assert (header != null) : "FixMessageHeader is expected";
+        assert (trailer != null) : "FixMessageTrailer is expected";
         this.header = header;
         this.trailer = trailer;
         body = new ArrayList<>(DEFAULT_BODY_FIELD_COUNT);

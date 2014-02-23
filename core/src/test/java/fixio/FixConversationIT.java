@@ -21,6 +21,7 @@ import fixio.fixprotocol.FixMessageBuilder;
 import fixio.fixprotocol.FixMessageBuilderImpl;
 import fixio.fixprotocol.MessageTypes;
 import fixio.handlers.FixApplicationAdapter;
+import fixio.netty.pipeline.server.AcceptAllAuthenticator;
 import io.netty.channel.ChannelFuture;
 import io.netty.channel.ChannelHandlerContext;
 import org.junit.*;
@@ -42,7 +43,7 @@ public class FixConversationIT {
 
     @BeforeClass
     public static void beforeClass() throws InterruptedException {
-        server = new FixServer(PORT, new ServerLogicHandler());
+        server = new FixServer(PORT, new AcceptAllAuthenticator(), new ServerLogicHandler());
         server.start();
     }
 

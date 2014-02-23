@@ -18,6 +18,7 @@ package fixio;
 
 import fixio.handlers.FixApplication;
 import fixio.netty.pipeline.server.FixAcceptorChannelInitializer;
+import fixio.netty.pipeline.server.FixAuthenticator;
 import io.netty.bootstrap.ServerBootstrap;
 import io.netty.buffer.PooledByteBufAllocator;
 import io.netty.channel.Channel;
@@ -39,16 +40,28 @@ public class FixServer extends AbstractFixConnector {
     private Channel channel;
     private EventLoopGroup bossGroup;
     private EventLoopGroup workerGroup;
+    private FixAuthenticator authenticator;
 
-    public FixServer(int port, FixApplication fixApplication) {
+    public FixServer(int port,
+                     FixAuthenticator authenticator,
+                     FixApplication fixApplication) {
         super(fixApplication);
+        assert (authenticator != null) : "Authenticator is required";
+        this.authenticator = authenticator;
         this.port = port;
     }
 
     public void start() throws InterruptedException {
         bossGroup = new NioEventLoopGroup();
         workerGroup = new NioEventLoopGroup(8);
-        ServerBootstrap bootstrap = new ServerBootstrap();
+        final ServerBootstrap bootstrap = new ServerBootstrap();
+        final FixAcceptorChannelInitializer<SocketChannel> channelInitializer = new FixAcceptorChannelInitializer<>(
+                workerGroup,
+                authenticator,
+                getFixApplication()
+        );
+
+
         bootstrap.group(bossGroup, workerGroup)
                 .channel(NioServerSocketChannel.class)
                 .childOption(ChannelOption.TCP_NODELAY,
@@ -56,10 +69,7 @@ public class FixServer extends AbstractFixConnector {
                                 "nfs.rpc.tcp.nodelay", "true")))
                 .childOption(ChannelOption.ALLOCATOR, new PooledByteBufAllocator())
                 .localAddress(new InetSocketAddress(port))
-                .childHandler(new FixAcceptorChannelInitializer<SocketChannel>(
-                        workerGroup,
-                        getFixApplication()
-                ))
+                .childHandler(channelInitializer)
                 .validate();
 
         ChannelFuture f = bootstrap.bind().sync();
