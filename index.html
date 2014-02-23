@@ -41,7 +41,7 @@
 <h2>
 <a name="why-one-more-fix-protocol-api" class="anchor" href="#why-one-more-fix-protocol-api"><span class="octicon octicon-link"></span></a>Why One More FIX Protocol API</h2>
 
-<p>This API is intended to be a replacement for well known <a href="http://www.quickfixj.org/" title="Java Open Source FIX Engine">QuickFIX/J</a> library to be used for high-frequency trading cases.</p>
+<p>This API is intended to be a replacement for well known <a href="http://www.quickfixj.org/" title="Java Open Source FIX Engine">QuickFIX/J</a> library to be used for high-frequency cases.</p>
 
 <h2>
 <a name="design-goals" class="anchor" href="#design-goals"><span class="octicon octicon-link"></span></a>Design goals</h2>
@@ -78,23 +78,23 @@ thus improving overall application performance under high load.</li>
 <code>mvn clean install</code>
 </li>
 <li>Add the dependency to your project</li>
-</ol><pre><code>&lt;dependency&gt;
-    &lt;groupId&gt;kpavlov.fixio&lt;/groupId&gt;
-    &lt;artifactId&gt;core&lt;/artifactId&gt;
-    &lt;version&gt;1.0-SNAPSHOT&lt;/version&gt;
-&lt;/dependency&gt;
-</code></pre>
+</ol><div class="highlight highlight-xml"><pre><span class="nt">&lt;dependency&gt;</span>
+    <span class="nt">&lt;groupId&gt;</span>kpavlov.fixio<span class="nt">&lt;/groupId&gt;</span>
+    <span class="nt">&lt;artifactId&gt;</span>core<span class="nt">&lt;/artifactId&gt;</span>
+    <span class="nt">&lt;version&gt;</span>1.0-SNAPSHOT<span class="nt">&lt;/version&gt;</span>
+<span class="nt">&lt;/dependency&gt;</span>
+</pre></div>
 
 <p>You'll also need a slf4j API implementation at runtime, so please add appropriate dependency, e.g.:</p>
 
-<pre><code>&lt;dependency&gt;
-    &lt;groupId&gt;org.slf4j&lt;/groupId&gt;
-    &lt;artifactId&gt;slf4j-simple&lt;/artifactId&gt;
-    &lt;version&gt;1.7.5&lt;/version&gt;
-    &lt;scope&gt;runtime&lt;/scope&gt;
-    &lt;optional&gt;true&lt;/optional&gt;
-&lt;/dependency&gt;
-</code></pre>
+<div class="highlight highlight-xml"><pre><span class="nt">&lt;dependency&gt;</span>
+    <span class="nt">&lt;groupId&gt;</span>org.slf4j<span class="nt">&lt;/groupId&gt;</span>
+    <span class="nt">&lt;artifactId&gt;</span>slf4j-simple<span class="nt">&lt;/artifactId&gt;</span>
+    <span class="nt">&lt;version&gt;</span>1.7.5<span class="nt">&lt;/version&gt;</span>
+    <span class="nt">&lt;scope&gt;</span>runtime<span class="nt">&lt;/scope&gt;</span>
+    <span class="nt">&lt;optional&gt;</span>true<span class="nt">&lt;/optional&gt;</span>
+<span class="nt">&lt;/dependency&gt;</span>
+</pre></div>
 
 <h2>
 <a name="examples" class="anchor" href="#examples"><span class="octicon octicon-link"></span></a>Examples</h2>
@@ -117,21 +117,21 @@ You may extend <a href="https://github.com/kpavlov/fixio/treemaster/core/src/mai
 <li><p>Invoke <code>FixClient.connect(host, port)</code> to initiate connection.
 Method <code>connect(...)</code> returns a <a href="http://netty.io/5.0/api/io/netty/channel/ChannelFuture.html">ChannelFeature</a> which which will be notified when a channel is closed,
 so you may invoke the method <code>sync()</code> on it if you wish to wait for connection to be closed.</p></li>
-</ol><pre><code>FixApplication app = new FixApplicationAdapter();
-client = new FixClient(app);
+</ol><div class="highlight highlight-java"><pre><span class="n">FixApplication</span> <span class="n">app</span> <span class="o">=</span> <span class="k">new</span> <span class="n">FixApplicationAdapter</span><span class="o">();</span>
+<span class="n">client</span> <span class="o">=</span> <span class="k">new</span> <span class="n">FixClient</span><span class="o">(</span><span class="n">app</span><span class="o">);</span>
 
-// set settings file location related to classpath
-client.setSettingsResource("/client.properties");
+<span class="c1">// set settings file location related to classpath</span>
+<span class="n">client</span><span class="o">.</span><span class="na">setSettingsResource</span><span class="o">(</span><span class="s">"/client.properties"</span><span class="o">);</span>
 
-// connect to specified host and port
-ChannelFeature closeFeature = client.connect("localhost", 10201);
+<span class="c1">// connect to specified host and port</span>
+<span class="n">ChannelFeature</span> <span class="n">closeFeature</span> <span class="o">=</span> <span class="n">client</span><span class="o">.</span><span class="na">connect</span><span class="o">(</span><span class="s">"localhost"</span><span class="o">,</span> <span class="mi">10201</span><span class="o">);</span>
 
-// wait until FIX Session is closed
-closeFeature.sync();
+<span class="c1">// wait until FIX Session is closed</span>
+<span class="n">closeFeature</span><span class="o">.</span><span class="na">sync</span><span class="o">();</span>
 
-// Shutdown FIX client
-client.disconnect();
-</code></pre>
+<span class="c1">// Shutdown FIX client</span>
+<span class="n">client</span><span class="o">.</span><span class="na">disconnect</span><span class="o">();</span>
+</pre></div>
 
 <h2>
 <a name="working-with-fix-messages" class="anchor" href="#working-with-fix-messages"><span class="octicon octicon-link"></span></a>Working With FIX Messages</h2>
@@ -142,11 +142,11 @@ client.disconnect();
 
 <p>Example of using FixMessageBuilder:</p>
 
-<pre><code>FixMessageBuilder userRequest = new FixMessageBuilderImpl(MessageTypes.USER_REQUEST);
-userRequest.add(UserRequestID, "UserRequestID");
-userRequest.add(UserRequestType, 4);//UserRequestType=RequestIndividualUserStatus
-userRequest.add(Username, "user");
-</code></pre>
+<div class="highlight highlight-java"><pre><span class="n">FixMessageBuilder</span> <span class="n">userRequest</span> <span class="o">=</span> <span class="k">new</span> <span class="n">FixMessageBuilderImpl</span><span class="o">(</span><span class="n">MessageTypes</span><span class="o">.</span><span class="na">USER_REQUEST</span><span class="o">);</span>
+<span class="n">userRequest</span><span class="o">.</span><span class="na">add</span><span class="o">(</span><span class="n">UserRequestID</span><span class="o">,</span> <span class="s">"UserRequestID"</span><span class="o">);</span>
+<span class="n">userRequest</span><span class="o">.</span><span class="na">add</span><span class="o">(</span><span class="n">UserRequestType</span><span class="o">,</span> <span class="mi">4</span><span class="o">);</span><span class="c1">//UserRequestType=RequestIndividualUserStatus</span>
+<span class="n">userRequest</span><span class="o">.</span><span class="na">add</span><span class="o">(</span><span class="n">Username</span><span class="o">,</span> <span class="s">"user"</span><span class="o">);</span>
+</pre></div>
 
 <h2>
 <a name="fixapplication" class="anchor" href="#fixapplication"><span class="octicon octicon-link"></span></a>FixApplication</h2>
@@ -154,7 +154,7 @@ userRequest.add(Username, "user");
 <p><a href="https://github.com/kpavlov/fixio/treemaster/core/src/main/java/fixio/handlers/FixApplication.java">FixApplication</a> interface should be implemented to handle application business logic.
 It is a callback interface which handles FIX session events, incoming and outgoing messages.</p>
 
-<p><a href="https://github.com/kpavlov/fixio/treemaster/core/src/main/java/fixio/handlers/FixApplication.java">FixApplication</a> has a callback methods</p>
+<p><a href="https://github.com/kpavlov/fixio/treemaster/core/src/main/java/fixio/handlers/FixApplication.java">FixApplication</a> has the following methods:</p>
 
 <ul>
 <li>to handle session events (<code>onLogon(...)</code> and <code>onLogout(...)</code>),</li>
