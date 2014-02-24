@@ -5,19 +5,19 @@ fixio - FIX Protocol Support for Netty [![Build Status](https://travis-ci.org/kp
 
 ## Why One More FIX Protocol API
 
-This API is intended to be a replacement for well known [QuickFIX/J][quickfix] library to be used for high-frequency cases.
+This API is intended to replace well known [QuickFIX/J][quickfix] in high-frequency trading scenarios.
 
 ## Design goals
 
 1. Implement [FIX Protocol][fixprotocol] Java API with as low memory footprint as possible in order to eliminate unnecessary GC overhead,
 thus improving overall application performance under high load.
-2. Provide [FIX Protocol][fixprotocol] Codecs for [Netty][netty], making it possible to get rid of Apache [Mina][mina] which is used by [QuickFIX/J][quickfix] as a transport layer.
+2. Provide [FIX Protocol][fixprotocol] Codecs for [Netty][netty], to make it possible to get rid of Apache [Mina][mina] which is used by [QuickFIX/J][quickfix] as a transport layer.
 3. Avoid using expensive operations:
      - Avoid synchronization.
      - Replace BigDecimals with custom [Fixed Point Number][FixedPointNumber] implementation for financial data.
      - Reuse java.util.Calendar and java.util.TimeZone instances.
 
-This API has a number of [limitations](#Limitations), so it may be not suitable for any FIX application.
+The API has a number of [limitations](#Limitations), so it may be not suitable for any FIX application.
 
 ## Limitations
 
