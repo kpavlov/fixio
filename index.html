@@ -106,7 +106,7 @@ and <a href="https://github.com/kpavlov/fixio/treemaster/examples/src/main/java/
 and increased Survivor spaces (<code>-XX:SurvivorRatio=4</code>).</p>
 
 <h2>
-<a name="creating-simple-fix-client" class="anchor" href="#creating-simple-fix-client"><span class="octicon octicon-link"></span></a>Creating Simple FIX Client</h2>
+<a name="writing-simple-fix-client" class="anchor" href="#writing-simple-fix-client"><span class="octicon octicon-link"></span></a>Writing Simple FIX Client</h2>
 
 <p>To create a simple FIX client you need to:</p>
 
@@ -148,6 +148,28 @@ so you may invoke the method <code>sync()</code> on it if you wish to wait for c
 <span class="n">userRequest</span><span class="o">.</span><span class="na">add</span><span class="o">(</span><span class="n">Username</span><span class="o">,</span> <span class="s">"user"</span><span class="o">);</span>
 </pre></div>
 
+<p>To create a FIX message components, also referred as groups, use methods <code>FixMessageBuilder.newGrop(...)</code>.
+These methods returns a new group you'll to add new fields to.</p>
+
+<p>Example of using FixMessageBuilder with groups:</p>
+
+<div class="highlight highlight-java"><pre><span class="n">FixMessageBuilder</span> <span class="n">quoteRequest</span> <span class="o">=</span> <span class="k">new</span> <span class="n">FixMessageBuilderImpl</span><span class="o">(</span><span class="n">MessageTypes</span><span class="o">.</span><span class="na">QUOTE_REQUEST</span><span class="o">);</span>
+<span class="n">quoteRequest</span><span class="o">.</span><span class="na">add</span><span class="o">(</span><span class="n">FieldType</span><span class="o">.</span><span class="na">QuoteReqID</span><span class="o">,</span> <span class="n">quoteRequestId</span><span class="o">);</span>
+<span class="n">quoteRequest</span><span class="o">.</span><span class="na">add</span><span class="o">(</span><span class="n">FieldType</span><span class="o">.</span><span class="na">ClOrdID</span><span class="o">,</span> <span class="n">clientOrderId</span><span class="o">);</span>
+
+<span class="n">Group</span> <span class="n">instrument1</span> <span class="o">=</span> <span class="n">quoteRequest</span><span class="o">.</span><span class="na">newGroup</span><span class="o">(</span><span class="n">FieldType</span><span class="o">.</span><span class="na">NoRelatedSym</span><span class="o">,</span> <span class="mi">2</span><span class="o">);</span> <span class="c1">// create group with 2 fields</span>
+<span class="n">instrument1</span><span class="o">.</span><span class="na">add</span><span class="o">(</span><span class="n">FieldType</span><span class="o">.</span><span class="na">Symbol</span><span class="o">,</span> <span class="s">"EUR/USD"</span><span class="o">);</span>
+<span class="n">instrument1</span><span class="o">.</span><span class="na">add</span><span class="o">(</span><span class="n">FieldType</span><span class="o">.</span><span class="na">SecurityType</span><span class="o">,</span> <span class="s">"CURRENCY"</span><span class="o">);</span>
+
+<span class="n">Group</span> <span class="n">instrument2</span> <span class="o">=</span> <span class="n">quoteRequest</span><span class="o">.</span><span class="na">newGroup</span><span class="o">(</span><span class="n">FieldType</span><span class="o">.</span><span class="na">NoRelatedSym</span><span class="o">);</span> <span class="c1">// create group with unknown number of fields</span>
+<span class="n">instrument2</span><span class="o">.</span><span class="na">add</span><span class="o">(</span><span class="n">FieldType</span><span class="o">.</span><span class="na">Symbol</span><span class="o">,</span> <span class="s">"EUR/CHF"</span><span class="o">);</span>
+<span class="n">instrument2</span><span class="o">.</span><span class="na">add</span><span class="o">(</span><span class="n">FieldType</span><span class="o">.</span><span class="na">SecurityType</span><span class="o">,</span> <span class="s">"CURRENCY"</span><span class="o">);</span>
+
+<span class="n">quoteRequest</span><span class="o">.</span><span class="na">add</span><span class="o">(</span><span class="n">FieldType</span><span class="o">.</span><span class="na">QuoteRequestType</span><span class="o">,</span> <span class="mi">2</span><span class="o">);</span> <span class="c1">//QuoteRequestType=AUTOMATIC</span>
+</pre></div>
+
+<p>It is preferable to specify group size to achieve optimal performance and memory usage.</p>
+
 <h2>
 <a name="fixapplication" class="anchor" href="#fixapplication"><span class="octicon octicon-link"></span></a>FixApplication</h2>
 
@@ -160,7 +182,24 @@ It is a callback interface which handles FIX session events, incoming and outgoi
 <li>to handle session events (<code>onLogon(...)</code> and <code>onLogout(...)</code>),</li>
 <li>to process incoming messages (<code>onMessage(...)</code>)</li>
 <li>to pre-process outgoing message (<code>beforeSendMessage(...)</code>). You may add custom fields to FixMessageHeader in this method.</li>
-</ul>
+</ul><p>Start your with extending <a href="https://github.com/kpavlov/fixio/treemaster/core/src/main/java/fixio/handlers/FixApplicationAdapter.java">FixApplicationAdapter</a>.</p>
+
+<h2>
+<a name="writing-simple-fix-server" class="anchor" href="#writing-simple-fix-server"><span class="octicon octicon-link"></span></a>Writing Simple FIX Server</h2>
+
+<p>To implement FIX server one should follow these steps:</p>
+
+<ol>
+<li>Implement <a href="https://github.com/kpavlov/fixio/treemaster/core/src/main/java/fixio/handlers/FixApplication.java">FixApplication</a>. Use <a href="https://github.com/kpavlov/fixio/treemaster/core/src/main/java/fixio/handlers/FixApplicationAdapter.java">FixApplicationAdapter</a> as starting point.</li>
+<li>Create <a href="https://github.com/kpavlov/fixio/treemaster/core/src/main/java/fixio/netty/pipeline/server/FixAuthenticator.java">FixAuthenticator</a> which is responsible for accepting or rejecting client connections.
+There is a simple implementation - <a href="https://github.com/kpavlov/fixio/treemaster/core/src/main/java/fixio/netty/pipeline/server/AcceptAllAuthenticator.java">AcceptAllAuthenticator</a> which accepts all client connections.</li>
+<li>Create and start <a href="https://github.com/kpavlov/fixio/treemaster/core/src/main/java/fixio/FixServer.java">FixServer</a>.</li>
+</ol><p>FIX Server example:</p>
+
+<div class="highlight highlight-java"><pre><span class="n">FixApplication</span> <span class="n">app</span> <span class="o">=</span> <span class="k">new</span> <span class="n">FixApplicationAdapter</span><span class="o">();</span>
+<span class="n">FixServer</span> <span class="n">server</span> <span class="o">=</span> <span class="k">new</span> <span class="n">FixServer</span><span class="o">(</span><span class="n">port</span><span class="o">,</span> <span class="k">new</span> <span class="n">AcceptAllAuthenticator</span><span class="o">(),</span> <span class="n">app</span><span class="o">);</span>
+<span class="n">server</span><span class="o">.</span><span class="na">start</span><span class="o">();</span>
+</pre></div>
         </section>
 
         <footer>
