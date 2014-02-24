@@ -1,5 +1,5 @@
 /*
- * Copyright 2013 The FIX.io Project
+ * Copyright 2014 The FIX.io Project
  *
  * The FIX.io Project licenses this file to you under the Apache License,
  * version 2.0 (the "License"); you may not use this file except in compliance
@@ -55,22 +55,22 @@ public class FixMessageBuilderImplTest {
 
     @Test
     public void testWithGroups() {
-        FixMessageBuilderImpl quoteRequest = new FixMessageBuilderImpl(MessageTypes.QUOTE_REQUEST);
+        String clientOrderId = randomAscii(4);
         String quoteRequestId = randomAscii(3);
-        quoteRequest.add(131, quoteRequestId); //quoteReqId
-        String clientReqId = randomAscii(4);
-        quoteRequest.add(11, clientReqId);
 
+        FixMessageBuilderImpl quoteRequest = new FixMessageBuilderImpl(MessageTypes.QUOTE_REQUEST);
+        quoteRequest.add(FieldType.QuoteReqID, quoteRequestId);
+        quoteRequest.add(FieldType.ClOrdID, clientOrderId);
 
-        Group instrument1 = quoteRequest.newGroup(146);//noRelatedSym
-        instrument1.add(55, "EUR/USD");
-        instrument1.add(167, "CURRENCY");
+        Group instrument1 = quoteRequest.newGroup(FieldType.NoRelatedSym, 2);
+        instrument1.add(FieldType.Symbol, "EUR/USD");
+        instrument1.add(FieldType.SecurityType, "CURRENCY");
 
-        Group instrument2 = quoteRequest.newGroup(146);//noRelatedSym
-        instrument2.add(55, "EUR/CHF");
-        instrument2.add(167, "CURRENCY");
+        Group instrument2 = quoteRequest.newGroup(FieldType.NoRelatedSym);
+        instrument2.add(FieldType.Symbol, "EUR/CHF");
+        instrument2.add(FieldType.SecurityType, "CURRENCY");
 
-        quoteRequest.add(303, 2); //QuoteRequestType=AUTOMATIC
+        quoteRequest.add(FieldType.QuoteRequestType, 2); //QuoteRequestType=AUTOMATIC
 
         // read
 

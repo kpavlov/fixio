@@ -61,7 +61,7 @@ and [server][server-example] applications in module ["examples"][examples-module
 I recommend running server with Concurrent Mark Sweep Collector enabled: `-XX:+UseConcMarkSweepGC`
 and increased Survivor spaces (`-XX:SurvivorRatio=4`).
 
-## Creating Simple FIX Client
+## Writing Simple FIX Client
 
 To create a simple FIX client you need to:
 
@@ -106,6 +106,29 @@ userRequest.add(UserRequestType, 4);//UserRequestType=RequestIndividualUserStatu
 userRequest.add(Username, "user");
 ~~~~~~~~~
 
+To create a FIX message components, also referred as groups, use methods `FixMessageBuilder.newGrop(...)`.
+These methods returns a new group you'll to add new fields to.
+
+Example of using FixMessageBuilder with groups:
+
+~~~~~~~~~java
+FixMessageBuilder quoteRequest = new FixMessageBuilderImpl(MessageTypes.QUOTE_REQUEST);
+quoteRequest.add(FieldType.QuoteReqID, quoteRequestId);
+quoteRequest.add(FieldType.ClOrdID, clientOrderId);
+
+Group instrument1 = quoteRequest.newGroup(FieldType.NoRelatedSym, 2); // create group with 2 fields
+instrument1.add(FieldType.Symbol, "EUR/USD");
+instrument1.add(FieldType.SecurityType, "CURRENCY");
+
+Group instrument2 = quoteRequest.newGroup(FieldType.NoRelatedSym); // create group with unknown number of fields
+instrument2.add(FieldType.Symbol, "EUR/CHF");
+instrument2.add(FieldType.SecurityType, "CURRENCY");
+
+quoteRequest.add(FieldType.QuoteRequestType, 2); //QuoteRequestType=AUTOMATIC
+~~~~~~~~~
+
+It is preferable to specify group size to achieve optimal performance and memory usage.
+
 ## FixApplication
 
 [FixApplication][FixApplication] interface should be implemented to handle application business logic.
@@ -117,10 +140,32 @@ It is a callback interface which handles FIX session events, incoming and outgoi
 - to process incoming messages (`onMessage(...)`)
 - to pre-process outgoing message (`beforeSendMessage(...)`). You may add custom fields to FixMessageHeader in this method.
 
+Start your with extending [FixApplicationAdapter][FixApplicationAdapter].
+
+## Writing Simple FIX Server
+
+To implement FIX server one should follow these steps:
+
+1. Implement [FixApplication][FixApplication]. Use [FixApplicationAdapter][FixApplicationAdapter] as starting point.
+2. Create [FixAuthenticator][FixAuthenticator] which is responsible for accepting or rejecting client connections.
+   There is a simple implementation - [AcceptAllAuthenticator][] which accepts all client connections.
+3. Create and start [FixServer][FixServer].
+
+FIX Server example:
+
+~~~~~~~~~java
+FixApplication app = new FixApplicationAdapter();
+FixServer server = new FixServer(port, new AcceptAllAuthenticator(), app);
+server.start();
+~~~~~~~~~
+
 [FixedPointNumber]: https://github.com/kpavlov/fixio/treemaster/core/src/main/java/fixio/fixprotocol/fields/FixedPointNumber.java
 [FixApplication]: https://github.com/kpavlov/fixio/treemaster/core/src/main/java/fixio/handlers/FixApplication.java
 [FixApplicationAdapter]: https://github.com/kpavlov/fixio/treemaster/core/src/main/java/fixio/handlers/FixApplicationAdapter.java
 [FixClient]: https://github.com/kpavlov/fixio/treemaster/core/src/main/java/fixio/FixClient.java
+[FixServer]: https://github.com/kpavlov/fixio/treemaster/core/src/main/java/fixio/FixServer.java
+[FixAuthenticator]: https://github.com/kpavlov/fixio/treemaster/core/src/main/java/fixio/netty/pipeline/server/FixAuthenticator.java
+[AcceptAllAuthenticator]: https://github.com/kpavlov/fixio/treemaster/core/src/main/java/fixio/netty/pipeline/server/AcceptAllAuthenticator.java
 [ChannelFeature]: http://netty.io/5.0/api/io/netty/channel/ChannelFuture.html
 
 [FixMessage]: https://github.com/kpavlov/fixio/treemaster/core/src/main/java/fixio/fixprotocol/FixMessage.java
