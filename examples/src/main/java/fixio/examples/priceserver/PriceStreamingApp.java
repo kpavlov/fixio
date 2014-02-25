@@ -17,6 +17,7 @@ package fixio.examples.priceserver;
 
 import fixio.events.LogonEvent;
 import fixio.events.LogoutEvent;
+import fixio.examples.generator.Quote;
 import fixio.fixprotocol.*;
 import fixio.fixprotocol.fields.FixedPointNumber;
 import fixio.handlers.FixApplicationAdapter;

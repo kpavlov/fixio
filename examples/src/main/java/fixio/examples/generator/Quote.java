@@ -13,9 +13,9 @@
  * License for the specific language governing permissions and limitations
  * under the License.
  */
-package fixio.examples.priceserver;
+package fixio.examples.generator;
 
-class Quote {
+public class Quote {
 
     private final double bid;
     private final double offer;

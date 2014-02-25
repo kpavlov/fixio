@@ -13,21 +13,21 @@
  * License for the specific language governing permissions and limitations
  * under the License.
  */
-package fixio.examples.priceserver;
+package fixio.examples.generator;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.util.concurrent.BlockingQueue;
 
-class QuoteGeneratorTask implements Runnable {
+public class QuoteGeneratorTask implements Runnable {
 
     public static final Logger LOGGER = LoggerFactory.getLogger(QuoteGeneratorTask.class);
     private final BlockingQueue<Quote> receiver;
     private int t;
     private volatile boolean isStopping = false;
 
-    QuoteGeneratorTask(BlockingQueue<Quote> receiverQueue) {
+    public QuoteGeneratorTask(BlockingQueue<Quote> receiverQueue) {
         receiver = receiverQueue;
     }
 

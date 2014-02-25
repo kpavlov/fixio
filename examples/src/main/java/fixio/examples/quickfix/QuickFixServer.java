@@ -13,45 +13,47 @@
  * License for the specific language governing permissions and limitations
  * under the License.
  */
-package fixio.examples.priceserver;
+package fixio.examples.quickfix;
 
-import fixio.FixServer;
 import fixio.examples.generator.Quote;
 import fixio.examples.generator.QuoteGeneratorTask;
-import fixio.netty.pipeline.server.AcceptAllAuthenticator;
+import quickfix.*;
 
 import java.util.concurrent.ArrayBlockingQueue;
 
-public class PriceServer {
-
-    public static final int DEFAULT_PORT = 10101;
+public class QuickFixServer {
 
     private final ArrayBlockingQueue<Quote> quoteQueue = new ArrayBlockingQueue<>(8192);
-
-    private final FixServer server;
     private Thread generator;
     private QuoteGeneratorTask generatorTask;
+    private Acceptor acceptor;
 
-    public PriceServer(int port) {
-        PriceStreamingApp app = new PriceStreamingApp(quoteQueue);
-        server = new FixServer(port, new AcceptAllAuthenticator(), app);
+    public QuickFixServer() throws ConfigError {
+        SessionSettings settings = new SessionSettings(getClass().getResourceAsStream("/quickfix/quickfix-server.properties"));
+        MessageStoreFactory storeFactory = new MemoryStoreFactory();
+        LogFactory logFactory = new SLF4JLogFactory(settings);
+        MessageFactory messageFactory = new DefaultMessageFactory();
+
+        Application application = new QuickFixStreamingApp(quoteQueue);
+
+        acceptor = new SocketAcceptor(application, storeFactory, settings, logFactory, messageFactory);
     }
 
-    public static void main(String[] args) throws InterruptedException {
-        PriceServer priceServer = new PriceServer(DEFAULT_PORT);
-        priceServer.start();
-    }
-
-    public void start() throws InterruptedException {
+    public void start() throws ConfigError {
         generatorTask = new QuoteGeneratorTask(quoteQueue);
         generator = new Thread(generatorTask, "QuoteGenerator");
-        server.start();
+        acceptor.start();
         generator.start();
     }
 
     public void stop() throws InterruptedException {
         generatorTask.stop();
-        server.stop();
+        acceptor.stop();
         generator.join();
+    }
+
+    public static void main(String[] args) throws ConfigError {
+        QuickFixServer quickFixServer = new QuickFixServer();
+        quickFixServer.start();
     }
 }

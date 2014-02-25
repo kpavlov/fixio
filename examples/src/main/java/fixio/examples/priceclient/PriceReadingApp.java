@@ -38,7 +38,6 @@ class PriceReadingApp extends FixApplicationAdapter {
     public void onLogon(ChannelHandlerContext ctx, LogonEvent msg) {
         counter = 0;
         ctx.writeAndFlush(createQuoteRequest());
-        startTimeNanos = System.nanoTime();
     }
 
     @Override
@@ -48,6 +47,8 @@ class PriceReadingApp extends FixApplicationAdapter {
             case MessageTypes.QUOTE:
                 onQuote(msg);
                 break;
+            default:
+                return;
         }
         if (counter % 10000 == 0) {
             LOGGER.debug("Read {} Quotes", counter);
@@ -64,6 +65,9 @@ class PriceReadingApp extends FixApplicationAdapter {
 
     private void onQuote(FixMessage quote) {
         LOGGER.trace("quote = {}", quote);
+        if (startTimeNanos == 0) {
+            startTimeNanos = System.nanoTime();
+        }
         counter++;
     }
 
@@ -79,7 +83,7 @@ class PriceReadingApp extends FixApplicationAdapter {
         quoteRequestId = Long.toHexString(System.currentTimeMillis());
         quoteRequest.add(FieldType.QuoteReqID, quoteRequestId);
         String clientReqId = quoteRequestId + counter;
-        quoteRequest.add(11, clientReqId);
+        quoteRequest.add(FieldType.ClOrdID, clientReqId);
 
         Group instrument1 = quoteRequest.newGroup(FieldType.NoRelatedSym, 2);
         instrument1.add(FieldType.Symbol, "EUR/USD");

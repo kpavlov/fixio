@@ -26,6 +26,10 @@ The API has a number of [limitations](#Limitations), so it may be not suitable f
 3. Message encodings other than US-ASCII are not supported.
 4. ...
 
+## Performance
+
+Currently fixio can beat QuickFix performance in simple scenario. See [performance comparison][https://github.com/kpavlov/fixio/wiki/Performance-Comparison].
+
 # Getting Started
 
 1. [Download ZIP archive](archive/master.zip) or clone/fork the repository.
