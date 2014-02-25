@@ -1,5 +1,5 @@
 /*
- * Copyright 2013 The FIX.io Project
+ * Copyright 2014 The FIX.io Project
  *
  * The FIX.io Project licenses this file to you under the Apache License,
  * version 2.0 (the "License"); you may not use this file except in compliance
@@ -17,6 +17,7 @@ package fixio.netty.pipeline;
 
 import fixio.fixprotocol.FixMessageBuilderImpl;
 import fixio.fixprotocol.MessageTypes;
+import io.netty.channel.Channel;
 import io.netty.channel.ChannelHandlerContext;
 import org.junit.Before;
 import org.junit.Test;
@@ -42,6 +43,8 @@ public class TestRequestHandlerTest {
     private FixMessageBuilderImpl fixMessage;
     @Mock
     private ChannelHandlerContext ctx;
+    @Mock
+    private Channel channel;
     @Captor
     private ArgumentCaptor<FixMessageBuilderImpl> messageBuilderCaptor;
 
@@ -53,6 +56,10 @@ public class TestRequestHandlerTest {
     @Test
     public void testRejectNotSupportedObject() {
         assertFalse(handler.acceptInboundMessage(new Object()));
+    }
+
+    @Test
+    public void testRejectNullObject() {
         assertFalse(handler.acceptInboundMessage(null));
     }
 
@@ -66,25 +73,28 @@ public class TestRequestHandlerTest {
     public void testSkipOtherMessage() throws Exception {
         when(fixMessage.getMessageType()).thenReturn(MessageTypes.HEARTBEAT);
 
-        handler.decode(ctx, fixMessage, null);
+        ArrayList<Object> out = new ArrayList<>();
+        handler.decode(ctx, fixMessage, out);
 
         verifyZeroInteractions(ctx);
+        assertTrue(out.isEmpty());
     }
 
     @Test
     public void testHandleTestRequest() throws Exception {
         String testReqId = randomAscii(10);
+        when(ctx.channel()).thenReturn(channel);
         when(fixMessage.getMessageType()).thenReturn(MessageTypes.TEST_REQUEST);
-        when(fixMessage.getString(TestReqID.tag())).thenReturn(testReqId);
+        when(fixMessage.getString(TestReqID)).thenReturn(testReqId);
 
         List<Object> result = new ArrayList<>();
         handler.decode(ctx, fixMessage, result);
 
-        verify(ctx, times(1)).writeAndFlush(messageBuilderCaptor.capture());
+        verify(channel, times(1)).writeAndFlush(messageBuilderCaptor.capture());
 
         final FixMessageBuilderImpl fixMessageBuilder = messageBuilderCaptor.getValue();
 
         assertEquals(MessageTypes.HEARTBEAT, fixMessageBuilder.getMessageType());
-        assertEquals(fixMessageBuilder.getString(TestReqID.tag()), testReqId);
+        assertEquals(fixMessageBuilder.getString(TestReqID), testReqId);
     }
 }

@@ -1,5 +1,5 @@
 /*
- * Copyright 2013 The FIX.io Project
+ * Copyright 2014 The FIX.io Project
  *
  * The FIX.io Project licenses this file to you under the Apache License,
  * version 2.0 (the "License"); you may not use this file except in compliance
@@ -45,12 +45,10 @@ public class TestRequestHandler extends MessageToMessageDecoder<FixMessage> {
         if (!MessageTypes.TEST_REQUEST.equals(msg.getMessageType())) {
             return;
         }
-        final String testReqId = msg.getString(TestReqID.tag());
+        final String testReqId = msg.getString(TestReqID);
         final FixMessageBuilderImpl builder = new FixMessageBuilderImpl(MessageTypes.HEARTBEAT);
-        builder.add(TestReqID.tag(), testReqId);
+        builder.add(TestReqID, testReqId);
 
-        ctx.writeAndFlush(builder);
-        //out.add(builder);
+        ctx.channel().writeAndFlush(builder);
     }
-
 }
