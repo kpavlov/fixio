@@ -72,7 +72,7 @@ public class ClientSessionHandler extends AbstractSessionHandler {
     public void channelActive(ChannelHandlerContext ctx) throws Exception {
         getLogger().info("Connection established, starting Client FIX session.");
 
-        FixMessageBuilder logonRequest = new FixMessageBuilderImpl(MessageTypes.LOGON);
+        FixMessageBuilder logonRequest = createLogonRequest(sessionSettingsProvider);
 
         FixSession pendingSession = createSession(sessionSettingsProvider);
         setSession(ctx, pendingSession);
@@ -81,6 +81,13 @@ public class ClientSessionHandler extends AbstractSessionHandler {
         getLogger().info("Sending Logon: {}", logonRequest);
 
         ctx.writeAndFlush(logonRequest);
+    }
+
+    private static FixMessageBuilderImpl createLogonRequest(FixSessionSettingsProvider sessionSettingsProvider) {
+        FixMessageBuilderImpl messageBuilder = new FixMessageBuilderImpl(MessageTypes.LOGON);
+        messageBuilder.add(FieldType.HeartBtInt, sessionSettingsProvider.getHeartbeatInterval());
+        messageBuilder.add(FieldType.EncryptMethod, 0);
+        return messageBuilder;
     }
 
     private FixSession createSession(FixSessionSettingsProvider settingsProvider) {

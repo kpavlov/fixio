@@ -28,6 +28,7 @@ public interface FixSessionSettingsProvider {
 
     String getBeginString();
 
-
     boolean isResetMsgSeqNum();
+
+    int getHeartbeatInterval();
 }

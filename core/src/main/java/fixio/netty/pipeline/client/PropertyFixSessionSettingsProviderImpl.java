@@ -64,6 +64,11 @@ public class PropertyFixSessionSettingsProviderImpl implements FixSessionSetting
     }
 
     @Override
+    public int getHeartbeatInterval() {
+        return Integer.parseInt(properties.getProperty("HeartBtInt", "60"));
+    }
+
+    @Override
     public String getSenderCompID() {
         return properties.getProperty("SenderCompID");
     }

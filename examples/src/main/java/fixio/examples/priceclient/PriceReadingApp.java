@@ -83,11 +83,11 @@ class PriceReadingApp extends FixApplicationAdapter {
 
         Group instrument1 = quoteRequest.newGroup(FieldType.NoRelatedSym, 2);
         instrument1.add(FieldType.Symbol, "EUR/USD");
-        instrument1.add(FieldType.SecurityType, "CURRENCY");
+        instrument1.add(FieldType.SecurityType, "FOR");
 
         Group instrument2 = quoteRequest.newGroup(FieldType.NoRelatedSym, 2);
         instrument2.add(FieldType.Symbol, "EUR/CHF");
-        instrument2.add(FieldType.SecurityType, "CURRENCY");
+        instrument2.add(FieldType.SecurityType, "FOR");
 
         quoteRequest.add(FieldType.QuoteRequestType, 2); //QuoteRequestType=AUTOMATIC
         return quoteRequest;

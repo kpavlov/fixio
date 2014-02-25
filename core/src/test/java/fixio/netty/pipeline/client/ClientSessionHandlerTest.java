@@ -15,7 +15,8 @@
  */
 package fixio.netty.pipeline.client;
 
-import fixio.fixprotocol.FixMessageBuilder;
+import fixio.fixprotocol.FieldType;
+import fixio.fixprotocol.FixMessageBuilderImpl;
 import fixio.fixprotocol.FixMessageHeader;
 import fixio.fixprotocol.MessageTypes;
 import fixio.fixprotocol.session.FixSession;
@@ -53,9 +54,10 @@ public class ClientSessionHandlerTest {
     @Mock
     private FixApplication fixApplication;
     @Captor
-    private ArgumentCaptor<FixMessageBuilder> messageCaptor;
+    private ArgumentCaptor<FixMessageBuilderImpl> messageCaptor;
     private int inMsgSeqNum;
     private int outMsgSeqNum;
+    private Integer heartbeartInterval;
 
     @Before
     public void setUp() {
@@ -64,6 +66,9 @@ public class ClientSessionHandlerTest {
         Random random = new Random();
         inMsgSeqNum = random.nextInt();
         outMsgSeqNum = random.nextInt();
+
+        heartbeartInterval = random.nextInt(100) + 10;
+        when(settingsProvider.getHeartbeatInterval()).thenReturn(heartbeartInterval);
 
         when(sequenceProvider.getMsgInSeqNum()).thenReturn(inMsgSeqNum);
         when(sequenceProvider.getMsgOutSeqNum()).thenReturn(outMsgSeqNum);
@@ -79,7 +84,7 @@ public class ClientSessionHandlerTest {
 
         verify(ctx).writeAndFlush(messageCaptor.capture());
 
-        FixMessageBuilder messageBuilder = messageCaptor.getValue();
+        FixMessageBuilderImpl messageBuilder = messageCaptor.getValue();
         FixMessageHeader header = messageBuilder.getHeader();
 
         verify(fixApplication).beforeSendMessage(same(ctx), same(messageBuilder));
@@ -87,5 +92,8 @@ public class ClientSessionHandlerTest {
         assertEquals("LOGON expected", MessageTypes.LOGON, header.getMessageType());
         assertEquals(outMsgSeqNum, header.getMsgSeqNum());
         assertTrue(header.getSendingTime() > 0);
+
+        assertEquals("HeartBtInt", heartbeartInterval, messageBuilder.getInt(FieldType.HeartBtInt));
+        assertEquals("EncryptMethod", (Integer) 0, messageBuilder.getInt(FieldType.EncryptMethod));
     }
 }

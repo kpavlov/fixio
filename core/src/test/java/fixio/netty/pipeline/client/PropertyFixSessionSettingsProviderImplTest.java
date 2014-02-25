@@ -40,6 +40,11 @@ public class PropertyFixSessionSettingsProviderImplTest {
     }
 
     @Test
+    public void testGetHeartbeatInterval() {
+        assertEquals(40, provider.getHeartbeatInterval());
+    }
+
+    @Test
     public void testGetBeginString() {
         assertEquals("FIX.4.4", provider.getBeginString());
     }
