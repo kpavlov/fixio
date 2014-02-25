@@ -28,7 +28,7 @@ The API has a number of [limitations](#Limitations), so it may be not suitable f
 
 ## Performance
 
-Currently fixio can beat QuickFix performance in simple scenario. See [performance comparison][https://github.com/kpavlov/fixio/wiki/Performance-Comparison].
+Currently fixio can beat QuickFix performance in simple scenario. See [performance comparison](https://github.com/kpavlov/fixio/wiki/Performance-Comparison).
 
 # Getting Started
 
