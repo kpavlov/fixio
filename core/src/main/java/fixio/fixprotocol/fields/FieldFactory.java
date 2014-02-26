@@ -63,9 +63,8 @@ public class FieldFactory {
     }
 
     @SuppressWarnings("unchecked")
-    public static <F extends AbstractField<?>> F fromIntValue(int tagNum, int value) {
-        FieldType fieldType = FieldType.forTag(tagNum);
-        switch (fieldType.type()) {
+    public static <F extends AbstractField<?>> F fromIntValue(DataType type, int tagNum, int value) {
+        switch (type) {
             case STRING:
                 return (F) new StringField(tagNum, String.valueOf(value));
             case FLOAT:
@@ -84,9 +83,14 @@ public class FieldFactory {
             case UTCDATEONLY:
                 return (F) new UTCDateOnlyField(tagNum, value);
             default:
-                throw new IllegalArgumentException("Value " + value + " is not applicable for field type: " + fieldType
-                        + '(' + fieldType.type() + ')');
+                throw new IllegalArgumentException("Value " + value + " is not applicable for field: " + tagNum
+                        + '(' + type + ')');
         }
+    }
+
+    public static <F extends AbstractField<?>> F fromIntValue(int tagNum, int value) {
+        FieldType fieldType = FieldType.forTag(tagNum);
+        return fromIntValue(fieldType.type(), tagNum, value);
     }
 
     public static <F extends AbstractField<?>> F fromLongValue(int tagNum, long value) {
@@ -119,7 +123,7 @@ public class FieldFactory {
             case UTCDATEONLY:
                 return (F) new UTCDateOnlyField(tagNum, value);
             default:
-                throw new IllegalArgumentException("Value " + value + " is not applicable for field : " + tagNum
+                throw new IllegalArgumentException("Value " + value + " is not applicable for field: " + tagNum
                         + '(' + type + ')');
         }
     }

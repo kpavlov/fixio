@@ -19,12 +19,15 @@ import org.junit.Before;
 import org.junit.Test;
 
 import java.util.List;
+import java.util.Random;
 
 import static org.apache.commons.lang3.RandomStringUtils.randomAscii;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertSame;
 
 public class FixMessageBuilderImplTest {
+
+    private static final Random RANDOM = new Random();
 
     private FixMessageBuilderImpl fixMessage;
 
@@ -44,8 +47,6 @@ public class FixMessageBuilderImplTest {
         fixMessage.setMessageType(msgType);
         fixMessage.getHeader().setSenderCompID(senderCompID);
         fixMessage.getHeader().setTargetCompID(targetCompID);
-
-        //FixMessageBuilderImpl fixMessage = builder.build();
 
         assertEquals("beginString", beginString, fixMessage.getHeader().getBeginString());
         assertEquals("msgType", msgType, fixMessage.getMessageType());
@@ -79,5 +80,27 @@ public class FixMessageBuilderImplTest {
 
         assertSame(instrument1, instruments.get(0));
         assertSame(instrument2, instruments.get(1));
+    }
+
+    @Test
+    public void testAddStringByTypeAndTag() {
+        String value = randomAscii(3);
+        int tagNum = new Random().nextInt(100) + 100;
+
+        FixMessageBuilderImpl messageBuilder = new FixMessageBuilderImpl();
+        assertSame(messageBuilder, messageBuilder.add(DataType.STRING, tagNum, value));
+
+        assertEquals(value, messageBuilder.getString(tagNum));
+    }
+
+    @Test
+    public void testAddIntByTypeAndTag() {
+        int value = RANDOM.nextInt(1000);
+        int tagNum = RANDOM.nextInt(100) + 100;
+
+        FixMessageBuilderImpl messageBuilder = new FixMessageBuilderImpl();
+        assertSame(messageBuilder, messageBuilder.add(DataType.LENGTH, tagNum, value));
+
+        assertEquals((Integer) value, messageBuilder.getInt(tagNum));
     }
 }

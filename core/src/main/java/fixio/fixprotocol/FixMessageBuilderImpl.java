@@ -84,7 +84,6 @@ public class FixMessageBuilderImpl implements FixMessage, FixMessageBuilder {
     @Override
     public FixMessageBuilderImpl add(FieldType field, int value) {
         assert (field != null) : "Tag must be specified.";
-
         return add(field, String.valueOf(value));
     }
 
@@ -92,6 +91,13 @@ public class FixMessageBuilderImpl implements FixMessage, FixMessageBuilder {
     public FixMessageBuilderImpl add(int tagNum, int value) {
         assert (tagNum > 0) : "Tag must be positive.";
         body.add(FieldFactory.fromIntValue(tagNum, value));
+        return this;
+    }
+
+    @Override
+    public FixMessageBuilder add(DataType type, int tagNum, int value) {
+        assert (tagNum > 0) : "Tag must be positive.";
+        body.add(FieldFactory.fromIntValue(type, tagNum, value));
         return this;
     }
 
@@ -115,6 +121,14 @@ public class FixMessageBuilderImpl implements FixMessage, FixMessageBuilder {
         assert (tagNum > 0) : "TagNum must be positive. Got " + tagNum;
         assert (value != null) : "Value must be specified.";
         body.add(FieldFactory.fromStringValue(tagNum, value));
+        return this;
+    }
+
+    @Override
+    public FixMessageBuilder add(DataType type, int tagNum, String value) {
+        assert (tagNum > 0) : "TagNum must be positive. Got " + tagNum;
+        assert (value != null) : "Value must be specified.";
+        body.add(FieldFactory.fromStringValue(type, tagNum, value));
         return this;
     }
 
