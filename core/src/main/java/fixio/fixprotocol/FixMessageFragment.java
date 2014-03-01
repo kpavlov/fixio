@@ -1,5 +1,5 @@
 /*
- * Copyright 2013 The FIX.io Project
+ * Copyright 2014 The FIX.io Project
  *
  * The FIX.io Project licenses this file to you under the Apache License,
  * version 2.0 (the "License"); you may not use this file except in compliance
@@ -16,15 +16,7 @@
 
 package fixio.fixprotocol;
 
-public abstract class FixMessageFragment {
+public interface FixMessageFragment {
 
-    private final int tagNum;
-
-    protected FixMessageFragment(int tagNum) {
-        this.tagNum = tagNum;
-    }
-
-    public int getTagNum() {
-        return tagNum;
-    }
+    int getTagNum();
 }

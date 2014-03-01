@@ -27,9 +27,6 @@ import static java.nio.charset.StandardCharsets.US_ASCII;
 
 public class UTCTimeOnlyField extends AbstractField<Long> {
 
-//    private static final MessageFormat MESSAGE_FORMAT
-//            = new MessageFormat("{0,number,####}{1,number,##}{2,number,##}-{3,number,##}:{4,number,##}:{5,number,##}");
-
     private static final long MILLIS_PER_SECOND = 1000;
     private static final long MILLIS_PER_MINUTE = 60 * MILLIS_PER_SECOND;
     private static final long MILLIS_PER_HOUR = 60 * MILLIS_PER_MINUTE;

@@ -19,14 +19,26 @@ package fixio.fixprotocol.fields;
 import fixio.fixprotocol.FieldType;
 import fixio.fixprotocol.FixMessageFragment;
 
-public abstract class AbstractField<T> extends FixMessageFragment {
+public abstract class AbstractField<T> implements FixMessageFragment {
+
+    private final int tagNum;
 
     protected AbstractField(int tagNum) {
-        super(tagNum);
+        this.tagNum = tagNum;
+    }
+
+    @Override
+    public int getTagNum() {
+        return tagNum;
     }
 
     public abstract T getValue();
 
+    /**
+     * Returns byte array representation of the field to be written to the stream.
+     *
+     * @return array of bytes. Should never return <code>null</code>.
+     */
     public abstract byte[] getBytes();
 
     @Override

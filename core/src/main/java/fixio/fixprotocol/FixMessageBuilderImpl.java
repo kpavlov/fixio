@@ -15,7 +15,6 @@
  */
 package fixio.fixprotocol;
 
-import fixio.fixprotocol.fields.FieldFactory;
 import fixio.fixprotocol.fields.FixedPointNumber;
 import fixio.fixprotocol.fields.IntField;
 import fixio.fixprotocol.fields.StringField;
@@ -83,52 +82,74 @@ public class FixMessageBuilderImpl implements FixMessage, FixMessageBuilder {
 
     @Override
     public FixMessageBuilderImpl add(FieldType field, int value) {
-        assert (field != null) : "Tag must be specified.";
-        return add(field, String.valueOf(value));
+        FieldListBuilderHelper.add(body, field, value);
+        return this;
     }
 
     @Override
     public FixMessageBuilderImpl add(int tagNum, int value) {
-        assert (tagNum > 0) : "Tag must be positive.";
-        body.add(FieldFactory.fromIntValue(tagNum, value));
+        FieldListBuilderHelper.add(body, tagNum, value);
         return this;
     }
 
     @Override
     public FixMessageBuilder add(DataType type, int tagNum, int value) {
-        assert (tagNum > 0) : "Tag must be positive.";
-        body.add(FieldFactory.fromIntValue(type, tagNum, value));
+        FieldListBuilderHelper.add(body, type, tagNum, value);
         return this;
     }
 
-    public FixMessageBuilderImpl add(FieldType fieldType, FixedPointNumber value) {
-        assert (fieldType != null) : "Tag must be specified.";
-        assert (value != null) : "Value must be specified.";
-        body.add(FieldFactory.fromFixedPointValue(fieldType, value));
+
+    @Override
+    public FixMessageBuilderImpl add(FieldType field, long value) {
+        FieldListBuilderHelper.add(body, field, value);
+        return this;
+    }
+
+    @Override
+    public FixMessageBuilderImpl add(int tagNum, long value) {
+        FieldListBuilderHelper.add(body, tagNum, value);
+        return this;
+    }
+
+    @Override
+    public FixMessageBuilder add(DataType type, int tagNum, long value) {
+        FieldListBuilderHelper.add(body, type, tagNum, value);
         return this;
     }
 
     @Override
     public FixMessageBuilderImpl add(FieldType fieldType, String value) {
-        assert (fieldType != null) : "Tag must be specified.";
-        assert (value != null) : "Value must be specified.";
-        body.add(FieldFactory.fromStringValue(fieldType, value));
+        FieldListBuilderHelper.add(body, fieldType, value);
         return this;
     }
 
     @Override
     public FixMessageBuilderImpl add(int tagNum, String value) {
-        assert (tagNum > 0) : "TagNum must be positive. Got " + tagNum;
-        assert (value != null) : "Value must be specified.";
-        body.add(FieldFactory.fromStringValue(tagNum, value));
+        FieldListBuilderHelper.add(body, tagNum, value);
         return this;
     }
 
     @Override
     public FixMessageBuilder add(DataType type, int tagNum, String value) {
-        assert (tagNum > 0) : "TagNum must be positive. Got " + tagNum;
-        assert (value != null) : "Value must be specified.";
-        body.add(FieldFactory.fromStringValue(type, tagNum, value));
+        FieldListBuilderHelper.add(body, type, tagNum, value);
+        return this;
+    }
+
+    @Override
+    public FixMessageBuilderImpl add(FieldType fieldType, FixedPointNumber value) {
+        FieldListBuilderHelper.add(body, fieldType, value);
+        return this;
+    }
+
+    @Override
+    public FixMessageBuilder add(int tagNum, FixedPointNumber value) {
+        FieldListBuilderHelper.add(body, tagNum, value);
+        return this;
+    }
+
+    @Override
+    public FixMessageBuilder add(DataType type, int tagNum, FixedPointNumber value) {
+        FieldListBuilderHelper.add(body, type, tagNum, value);
         return this;
     }
 

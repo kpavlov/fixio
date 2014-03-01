@@ -130,7 +130,7 @@ public class FieldFactory {
 
     public static <F extends AbstractField<?>> F fromStringValue(int tagNum, String value) {
         FieldType fieldType = FieldType.forTag(tagNum);
-        return fromStringValue(fieldType, value);
+        return fromStringValue(fieldType.type(), tagNum, value);
     }
 
     public static <F extends AbstractField<?>> F fromStringValue(FieldType fieldType, String value) {

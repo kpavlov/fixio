@@ -22,18 +22,24 @@ import java.util.List;
 /**
  * Represents a sequence of {@link Group}s prepended with tag of type {@link DataType#NUMINGROUP}.
  */
-public class GroupField extends FixMessageFragment {
+public class GroupField implements FixMessageFragment {
 
     private static final int DEFAULT_SIZE = 2;
     private final List<Group> groups;
+    private final int tagNum;
 
     protected GroupField(int tagNum, int expectedSize) {
-        super(tagNum);
+        this.tagNum = tagNum;
         groups = new ArrayList<>(expectedSize);
     }
 
     protected GroupField(int tagNum) {
         this(tagNum, DEFAULT_SIZE);
+    }
+
+    @Override
+    public int getTagNum() {
+        return tagNum;
     }
 
     public void add(Group group) {

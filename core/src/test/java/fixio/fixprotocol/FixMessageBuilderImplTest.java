@@ -103,4 +103,15 @@ public class FixMessageBuilderImplTest {
 
         assertEquals((Integer) value, messageBuilder.getInt(tagNum));
     }
+
+    @Test
+    public void testAddIntByTag() {
+        int value = RANDOM.nextInt(1000);
+        FieldType tag = FieldType.MsgSeqNum;
+
+        FixMessageBuilderImpl messageBuilder = new FixMessageBuilderImpl();
+        assertSame(messageBuilder, messageBuilder.add(tag, value));
+
+        assertEquals((Integer) value, messageBuilder.getInt(tag));
+    }
 }

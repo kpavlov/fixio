@@ -15,6 +15,7 @@
  */
 package fixio.fixprotocol;
 
+import fixio.fixprotocol.fields.FixedPointNumber;
 import fixio.fixprotocol.fields.StringField;
 
 import java.util.ArrayList;
@@ -23,9 +24,9 @@ import java.util.List;
 /**
  * Represents FIX Protocol field Group or Component - a sequence of Fields or other Groups.
  */
-public class Group {
+public class Group implements FieldListBuilder<Group> {
 
-    public static final int DEFAULT_GROUP_SIZE = 8;
+    private static final int DEFAULT_GROUP_SIZE = 8;
     private final ArrayList<FixMessageFragment> contents;
 
     public Group(int expectedSize) {
@@ -40,15 +41,75 @@ public class Group {
         contents.add(element);
     }
 
+    @Override
     public Group add(FieldType fieldType, String value) {
         contents.add(new StringField(fieldType.tag(), value));
         return this;
     }
 
+    @Override
     public Group add(int tagNum, String value) {
-        assert (tagNum > 0) : "Tag must be positive.";
-        assert (value != null) : "Value  must be specified.";
-        contents.add(new StringField(tagNum, value));
+        FieldListBuilderHelper.add(contents, tagNum, value);
+        return this;
+    }
+
+    @Override
+    public Group add(DataType type, int tagNum, String value) {
+        FieldListBuilderHelper.add(contents, type, tagNum, value);
+        return this;
+    }
+
+    @Override
+    public Group add(FieldType field, int value) {
+        FieldListBuilderHelper.add(contents, field, value);
+        return this;
+    }
+
+    @Override
+    public Group add(int tagNum, int value) {
+        FieldListBuilderHelper.add(contents, tagNum, value);
+        return this;
+    }
+
+    @Override
+    public Group add(DataType type, int tagNum, int value) {
+        FieldListBuilderHelper.add(contents, tagNum, value);
+        return this;
+    }
+
+    @Override
+    public Group add(FieldType field, long value) {
+        FieldListBuilderHelper.add(contents, field, value);
+        return this;
+    }
+
+    @Override
+    public Group add(int tagNum, long value) {
+        FieldListBuilderHelper.add(contents, tagNum, value);
+        return this;
+    }
+
+    @Override
+    public Group add(DataType type, int tagNum, long value) {
+        FieldListBuilderHelper.add(contents, type, tagNum, value);
+        return this;
+    }
+
+    @Override
+    public Group add(FieldType fieldType, FixedPointNumber value) {
+        FieldListBuilderHelper.add(contents, fieldType, value);
+        return this;
+    }
+
+    @Override
+    public Group add(int tagNum, FixedPointNumber value) {
+        FieldListBuilderHelper.add(contents, tagNum, value);
+        return this;
+    }
+
+    @Override
+    public Group add(DataType type, int tagNum, FixedPointNumber value) {
+        FieldListBuilderHelper.add(contents, type, tagNum, value);
         return this;
     }
 

@@ -22,22 +22,10 @@ import java.util.List;
  * <p/>
  * Messages of this type are passed into {@link fixio.netty.codec.FixMessageEncoder}.
  */
-public interface FixMessageBuilder {
+public interface FixMessageBuilder extends FieldListBuilder<FixMessageBuilder> {
     FixMessageHeader getHeader();
 
-    List<FixMessageFragment> getBody();
-
-    FixMessageBuilder add(FieldType field, String value);
-
-    FixMessageBuilder add(int tagNum, String value);
-
-    FixMessageBuilder add(DataType type, int tagNum, String value);
-
-    FixMessageBuilder add(FieldType field, int value);
-
-    FixMessageBuilder add(int tagNum, int value);
-
-    FixMessageBuilder add(DataType type, int tagNum, int value);
+    List<? extends FixMessageFragment> getBody();
 
     Group newGroup(int tagNum);
 
