@@ -153,6 +153,20 @@ public class FixMessageEncoder extends MessageToByteEncoder<FixMessageBuilder> {
         }
     }
 
+    static void writeChecksumField(ByteBuf out, int value) {
+        int x2 = value / 100;
+        int x1 = (value - x2 * 100) / 10;
+        int x0 = value - x2 * 100 - x1 * 10;
+        out.ensureWritable(7);
+        out.writeByte('1');
+        out.writeByte('0');
+        out.writeByte('=');
+        out.writeByte('0' + x2);
+        out.writeByte('0' + x1);
+        out.writeByte('0' + x0);
+        out.writeByte((byte) 1);
+    }
+
     @Override
     public void encode(ChannelHandlerContext ctx,
                        FixMessageBuilder msg,
@@ -180,7 +194,7 @@ public class FixMessageEncoder extends MessageToByteEncoder<FixMessageBuilder> {
         int checksum = calculateChecksum(out, initialOffset);
 
         // Checksum
-        writeField(10, String.format("%1$03d", checksum), out);
+        writeChecksumField(out, checksum);
         ctx.flush();
 
         headBuf.release();
