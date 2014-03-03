@@ -73,7 +73,7 @@ class PriceReadingApp extends FixApplicationAdapter {
 
     private FixMessageBuilder createQuoteCancel() {
         FixMessageBuilder quoteCancel = new FixMessageBuilderImpl(MessageTypes.QUOTE_CANCEL);
-        quoteCancel.add(FieldType.QuoteRequestType, "4"); //QuoteRequestType=AUTOMATIC
+        quoteCancel.add(FieldType.QuoteCancelType, "4"); //QuoteCancelType=CANCEL_ALL_QUOTES
         quoteCancel.add(FieldType.QuoteReqID, quoteRequestId);
         return quoteCancel;
     }
