@@ -124,6 +124,7 @@ public class QuickFixStreamingApp implements Application {
                 try {
                     quote = quoteQueue.take();
                 } catch (InterruptedException e) {
+                    Thread.currentThread().interrupt();
                     LOGGER.error("Interrupted queue", e);
                 }
                 for (Map.Entry<String, SessionID> subscriptionEntry : subscriptions.entrySet()) {

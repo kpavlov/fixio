@@ -118,6 +118,7 @@ class PriceStreamingApp extends FixApplicationAdapter {
                 try {
                     quote = quoteQueue.take();
                 } catch (InterruptedException e) {
+                    Thread.currentThread().interrupt();
                     LOGGER.error("Interrupted queue", e);
                 }
                 for (Map.Entry<String, ChannelHandlerContext> subscriptionEntry : subscriptions.entrySet()) {
