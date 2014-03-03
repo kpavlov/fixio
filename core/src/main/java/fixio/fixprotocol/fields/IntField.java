@@ -15,11 +15,39 @@
  */
 package fixio.fixprotocol.fields;
 
+import java.text.ParseException;
+
 import static java.nio.charset.StandardCharsets.US_ASCII;
 
 public class IntField extends AbstractField<Integer> {
 
-    private int value;
+    private final int value;
+
+    protected IntField(int tagNum, byte[] bytes, int offset, int length) throws ParseException {
+        super(tagNum);
+        int index = offset;
+        int sign = 1;
+        switch (bytes[offset]) {
+            case '-':
+                sign = -1;
+                index++;
+                break;
+            case '+':
+                sign = +1;
+                index++;
+                break;
+            default:
+        }
+        int tempValue = 0;
+        for (int i = index; i < offset + length; i++) {
+            int digit = (bytes[i] - '0');
+            if (digit > 9 || digit < 0) {
+                throw new ParseException("Unparseable int: " + new String(bytes, offset, length, US_ASCII), i);
+            }
+            tempValue = tempValue * 10 + digit;
+        }
+        this.value = tempValue * sign;
+    }
 
     protected IntField(int tagNum, int value) {
         super(tagNum);

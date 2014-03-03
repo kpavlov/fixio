@@ -50,7 +50,7 @@ public class FieldFactory {
                 case LENGTH:
                 case SEQNUM:
                 case NUMINGROUP:
-                    return (F) new IntField(tagNum, Integer.parseInt(new String(value, offset, length, US_ASCII)));
+                    return (F) new IntField(tagNum, value, offset, length);
                 case UTCTIMESTAMP:
                     return (F) new UTCTimestampField(tagNum, value, offset, length);
                 default:
@@ -70,7 +70,10 @@ public class FieldFactory {
             case FLOAT:
             case PRICE:
             case QTY:
-                return (F) new FloatField(tagNum, new FixedPointNumber(value));
+            case PRICEOFFSET:
+            case PERCENTAGE:
+            case AMT:
+//                return (F) new FloatField(tagNum, new FixedPointNumber(value));
             case INT:
             case LENGTH:
             case SEQNUM:
@@ -109,8 +112,11 @@ public class FieldFactory {
                 return (F) new StringField(tagNum, String.valueOf(value));
             case FLOAT:
             case PRICE:
+            case PRICEOFFSET:
+            case PERCENTAGE:
+            case AMT:
             case QTY:
-                return (F) new FloatField(tagNum, new FixedPointNumber(value));
+//                return (F) new FloatField(tagNum, new FixedPointNumber(value));
             case INT:
             case LENGTH:
             case SEQNUM:
@@ -144,6 +150,9 @@ public class FieldFactory {
                 return (F) new StringField(tagNum, value);
             case FLOAT:
             case PRICE:
+            case PRICEOFFSET:
+            case PERCENTAGE:
+            case AMT:
             case QTY:
                 return (F) new FloatField(tagNum, new FixedPointNumber(value));
             case INT:
@@ -173,6 +182,9 @@ public class FieldFactory {
                 return (F) new StringField(tagNum, value.toString());
             case FLOAT:
             case PRICE:
+            case PRICEOFFSET:
+            case AMT:
+            case PERCENTAGE:
             case QTY:
                 return (F) new FloatField(tagNum, value);
             default:

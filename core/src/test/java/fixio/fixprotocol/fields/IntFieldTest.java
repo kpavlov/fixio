@@ -15,9 +15,10 @@
  */
 package fixio.fixprotocol.fields;
 
-import org.junit.Before;
 import org.junit.Test;
 
+import java.nio.charset.StandardCharsets;
+import java.text.ParseException;
 import java.util.Random;
 
 import static java.nio.charset.StandardCharsets.US_ASCII;
@@ -25,22 +26,19 @@ import static org.junit.Assert.assertArrayEquals;
 
 public class IntFieldTest {
 
-    private int value;
-    private int tag;
-    private IntField field;
-
-    @Before
-    public void setUp() throws Exception {
-        value = new Random().nextInt();
-        tag = new Random().nextInt();
-
-        field = new IntField(tag, value);
-    }
-
     @Test
     public void testGetBytes() throws Exception {
+        int value = new Random().nextInt();
+        int tag = new Random().nextInt();
+
+        IntField field = new IntField(tag, value);
         byte[] bytes = field.getBytes();
 
         assertArrayEquals(String.valueOf(value).getBytes(US_ASCII), bytes);
+    }
+
+    @Test(expected = ParseException.class)
+    public void testFailParseNonInteger() throws ParseException {
+        new IntField(10, "12a345".getBytes(StandardCharsets.US_ASCII), 0, 6);
     }
 }
