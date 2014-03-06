@@ -19,7 +19,6 @@ import fixio.events.LogonEvent;
 import fixio.events.LogoutEvent;
 import fixio.fixprotocol.FixMessage;
 import fixio.fixprotocol.FixMessageBuilder;
-import fixio.validator.IFixMsgValidator;
 import io.netty.channel.ChannelHandler;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.handler.codec.MessageToMessageDecoder;
@@ -27,23 +26,12 @@ import io.netty.util.ReferenceCountUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.util.ArrayList;
 import java.util.List;
 
 @ChannelHandler.Sharable
 public class FixApplicationAdapter extends MessageToMessageDecoder<Object> implements FixApplication {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(FixApplicationAdapter.class);
-    private List<IFixMsgHandler> handlers = new ArrayList<>();
-    private List<IFixMsgValidator> validators = new ArrayList<>();
-
-    public void addHandler(IFixMsgHandler handler){
-        handlers.add(handler);
-    }
-
-    public void addValidator(IFixMsgValidator validator){
-        validators.add(validator);
-    }
 
     @Override
     protected void decode(ChannelHandlerContext ctx, Object msg, List<Object> out) throws Exception {
@@ -70,44 +58,10 @@ public class FixApplicationAdapter extends MessageToMessageDecoder<Object> imple
 
     @Override
     public void onMessage(ChannelHandlerContext ctx, FixMessage msg, List<Object> out) throws Exception {
-        assert (msg != null) : "Message can't be null";
-        LOGGER.info("Received : {}", msg);
-
-        //Validate
-        for(IFixMsgValidator validator : validators){
-            if(validator.isValidate(ctx, msg)){
-                if(!validator.validate(ctx, msg)){
-                    if(validator.getErrorMsg() != null){
-                        ctx.write(validator.getErrorMsg());
-                    }
-                    return;
-                }
-            }
-        }
-
-        //Business handler
-        boolean bProcessed = false;
-        for(IFixMsgHandler handler : handlers){
-            if(handler.isProcess(ctx, msg)){
-                bProcessed = true;
-                handler.process(ctx, msg);
-                return;
-            }
-        }
-        if(!bProcessed){
-            LOGGER.warn("No hanler support this msg : " + msg);
-            // send business reject.....
-        }
     }
 
     @Override
     public void beforeSendMessage(ChannelHandlerContext ctx, FixMessageBuilder msg) throws Exception {
-        for(IFixMsgHandler handler : handlers){
-            if(handler.isProcess(ctx, msg)){
-                handler.beforeSendMessage(ctx, msg);
-                return;
-            }
-        }
     }
 
     @Override

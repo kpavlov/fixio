@@ -20,6 +20,7 @@ import fixio.events.LogoutEvent;
 import fixio.fixprotocol.*;
 import fixio.fixprotocol.session.FixSession;
 import fixio.handlers.FixApplication;
+import fixio.validator.BusinessRejectException;
 import io.netty.channel.ChannelFuture;
 import io.netty.channel.ChannelFutureListener;
 import io.netty.channel.ChannelHandlerContext;
@@ -104,6 +105,16 @@ public abstract class AbstractSessionHandler extends MessageToMessageCodec<FixMe
         out.add(msg);
     }
 
+    @Override
+    public void exceptionCaught(ChannelHandlerContext ctx, Throwable cause) throws Exception {
+        if (cause instanceof BusinessRejectException) {
+            FixMessageBuilderImpl businessMessageReject = createBusinessReject((BusinessRejectException) cause);
+            ctx.channel().writeAndFlush(businessMessageReject);
+        } else {
+            super.exceptionCaught(ctx, cause);
+        }
+    }
+
     protected abstract Logger getLogger();
 
     protected void sendReject(ChannelHandlerContext ctx, FixMessage originalMsg, boolean closeConnection) {
@@ -115,10 +126,23 @@ public abstract class AbstractSessionHandler extends MessageToMessageCodec<FixMe
         }
     }
 
-    protected FixMessageBuilderImpl createReject(FixMessage originalMsg) {
+    private static FixMessageBuilderImpl createReject(FixMessage originalMsg) {
         final FixMessageBuilderImpl reject = new FixMessageBuilderImpl(MessageTypes.REJECT);
         reject.add(FieldType.RefSeqNum, originalMsg.getInt(FieldType.MsgSeqNum.tag()));
         reject.add(FieldType.RefMsgType, originalMsg.getMessageType());
+        return reject;
+    }
+
+    private static FixMessageBuilderImpl createBusinessReject(BusinessRejectException exception) {
+        final FixMessageBuilderImpl reject = new FixMessageBuilderImpl(MessageTypes.BUSINESS_MESSAGE_REJECT);
+        if (exception.getRefSeqNum() > 0) {
+            reject.add(FieldType.RefSeqNum, exception.getRefSeqNum());
+        }
+        reject.add(FieldType.RefMsgType, exception.getRefMsgType());
+        reject.add(FieldType.BusinessRejectReason, exception.getBusinessRejectReason());
+        if (exception.getText() != null) {
+            reject.add(FieldType.Text, exception.getText());
+        }
         return reject;
     }
 

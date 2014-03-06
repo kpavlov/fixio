@@ -22,6 +22,8 @@ import fixio.fixprotocol.FixMessageBuilder;
 import fixio.fixprotocol.MessageTypes;
 import fixio.fixprotocol.session.FixSession;
 import fixio.handlers.FixApplication;
+import fixio.validator.BusinessRejectException;
+import io.netty.channel.Channel;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.util.Attribute;
 import org.junit.Before;
@@ -49,6 +51,8 @@ public class AbstractSessionHandlerTest {
     private AbstractSessionHandler sessionHandler;
     @Mock
     private ChannelHandlerContext ctx;
+    @Mock
+    private Channel channel;
     @Mock
     private FixSession fixSession;
     @Mock
@@ -123,5 +127,28 @@ public class AbstractSessionHandlerTest {
         sessionHandler.channelInactive(ctx);
 
         verify(ctx, never()).fireChannelRead(any(LogoutEvent.class));
+    }
+
+    @Test
+    public void testHandleBusinessRejectException() throws Exception {
+        int refSeqNum = RANDOM.nextInt(100) + 1;
+        String refMsgType = randomAscii(2);
+        int rejectReason = RANDOM.nextInt(5) + 1;
+        String rejectText = randomAscii(10);
+        BusinessRejectException exception = new BusinessRejectException(refSeqNum, refMsgType, rejectReason, rejectText);
+
+        when(ctx.channel()).thenReturn(channel);
+
+        sessionHandler.exceptionCaught(ctx, exception);
+
+        verify(channel, times(1)).writeAndFlush(rejectCaptor.capture());
+
+        FixMessage businessReject = rejectCaptor.getValue();
+
+        assertEquals(MessageTypes.BUSINESS_MESSAGE_REJECT, businessReject.getMessageType());
+        assertEquals(rejectReason, businessReject.getInt(FieldType.BusinessRejectReason).intValue());
+        assertEquals(refSeqNum, businessReject.getInt(FieldType.RefSeqNum).intValue());
+        assertEquals(refMsgType, businessReject.getString(FieldType.RefMsgType));
+        assertEquals(rejectText, businessReject.getString(FieldType.Text));
     }
 }
