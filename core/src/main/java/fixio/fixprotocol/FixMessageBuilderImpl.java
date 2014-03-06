@@ -98,7 +98,6 @@ public class FixMessageBuilderImpl implements FixMessage, FixMessageBuilder {
         return this;
     }
 
-
     @Override
     public FixMessageBuilderImpl add(FieldType field, long value) {
         FieldListBuilderHelper.add(body, field, value);
@@ -251,16 +250,6 @@ public class FixMessageBuilderImpl implements FixMessage, FixMessageBuilder {
         header.setMessageType(messageType);
     }
 
-    @Override
-    public String toString() {
-        final StringBuilder sb = new StringBuilder("\n");
-        String bodyStr = body.toString();
-        sb.append("header{").append(header).append('}').append("\n");
-        sb.append("body{").append(bodyStr.substring(1,bodyStr.length()-1)).append('}').append("\n");
-        sb.append("trailer{").append(trailer).append('}').append("\n");
-        return sb.toString();
-    }
-
     public List<Group> getGroups(int tagNum) {
         FixMessageFragment fragment = getFirst(tagNum);
         if (fragment instanceof GroupField) {
@@ -296,5 +285,14 @@ public class FixMessageBuilderImpl implements FixMessage, FixMessageBuilder {
             body.add(g);
         }
         g.add(group);
+    }
+
+    @Override
+    public String toString() {
+        final StringBuilder sb = new StringBuilder(512);
+        sb.append("header{").append(header)
+                .append("}, body{").append(body)
+                .append("}, trailer{").append(trailer).append('}');
+        return sb.toString();
     }
 }

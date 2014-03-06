@@ -103,8 +103,8 @@ public class FixClient extends AbstractFixConnector {
     public void disconnect() throws InterruptedException {
         LOGGER.info("Closing connection to {}", channel.remoteAddress());
         channel.close().sync();
-        bossEventLoopGroup.shutdownGracefully();
         workerEventLoopGroup.shutdownGracefully();
+        bossEventLoopGroup.shutdownGracefully();
         bossEventLoopGroup = null;
         workerEventLoopGroup = null;
     }

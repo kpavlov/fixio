@@ -157,11 +157,10 @@ public class FixMessageImpl implements FixMessage {
 
     @Override
     public String toString() {
-        final StringBuilder sb = new StringBuilder("\n");
-        String bodyStr = body.toString();
-        sb.append("header{").append(header).append("}").append("\n");
-        sb.append("body{").append(bodyStr.substring(1,bodyStr.length()-1)).append("}").append("\n");
-        sb.append("trailer{").append(trailer).append("}").append("\n");
+        final StringBuilder sb = new StringBuilder(512);
+        sb.append("header{").append(header)
+                .append("}, body{").append(body)
+                .append("}, trailer{").append(trailer).append("}");
         return sb.toString();
     }
 }
