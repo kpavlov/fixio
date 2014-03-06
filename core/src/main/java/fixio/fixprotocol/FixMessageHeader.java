@@ -104,7 +104,7 @@ public class FixMessageHeader {
 
     @Override
     public String toString() {
-        StringBuilder sb = new StringBuilder("FixMessageHeader{");
+        StringBuilder sb = new StringBuilder();
         sb.append("beginString='").append(beginString).append('\'');
         sb.append(", messageType='").append(messageType).append('\'');
         sb.append(", senderCompID='").append(senderCompID).append('\'');

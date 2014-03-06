@@ -48,14 +48,14 @@ public class FixMessageTrailer {
 
     @Override
     public String toString() {
-        final StringBuilder sb = new StringBuilder("FixMessageTrailer{");
+        final StringBuilder sb = new StringBuilder();
         if (signature != null) {
             sb.append("signature='").append(signature).append("', ");
         }
         if (signatureLength > 0) {
             sb.append(" signatureLength=").append(signatureLength).append(", ");
         }
-        sb.append("checkSum=").append(checkSum).append('}');
+        sb.append("checkSum=").append(checkSum);
         return sb.toString();
     }
 }
