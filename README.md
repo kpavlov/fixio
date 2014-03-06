@@ -95,73 +95,8 @@ closeFeature.sync();
 client.disconnect();
 ~~~~~~~~~
 
-## Working With FIX Messages
-
-There are two API interfaces to represent FIX messages: [FixMessage][FixMessage] and [FixMessageBuilder][FixMessageBuilder].
-
-[FixMessage][FixMessage] represents received message, whereas [FixMessageBuilder][FixMessageBuilder] represents a message to be sent.
-
-Example of using FixMessageBuilder:
-
-~~~~~~~~~java
-FixMessageBuilder userRequest = new FixMessageBuilderImpl(MessageTypes.USER_REQUEST);
-userRequest.add(UserRequestID, "UserRequestID");
-userRequest.add(UserRequestType, 4);//UserRequestType=RequestIndividualUserStatus
-userRequest.add(Username, "user");
-~~~~~~~~~
-
-To create a FIX message components, also referred as groups, use methods `FixMessageBuilder.newGrop(...)`.
-These methods returns a new group you'll to add new fields to.
-
-Example of using FixMessageBuilder with groups:
-
-~~~~~~~~~java
-FixMessageBuilder quoteRequest = new FixMessageBuilderImpl(MessageTypes.QUOTE_REQUEST);
-quoteRequest.add(FieldType.QuoteReqID, quoteRequestId);
-quoteRequest.add(FieldType.ClOrdID, clientOrderId);
-
-Group instrument1 = quoteRequest.newGroup(FieldType.NoRelatedSym, 2); // create group with 2 fields
-instrument1.add(FieldType.Symbol, "EUR/USD");
-instrument1.add(FieldType.SecurityType, "FOR");
-
-Group instrument2 = quoteRequest.newGroup(FieldType.NoRelatedSym); // create group with unknown number of fields
-instrument2.add(FieldType.Symbol, "EUR/CHF");
-instrument2.add(FieldType.SecurityType, "FOR");
-
-quoteRequest.add(FieldType.QuoteRequestType, 2); //QuoteRequestType=AUTOMATIC
-~~~~~~~~~
-
-It is preferable to specify group size to achieve optimal performance and memory usage.
-
-## FixApplication
-
-[FixApplication][FixApplication] interface should be implemented to handle application business logic.
-It is a callback interface which handles FIX session events, incoming and outgoing messages.
-
-[FixApplication][FixApplication] has the following methods:
-
-- to handle session events (`onLogon(...)` and `onLogout(...)`),
-- to process incoming messages (`onMessage(...)`)
-- to pre-process outgoing message (`beforeSendMessage(...)`). You may add custom fields to FixMessageHeader in this method.
-
-Start your with extending [FixApplicationAdapter][FixApplicationAdapter].
-
-## Writing Simple FIX Server
-
-To implement FIX server one should follow these steps:
-
-1. Implement [FixApplication][FixApplication]. Use [FixApplicationAdapter][FixApplicationAdapter] as starting point.
-2. Create [FixAuthenticator][FixAuthenticator] which is responsible for accepting or rejecting client connections.
-   There is a simple implementation - [AcceptAllAuthenticator][] which accepts all client connections.
-3. Create and start [FixServer][FixServer].
-
-FIX Server example:
-
-~~~~~~~~~java
-FixApplication app = new FixApplicationAdapter();
-FixServer server = new FixServer(port, new AcceptAllAuthenticator(), app);
-server.start();
-~~~~~~~~~
+You may find more information in [User Guide](https://github.com/kpavlov/fixio/wiki/User-Guide) and
+[Wiki pages](https://github.com/kpavlov/fixio/wiki).
 
 [FixedPointNumber]: https://github.com/kpavlov/fixio/treemaster/core/src/main/java/fixio/fixprotocol/fields/FixedPointNumber.java
 [FixApplication]: https://github.com/kpavlov/fixio/treemaster/core/src/main/java/fixio/handlers/FixApplication.java

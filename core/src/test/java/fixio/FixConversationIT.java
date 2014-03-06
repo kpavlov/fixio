@@ -16,10 +16,7 @@
 package fixio;
 
 import fixio.events.LogonEvent;
-import fixio.fixprotocol.FixMessage;
-import fixio.fixprotocol.FixMessageBuilder;
-import fixio.fixprotocol.FixMessageBuilderImpl;
-import fixio.fixprotocol.MessageTypes;
+import fixio.fixprotocol.*;
 import fixio.handlers.FixApplicationAdapter;
 import fixio.netty.pipeline.server.AcceptAllAuthenticator;
 import io.netty.channel.ChannelFuture;
@@ -56,7 +53,7 @@ public class FixConversationIT {
         FixMessageBuilder userRequest = new FixMessageBuilderImpl(MessageTypes.USER_REQUEST);
         userRequest.add(UserRequestID, "UserRequestID");
         userRequest.add(UserRequestType, 4);//UserRequestType=RequestIndividualUserStatus
-        userRequest.add(Username, "user");
+        userRequest.add(DataType.STRING, 553, "user");//Username(553)
         return userRequest;
     }
 
