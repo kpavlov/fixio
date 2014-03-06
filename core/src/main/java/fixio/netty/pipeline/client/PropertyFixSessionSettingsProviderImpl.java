@@ -50,12 +50,12 @@ public class PropertyFixSessionSettingsProviderImpl implements FixSessionSetting
 
     @Override
     public int getMsgOutSeqNum() {
-        return Integer.parseInt(properties.getProperty("MsgOutSeqNum", "1"));
+        return Integer.parseInt(properties.getProperty("MsgSeqOutNum", "1"));
     }
 
     @Override
     public int getMsgInSeqNum() {
-        return Integer.parseInt(properties.getProperty("MsgInSeqNum", "1"));
+        return Integer.parseInt(properties.getProperty("MsgSeqInNum", "1"));
     }
 
     @Override

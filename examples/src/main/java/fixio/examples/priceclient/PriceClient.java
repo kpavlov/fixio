@@ -17,6 +17,8 @@ package fixio.examples.priceclient;
 
 import fixio.FixClient;
 import fixio.examples.priceserver.PriceServer;
+import fixio.netty.pipeline.client.PropertyFixSessionSettingsProviderImpl;
+import fixio.netty.pipeline.client.StatelessMessageSequenceProvider;
 import io.netty.channel.ChannelFuture;
 
 public class PriceClient {
@@ -26,10 +28,13 @@ public class PriceClient {
     private final int port;
 
     public PriceClient(int port) {
+        PropertyFixSessionSettingsProviderImpl propertyImpl = new PropertyFixSessionSettingsProviderImpl("/client.properties");
         this.port = port;
         app = new PriceReadingApp();
         client = new FixClient(app);
-        client.setSettingsResource("/client.properties");
+        client.setSessionSettingsProvider(propertyImpl);
+//        client.setMessageSequenceProvider(propertyImpl);
+        client.setMessageSequenceProvider(StatelessMessageSequenceProvider.getInstance());
     }
 
     public static void main(String[] args) throws InterruptedException {

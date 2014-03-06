@@ -251,22 +251,22 @@ public class FixMessageBuilderImpl implements FixMessage, FixMessageBuilder {
         header.setMessageType(messageType);
     }
 
+    @Override
+    public String toString() {
+        final StringBuilder sb = new StringBuilder("\n");
+        String bodyStr = body.toString();
+        sb.append("header{").append(header).append('}').append("\n");
+        sb.append("body{").append(bodyStr.substring(1,bodyStr.length()-1)).append('}').append("\n");
+        sb.append("trailer{").append(trailer).append('}').append("\n");
+        return sb.toString();
+    }
+
     public List<Group> getGroups(int tagNum) {
         FixMessageFragment fragment = getFirst(tagNum);
         if (fragment instanceof GroupField) {
             return ((GroupField) fragment).getGroups();
         }
         return null;
-    }
-
-    @Override
-    public String toString() {
-        final StringBuilder sb = new StringBuilder("FixMessageBuilderImpl{");
-        sb.append("header=").append(header);
-        sb.append(", body=").append(body);
-        sb.append(", trailer=").append(trailer);
-        sb.append('}');
-        return sb.toString();
     }
 
     private FixMessageFragment getFirst(int tagNum) {

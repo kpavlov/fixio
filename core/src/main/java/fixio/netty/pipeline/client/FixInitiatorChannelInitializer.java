@@ -25,18 +25,20 @@ import io.netty.channel.EventLoopGroup;
 import io.netty.handler.codec.MessageToMessageCodec;
 
 public class FixInitiatorChannelInitializer<C extends Channel> extends FixChannelInitializer<C> {
-
+    private final MessageSequenceProvider sqnProvider;
     private final FixSessionSettingsProvider settingsProvider;
 
     public FixInitiatorChannelInitializer(EventLoopGroup workerGroup,
                                           FixSessionSettingsProvider settingsProvider,
+                                          MessageSequenceProvider sqnProvider,
                                           FixApplication fixApplication) {
         super(workerGroup, fixApplication);
+        this.sqnProvider = (sqnProvider==null)?StatelessMessageSequenceProvider.getInstance():sqnProvider;
         this.settingsProvider = settingsProvider;
     }
 
     @Override
     protected MessageToMessageCodec<FixMessage, FixMessageBuilder> createSessionHandler() {
-        return new ClientSessionHandler(settingsProvider, getFixApplication());
+        return new ClientSessionHandler(settingsProvider, sqnProvider, getFixApplication());
     }
 }

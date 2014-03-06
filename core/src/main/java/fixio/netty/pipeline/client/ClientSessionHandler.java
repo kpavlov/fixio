@@ -42,10 +42,6 @@ public class ClientSessionHandler extends AbstractSessionHandler {
         this.messageSequenceProvider = messageSequenceProvider;
     }
 
-    public ClientSessionHandler(FixSessionSettingsProvider settingsProvider, FixApplication fixApplication) {
-        this(settingsProvider, StatelessMessageSequenceProvider.getInstance(), fixApplication);
-    }
-
     @Override
     protected void decode(ChannelHandlerContext ctx, FixMessage msg, List<Object> out) throws Exception {
         final FixMessageHeader header = msg.getHeader();
@@ -58,7 +54,8 @@ public class ClientSessionHandler extends AbstractSessionHandler {
                     out.add(logonEvent);
                     return;
                 } else {
-                    throw new IllegalStateException("Duplicate Logon Request. Session Already Established.");
+                    throw new IllegalStateException("Sequence number expected [" + session.getNextIncomingMessageSeqNum() + "] " +
+                            "Received " + header.getMsgSeqNum() + ".");
                 }
 
             } else {
