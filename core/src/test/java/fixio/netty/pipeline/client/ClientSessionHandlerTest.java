@@ -35,6 +35,7 @@ import org.mockito.runners.MockitoJUnitRunner;
 
 import java.util.Random;
 
+import static org.apache.commons.lang3.RandomStringUtils.randomAscii;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 import static org.mockito.Matchers.same;
@@ -69,6 +70,8 @@ public class ClientSessionHandlerTest {
 
         heartbeartInterval = random.nextInt(100) + 10;
         when(settingsProvider.getHeartbeatInterval()).thenReturn(heartbeartInterval);
+        when(settingsProvider.getSenderCompID()).thenReturn(randomAscii(5));
+        when(settingsProvider.getTargetCompID()).thenReturn(randomAscii(5));
 
         when(sequenceProvider.getMsgInSeqNum()).thenReturn(inMsgSeqNum);
         when(sequenceProvider.getMsgOutSeqNum()).thenReturn(outMsgSeqNum);

@@ -1,5 +1,5 @@
 /*
- * Copyright 2013 The FIX.io Project
+ * Copyright 2014 The FIX.io Project
  *
  * The FIX.io Project licenses this file to you under the Apache License,
  * version 2.0 (the "License"); you may not use this file except in compliance
@@ -60,9 +60,9 @@ public class SessionRepositoryTest {
 
         assertSame("not same.", session, readSession);
 
-        assertSame(senderCompID, session.getSenderCompId());
-        assertSame(senderSubID, session.getSenderSubId());
-        assertSame(targetCompID, session.getTargetCompId());
-        assertSame(targetSubID, session.getTargetSubId());
+        assertSame(senderCompID, session.getSenderCompID());
+        assertSame(senderSubID, session.getSenderSubID());
+        assertSame(targetCompID, session.getTargetCompID());
+        assertSame(targetSubID, session.getTargetSubID());
     }
 }

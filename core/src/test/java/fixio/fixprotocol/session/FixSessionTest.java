@@ -1,5 +1,5 @@
 /*
- * Copyright 2013 The FIX.io Project
+ * Copyright 2014 The FIX.io Project
  *
  * The FIX.io Project licenses this file to you under the Apache License,
  * version 2.0 (the "License"); you may not use this file except in compliance
@@ -30,32 +30,42 @@ public class FixSessionTest {
 
     private FixSession session;
     private String beginString;
-    private String senderCompId;
-    private String senderSubId;
-    private String targetCompId;
-    private String targetSubId;
+    private String senderCompID;
+    private String senderSubID;
+    private String targetCompID;
+    private String targetSubID;
 
     @Before
     public void setUp() throws Exception {
 
         beginString = randomAscii(2);
-        senderCompId = randomAscii(3);
-        senderSubId = randomAscii(4);
-        targetCompId = randomAscii(5);
-        targetSubId = randomAscii(6);
+        senderCompID = randomAscii(3);
+        senderSubID = randomAscii(4);
+        targetCompID = randomAscii(5);
+        targetSubID = randomAscii(6);
 
         session = FixSession.newBuilder()
                 .beginString(beginString)
-                .senderCompId(senderCompId)
-                .senderSubId(senderSubId)
-                .targetCompId(targetCompId)
-                .targetSubId(targetSubId)
+                .senderCompId(senderCompID)
+                .senderSubId(senderSubID)
+                .targetCompId(targetCompID)
+                .targetSubId(targetSubID)
                 .build();
     }
 
     @Test
+    public void testGetSessionId() {
+        SessionId sessionId = session.getId();
+
+        assertEquals("senderCompID", senderCompID, sessionId.getSenderCompID());
+        assertEquals("senderSubID", senderSubID, sessionId.getSenderSubID());
+        assertEquals("targetCompID", targetCompID, sessionId.getTargetCompID());
+        assertEquals("targetSubID", targetSubID, sessionId.getTargetSubID());
+    }
+
+    @Test
     public void testPrepareOutgoing() throws Exception {
-        int nextOutgoingMsgSeqNum = new Random().nextInt(100);
+        int nextOutgoingMsgSeqNum = new Random().nextInt(100) + 100;
         session.setNextOutgoingMessageSeqNum(nextOutgoingMsgSeqNum);
 
         FixMessageBuilder messageBuilder = new FixMessageBuilderImpl();
@@ -68,9 +78,11 @@ public class FixSessionTest {
 
         assertEquals("nextOutgoingMsgSeqNum", nextOutgoingMsgSeqNum, header.getMsgSeqNum());
         assertEquals("beginString", beginString, header.getBeginString());
-        assertEquals("senderCompId", senderCompId, header.getSenderCompID());
-        assertEquals("senderSubId", senderSubId, header.getSenderSubID());
-        assertEquals("targetCompId", targetCompId, header.getTargetCompID());
-        assertEquals("targetSubId", targetSubId, header.getTargetSubID());
+        assertEquals("senderCompID", senderCompID, header.getSenderCompID());
+        assertEquals("senderSubID", senderSubID, header.getSenderSubID());
+        assertEquals("targetCompID", targetCompID, header.getTargetCompID());
+        assertEquals("targetSubID", targetSubID, header.getTargetSubID());
     }
+
+
 }

@@ -1,5 +1,5 @@
 /*
- * Copyright 2013 The FIX.io Project
+ * Copyright 2014 The FIX.io Project
  *
  * The FIX.io Project licenses this file to you under the Apache License,
  * version 2.0 (the "License"); you may not use this file except in compliance
@@ -43,8 +43,9 @@ public class SessionRepository {
                 .senderSubId(header.getSenderSubID())
                 .targetCompId(header.getTargetCompID())
                 .targetSubId(header.getTargetSubID())
-                .nextIncomingSeqNum(1)
                 .build();
+
+        session.setNextIncomingMessageSeqNum(1);
         session.setNextOutgoingMessageSeqNum(1);
 
         sessions.put(id, session);
@@ -54,7 +55,7 @@ public class SessionRepository {
     /**
      * Returns existing {@link FixSession} from the repository, or null if no such session is present.
      *
-     * @param header
+     * @param header FixMessageHeader containing session information
      * @return null if no session found in repository
      */
     public FixSession getSession(FixMessageHeader header) {

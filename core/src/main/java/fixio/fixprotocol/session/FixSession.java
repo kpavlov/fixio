@@ -28,44 +28,45 @@ public class FixSession {
             (FixSession.class, "nextIncomingMessageSeqNum");
     private final AtomicInteger nextOutgoingMessageSeqNum = new AtomicInteger();
     private final String beginString;
-    private final String senderCompId;
-    private final String senderSubId;
-    private final String targetCompId;
-    private final String targetSubId;
+    private final String senderCompID;
+    private final String senderSubID;
+    private final String targetCompID;
+    private final String targetSubID;
+    private final SessionId sessionId;
     private volatile int nextIncomingMessageSeqNum;
 
     private FixSession(String beginString,
-                       String senderCompId,
-                       String senderSubId,
-                       String targetCompId,
-                       String targetSubId,
-                       int nextIncomingSeqNum) {
+                       String senderCompID,
+                       String senderSubID,
+                       String targetCompID,
+                       String targetSubID) {
         this.beginString = beginString;
-        this.senderCompId = senderCompId;
-        this.senderSubId = senderSubId;
-        this.targetCompId = targetCompId;
-        this.targetSubId = targetSubId;
-        this.nextIncomingMessageSeqNum = nextIncomingSeqNum;
+        this.senderCompID = senderCompID;
+        this.senderSubID = senderSubID;
+        this.targetCompID = targetCompID;
+        this.targetSubID = targetSubID;
+
+        sessionId = new SessionId(senderCompID, targetCompID, senderSubID, targetSubID);
     }
 
     public static Builder newBuilder() {
         return new Builder();
     }
 
-    public String getSenderCompId() {
-        return senderCompId;
+    public String getSenderCompID() {
+        return senderCompID;
     }
 
-    public String getSenderSubId() {
-        return senderSubId;
+    public String getSenderSubID() {
+        return senderSubID;
     }
 
-    public String getTargetCompId() {
-        return targetCompId;
+    public String getTargetCompID() {
+        return targetCompID;
     }
 
-    public String getTargetSubId() {
-        return targetSubId;
+    public String getTargetSubID() {
+        return targetSubID;
     }
 
     public int getNextOutgoingMessageSeqNum() {
@@ -76,12 +77,12 @@ public class FixSession {
         this.nextOutgoingMessageSeqNum.set(nextOutgoingMessageSeqNum);
     }
 
-    public void setNextIncomingMessageSeqNum(int nextIncomingMessageSeqNum) {
-        this.nextIncomingMessageSeqNum = nextIncomingMessageSeqNum;
-    }
-
     public int getNextIncomingMessageSeqNum() {
         return nextIncomingMessageSeqNum;
+    }
+
+    public void setNextIncomingMessageSeqNum(int nextIncomingMessageSeqNum) {
+        this.nextIncomingMessageSeqNum = nextIncomingMessageSeqNum;
     }
 
     public int getNextOutgoingMsgSeqNum() {
@@ -97,10 +98,14 @@ public class FixSession {
         header.setBeginString(beginString);
         header.setMessageType(fixMessage.getHeader().getMessageType());
         header.setMsgSeqNum(nextOutgoingMessageSeqNum.getAndIncrement());
-        header.setSenderCompID(senderCompId);
-        header.setSenderSubID(senderSubId);
-        header.setTargetCompID(targetCompId);
-        header.setTargetSubID(targetSubId);
+        header.setSenderCompID(senderCompID);
+        header.setSenderSubID(senderSubID);
+        header.setTargetCompID(targetCompID);
+        header.setTargetSubID(targetSubID);
+    }
+
+    public SessionId getId() {
+        return sessionId;
     }
 
     public static class Builder {
@@ -110,7 +115,6 @@ public class FixSession {
         private String senderSubId;
         private String targetCompId;
         private String targetSubId;
-        private int nextIncomingSeqNum;
 
         private Builder() {
         }
@@ -140,19 +144,13 @@ public class FixSession {
             return this;
         }
 
-        public Builder nextIncomingSeqNum(int seqNum) {
-            this.nextIncomingSeqNum = seqNum;
-            return this;
-        }
-
         public FixSession build() {
             return new FixSession(
                     beginString,
                     senderCompId,
                     senderSubId,
                     targetCompId,
-                    targetSubId,
-                    nextIncomingSeqNum
+                    targetSubId
             );
         }
 

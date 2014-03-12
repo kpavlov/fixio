@@ -1,5 +1,5 @@
 /*
- * Copyright 2013 The FIX.io Project
+ * Copyright 2014 The FIX.io Project
  *
  * The FIX.io Project licenses this file to you under the Apache License,
  * version 2.0 (the "License"); you may not use this file except in compliance
@@ -21,10 +21,12 @@ public class SessionId {
     private final String targetCompID;
     private final String senderSubID;
     private final String targetSubID;
-
     private final int hash;
 
-    public SessionId(String senderCompID, String targetCompID, String senderSubID, String targetSubID) {
+    public SessionId(String senderCompID,
+                     String targetCompID,
+                     String senderSubID,
+                     String targetSubID) {
         assert (senderCompID != null) : "SenderCompID is required.";
         assert (targetCompID != null) : "TargetCompID is required.";
         this.senderCompID = senderCompID;
@@ -35,18 +37,38 @@ public class SessionId {
         this.hash = calculateHash();
     }
 
+    public String getSenderCompID() {
+        return senderCompID;
+    }
+
+    public String getSenderSubID() {
+        return senderSubID;
+    }
+
+    public String getTargetCompID() {
+        return targetCompID;
+    }
+
+    public String getTargetSubID() {
+        return targetSubID;
+    }
+
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
 
-        SessionId sessionId = (SessionId) o;
+        SessionId other = (SessionId) o;
 
-        if (!senderCompID.equals(sessionId.senderCompID)) return false;
-        if (senderSubID != null ? !senderSubID.equals(sessionId.senderSubID) : sessionId.senderSubID != null)
+        if (this.hashCode() != other.hashCode()) {
             return false;
-        if (!targetCompID.equals(sessionId.targetCompID)) return false;
-        if (targetSubID != null ? !targetSubID.equals(sessionId.targetSubID) : sessionId.targetSubID != null)
+        }
+
+        if (!senderCompID.equals(other.senderCompID)) return false;
+        if (senderSubID != null ? !senderSubID.equals(other.senderSubID) : other.senderSubID != null)
+            return false;
+        if (!targetCompID.equals(other.targetCompID)) return false;
+        if (targetSubID != null ? !targetSubID.equals(other.targetSubID) : other.targetSubID != null)
             return false;
 
         return true;
@@ -60,8 +82,12 @@ public class SessionId {
     private int calculateHash() {
         int result = senderCompID.hashCode();
         result = 31 * result + targetCompID.hashCode();
-        result = 31 * result + (senderSubID != null ? senderSubID.hashCode() : 0);
-        result = 31 * result + (targetSubID != null ? targetSubID.hashCode() : 0);
+        if (senderSubID != null) {
+            result = 31 * result + senderSubID.hashCode();
+        }
+        if (targetSubID != null) {
+            result = 31 * result + targetSubID.hashCode();
+        }
         return result;
     }
 }
