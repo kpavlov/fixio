@@ -87,7 +87,7 @@ public class ServerSessionHandler extends AbstractSessionHandler {
                     }
 
                     final FixMessageBuilder logonResponse = createLogonResponse();
-                    prepareMessageToSend(ctx, logonResponse);
+                    prepareMessageToSend(ctx, fixSession, logonResponse);
                     LOGGER.info("Sending Logon Response: {}", logonResponse);
                     ctx.write(logonResponse);
 
@@ -96,7 +96,7 @@ public class ServerSessionHandler extends AbstractSessionHandler {
                         FixMessageBuilder resendRequest = new FixMessageBuilderImpl(MessageTypes.RESEND_REQUEST);
                         resendRequest.add(FieldType.BeginSeqNo, expectedMsgSeqNum);
                         resendRequest.add(FieldType.EndSeqNo, msgSeqNum - 1);
-                        prepareMessageToSend(ctx, resendRequest);
+                        prepareMessageToSend(ctx, fixSession, resendRequest);
                         ctx.write(resendRequest);
                     }
                     ctx.flush();

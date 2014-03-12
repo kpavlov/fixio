@@ -42,22 +42,38 @@ public class ClientSessionHandler extends AbstractSessionHandler {
         this.messageSequenceProvider = messageSequenceProvider;
     }
 
+    private static FixMessageBuilderImpl createLogonRequest(FixSessionSettingsProvider sessionSettingsProvider) {
+        FixMessageBuilderImpl messageBuilder = new FixMessageBuilderImpl(MessageTypes.LOGON);
+        messageBuilder.add(FieldType.HeartBtInt, sessionSettingsProvider.getHeartbeatInterval());
+        messageBuilder.add(FieldType.EncryptMethod, 0);
+        return messageBuilder;
+    }
+
     @Override
     protected void decode(ChannelHandlerContext ctx, FixMessage msg, List<Object> out) throws Exception {
         final FixMessageHeader header = msg.getHeader();
         FixSession session = getSession(ctx);
         if (MessageTypes.LOGON.equals(header.getMessageType())) {
             if (session != null) {
-                getLogger().info("Fix Session Established.");
-                if (session.checkIncomingSeqNum(header.getMsgSeqNum())) {
-                    LogonEvent logonEvent = new LogonEvent(session);
-                    out.add(logonEvent);
-                    return;
-                } else {
-                    throw new IllegalStateException("Sequence number expected [" + session.getNextIncomingMessageSeqNum() + "] " +
-                            "Received " + header.getMsgSeqNum() + ".");
+                int incomingMsgSeqNum = header.getMsgSeqNum();
+                if (!session.checkIncomingSeqNum(incomingMsgSeqNum)) {
+                    int expectedMsgSeqNum = session.getNextIncomingMessageSeqNum();
+                    if (incomingMsgSeqNum > expectedMsgSeqNum) {
+                        FixMessageBuilder resendRequest = new FixMessageBuilderImpl(MessageTypes.RESEND_REQUEST);
+                        resendRequest.add(FieldType.BeginSeqNo, expectedMsgSeqNum);
+                        resendRequest.add(FieldType.EndSeqNo, incomingMsgSeqNum - 1);
+                        prepareMessageToSend(ctx, session, resendRequest);
+                        ctx.writeAndFlush(resendRequest);
+                    } else {
+                        getLogger().warn("Message Sequence Too Low");
+                        ctx.channel().close();
+                        return;
+                    }
                 }
-
+                getLogger().info("Fix Session Established.");
+                LogonEvent logonEvent = new LogonEvent(session);
+                out.add(logonEvent);
+                return;
             } else {
                 throw new IllegalStateException("Duplicate Logon Request. Session Already Established.");
             }
@@ -80,13 +96,6 @@ public class ClientSessionHandler extends AbstractSessionHandler {
         ctx.writeAndFlush(logonRequest);
     }
 
-    private static FixMessageBuilderImpl createLogonRequest(FixSessionSettingsProvider sessionSettingsProvider) {
-        FixMessageBuilderImpl messageBuilder = new FixMessageBuilderImpl(MessageTypes.LOGON);
-        messageBuilder.add(FieldType.HeartBtInt, sessionSettingsProvider.getHeartbeatInterval());
-        messageBuilder.add(FieldType.EncryptMethod, 0);
-        return messageBuilder;
-    }
-
     private FixSession createSession(FixSessionSettingsProvider settingsProvider) {
 
         int nextIncomingSeqNum;
@@ -105,7 +114,16 @@ public class ClientSessionHandler extends AbstractSessionHandler {
                 .build();
 
         session.setNextIncomingMessageSeqNum(nextIncomingSeqNum);
+
+
+        if (settingsProvider.isResetMsgSeqNum()) {
+            nextIncomingSeqNum = 1;
+        } else {
+            nextIncomingSeqNum = messageSequenceProvider.getMsgInSeqNum();
+        }
+
         session.setNextOutgoingMessageSeqNum(messageSequenceProvider.getMsgOutSeqNum());
+        session.setNextIncomingMessageSeqNum(nextIncomingSeqNum);
         return session;
     }
 
