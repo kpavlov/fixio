@@ -73,10 +73,11 @@ public class ServerSessionHandler extends AbstractSessionHandler {
                     fixSession = initSession(ctx, header);
 
                     final int msgSeqNum = header.getMsgSeqNum();
+                    int expectedMsgSeqNum = -1;
 
                     boolean seqTooHigh = false;
                     if (!fixSession.checkIncomingSeqNum(msgSeqNum)) {
-                        final int expectedMsgSeqNum = fixSession.getNextIncomingMessageSeqNum();
+                        expectedMsgSeqNum = fixSession.getNextIncomingMessageSeqNum();
                         if (msgSeqNum < expectedMsgSeqNum) {
                             sendLogoutAndClose(ctx, fixSession, "Sequence Number Too Low. Expected = " + expectedMsgSeqNum);
                             return;
@@ -91,7 +92,10 @@ public class ServerSessionHandler extends AbstractSessionHandler {
                     ctx.write(logonResponse);
 
                     if (seqTooHigh) {
+                        assert (expectedMsgSeqNum > 0);
                         FixMessageBuilder resendRequest = new FixMessageBuilderImpl(MessageTypes.RESEND_REQUEST);
+                        resendRequest.add(FieldType.BeginSeqNo, expectedMsgSeqNum);
+                        resendRequest.add(FieldType.EndSeqNo, msgSeqNum - 1);
                         prepareMessageToSend(ctx, resendRequest);
                         ctx.write(resendRequest);
                     }

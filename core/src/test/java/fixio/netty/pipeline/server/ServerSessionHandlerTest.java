@@ -16,11 +16,15 @@
 package fixio.netty.pipeline.server;
 
 import fixio.events.LogonEvent;
-import fixio.fixprotocol.*;
+import fixio.fixprotocol.FixMessage;
+import fixio.fixprotocol.FixMessageBuilderImpl;
+import fixio.fixprotocol.FixMessageHeader;
+import fixio.fixprotocol.MessageTypes;
 import fixio.fixprotocol.session.FixSession;
 import fixio.handlers.FixApplication;
 import fixio.netty.AttributeMock;
 import fixio.netty.pipeline.AbstractSessionHandler;
+import fixio.netty.pipeline.FixMessageAsserts;
 import io.netty.channel.ChannelFuture;
 import io.netty.channel.ChannelFutureListener;
 import io.netty.channel.ChannelHandlerContext;
@@ -37,7 +41,8 @@ import java.util.ArrayList;
 import java.util.List;
 
 import static org.apache.commons.lang3.RandomStringUtils.randomAscii;
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
 import static org.mockito.Mockito.*;
 
 @RunWith(MockitoJUnitRunner.class)
@@ -86,7 +91,7 @@ public class ServerSessionHandlerTest {
 
         FixMessageBuilderImpl logonAck = messageCaptor.getValue();
         verify(fixApplication).beforeSendMessage(same(ctx), same(logonAck));
-        assertLogonAck(logonAck);
+        FixMessageAsserts.assertLogonAck(logonAck);
     }
 
     @Test
@@ -103,7 +108,7 @@ public class ServerSessionHandlerTest {
     @Test
     public void testSequenceTooHigh() throws Exception {
         when(authenticator.authenticate(same(logonMsg))).thenReturn(true);
-        logonMsg.getHeader().setMsgSeqNum(2);
+        logonMsg.getHeader().setMsgSeqNum(3);
 
         handler.decode(ctx, logonMsg, outgoingMessages);
 
@@ -116,8 +121,8 @@ public class ServerSessionHandlerTest {
         verifyNoMoreInteractions(ctx);
 
         final List<FixMessageBuilderImpl> sentMessages = messageCaptor.getAllValues();
-        assertLogonAck(sentMessages.get(0));
-        assertResendRequest(sentMessages.get(1));
+        FixMessageAsserts.assertLogonAck(sentMessages.get(0));
+        FixMessageAsserts.assertResendRequest(sentMessages.get(1), 1, 2);
     }
 
     @Test
@@ -126,7 +131,6 @@ public class ServerSessionHandlerTest {
         logonMsg.getHeader().setMsgSeqNum(0);
         ChannelFuture channelFeature = mock(ChannelFuture.class);
         when(ctx.writeAndFlush(any())).thenReturn(channelFeature);
-
 
         handler.decode(ctx, logonMsg, outgoingMessages);
 
@@ -137,23 +141,6 @@ public class ServerSessionHandlerTest {
         verify(channelFeature).addListener(ChannelFutureListener.CLOSE);
         verifyNoMoreInteractions(ctx);
 
-        assertLogout(messageCaptor.getValue());
-    }
-
-    private void assertLogout(FixMessageBuilder fixMessage) {
-        assertEquals("Logout message type", MessageTypes.LOGOUT, fixMessage.getHeader().getMessageType());
-    }
-
-    private void assertResendRequest(FixMessageBuilder fixMessage) {
-        assertEquals("ResendRequest message type", MessageTypes.RESEND_REQUEST, fixMessage.getHeader().getMessageType());
-    }
-
-    private void assertLogonAck(FixMessage logonAck) {
-        FixMessageHeader header = logonAck.getHeader();
-        assertEquals("logon ack message type", MessageTypes.LOGON, header.getMessageType());
-        assertNull("Username not expected in response.", logonAck.getString(FieldType.Username));
-        assertNull("Password not expected in response", logonAck.getString(FieldType.Password));
-        assertNotNull("Heartbeat interval", logonAck.getInt(FieldType.HeartBtInt));
-        assertEquals("message SeqNum", 1, header.getMsgSeqNum());
+        FixMessageAsserts.assertLogout(messageCaptor.getValue());
     }
 }
