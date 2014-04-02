@@ -22,7 +22,7 @@ import java.util.List;
 /**
  * Represents a sequence of {@link Group}s prepended with tag of type {@link DataType#NUMINGROUP}.
  */
-public class GroupField implements FixMessageFragment {
+public class GroupField implements FixMessageFragment<List<Group>> {
 
     private static final int DEFAULT_SIZE = 2;
     private final List<Group> groups;
@@ -38,7 +38,7 @@ public class GroupField implements FixMessageFragment {
     }
 
     @Override
-    public Object getValue() {
+    public List<Group> getValue() {
         return groups;
     }
 
@@ -64,7 +64,7 @@ public class GroupField implements FixMessageFragment {
         int tagNum = getTagNum();
         StringBuilder sb = new StringBuilder(FieldType.forTag(tagNum) + "(" + tagNum + ")=" + getGroupCount());
         sb.append("[");
-        for (Group group : groups){
+        for (Group group : groups) {
             sb.append(group);
         }
         sb.append("]");
