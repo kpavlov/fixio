@@ -24,8 +24,6 @@ public class QuoteGeneratorTask implements Runnable {
 
     public static final Logger LOGGER = LoggerFactory.getLogger(QuoteGeneratorTask.class);
     private final BlockingQueue<Quote> receiver;
-    private int t;
-    private volatile boolean isStopping = false;
 
     public QuoteGeneratorTask(BlockingQueue<Quote> receiverQueue) {
         receiver = receiverQueue;
@@ -34,21 +32,21 @@ public class QuoteGeneratorTask implements Runnable {
     @Override
     public void run() {
         LOGGER.info("Started");
-        while (!isStopping) {
+        final Thread thread = Thread.currentThread();
+        int t = 0;
+        while (!thread.isInterrupted()) {
             try {
                 double bid = Math.sin((double) t / 100) * 2 + 0.5;
                 double offer = Math.sin((double) t - 10 / 100) * 2 + 0.5;
                 Quote quote = new Quote(bid, offer);
                 t++;
-                if (!receiver.offer(quote)) {
-                    // slow quote reader. We may discard the oldest quite in the queue.
-                    for (int i = 0; i < 10; i++) {
-                        receiver.poll();
-                    }
-                }
-
+                receiver.put(quote);
+            } catch (InterruptedException e) {
+                LOGGER.info("Interrupted.");
+                thread.interrupt();
+                return;
             } catch (Throwable e) {
-                LOGGER.error("Unable to sumbit quote.", e);
+                LOGGER.error("Unable to submit quote.", e);
             }
             Thread.yield();
         }
@@ -56,6 +54,6 @@ public class QuoteGeneratorTask implements Runnable {
     }
 
     public void stop() {
-        isStopping = true;
+        Thread.currentThread().interrupt();
     }
 }
