@@ -32,8 +32,6 @@ public abstract class AbstractField<T> implements FixMessageFragment {
         return tagNum;
     }
 
-    public abstract T getValue();
-
     /**
      * Returns byte array representation of the field to be written to the stream.
      *

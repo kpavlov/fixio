@@ -158,9 +158,11 @@ public class FixMessageImpl implements FixMessage {
     @Override
     public String toString() {
         final StringBuilder sb = new StringBuilder(512);
-        sb.append("header{").append(header)
-                .append("}, body{").append(body)
-                .append("}, trailer{").append(trailer).append("}");
+        final String sp = System.getProperty("line.separator");
+        sb.append(sp);
+        sb.append("header{").append(header).append("}").append(sp);
+        sb.append("body{").append(body).append("}").append(sp);
+        sb.append("trailer{").append(trailer).append('}').append(sp);
         return sb.toString();
     }
 }
