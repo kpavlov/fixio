@@ -16,7 +16,7 @@
 
 package fixio.fixprotocol;
 
-public interface FixMessageFragment {
-
+public interface FixMessageFragment<T> {
+    T getValue();
     int getTagNum();
 }

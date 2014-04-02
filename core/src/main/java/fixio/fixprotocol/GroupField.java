@@ -38,6 +38,11 @@ public class GroupField implements FixMessageFragment {
     }
 
     @Override
+    public Object getValue() {
+        return groups;
+    }
+
+    @Override
     public int getTagNum() {
         return tagNum;
     }
@@ -52,5 +57,17 @@ public class GroupField implements FixMessageFragment {
 
     public List<Group> getGroups() {
         return groups;
+    }
+
+    @Override
+    public String toString() {
+        int tagNum = getTagNum();
+        StringBuilder sb = new StringBuilder(FieldType.forTag(tagNum) + "(" + tagNum + ")=" + getGroupCount());
+        sb.append("[");
+        for (Group group : groups){
+            sb.append(group);
+        }
+        sb.append("]");
+        return sb.toString();
     }
 }
