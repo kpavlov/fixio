@@ -94,13 +94,18 @@ public class FixSession {
 
     public void prepareOutgoing(FixMessageBuilder fixMessage) {
         FixMessageHeader header = fixMessage.getHeader();
-        header.setBeginString(beginString);
-        header.setMessageType(fixMessage.getHeader().getMessageType());
-        header.setMsgSeqNum(nextOutgoingMessageSeqNum.getAndIncrement());
-        header.setSenderCompID(senderCompId);
-        header.setSenderSubID(senderSubId);
-        header.setTargetCompID(targetCompId);
-        header.setTargetSubID(targetSubId);
+        if(header.getBeginString()==null || "".equals(header.getBeginString()))
+            header.setBeginString(beginString);
+        if(header.getMsgSeqNum() == 0)
+            header.setMsgSeqNum(nextOutgoingMessageSeqNum.getAndIncrement());
+        if(header.getSenderCompID()==null || "".equals(header.getSenderCompID()))
+            header.setSenderCompID(senderCompId);
+        if(header.getSenderSubID()==null || "".equals(header.getSenderSubID()))
+            header.setSenderSubID(senderSubId);
+        if(header.getTargetCompID()==null || "".equals(header.getTargetCompID()))
+            header.setTargetCompID(targetCompId);
+        if(header.getTargetSubID()==null || "".equals(header.getTargetSubID()))
+            header.setTargetSubID(targetSubId);
     }
 
     public static class Builder {
