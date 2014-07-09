@@ -54,10 +54,14 @@ public class CompositeFixApplicationAdapter extends FixApplicationAdapter {
 
         //Business handler
         if (handlers != null) {
+            boolean isHandled = false;
             for (FixMessageHandler handler : handlers) {
-                if (!handler.handle(ctx, msg)) {
-                    break;
+                if (handler.handle(ctx, msg)){
+                    isHandled = true;
                 }
+            }
+            if (!isHandled){
+                LOGGER.warn("no handler for this message. {} ", msg);
             }
         }
     }
