@@ -28,7 +28,7 @@ public class FixSession {
             (FixSession.class, "nextIncomingMessageSeqNum");
     private final AtomicInteger nextOutgoingMessageSeqNum = new AtomicInteger();
     private final String beginString;
-    private final String senderCompId;
+    private String senderCompId;
     private final String senderSubId;
     private final String targetCompId;
     private final String targetSubId;
@@ -50,6 +50,10 @@ public class FixSession {
 
     public static Builder newBuilder() {
         return new Builder();
+    }
+
+    public void setSenderCompId(String senderCompId) {
+        this.senderCompId = senderCompId;
     }
 
     public String getSenderCompId() {
