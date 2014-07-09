@@ -184,6 +184,14 @@ public class FixMessageBuilderImpl implements FixMessage, FixMessageBuilder {
     }
 
     @Override
+    public void copyBody(List<? extends FixMessageFragment> body) {
+        this.body.clear();
+        for (FixMessageFragment fragment : body){
+            this.body.add(fragment);
+        }
+    }
+
+    @Override
     public String getString(int tagNum) {
         FixMessageFragment item = getFirst(tagNum);
         if (item == null) {
@@ -223,6 +231,17 @@ public class FixMessageBuilderImpl implements FixMessage, FixMessageBuilder {
     @Override
     public FixMessageHeader getHeader() {
         return header;
+    }
+
+    @Override
+    public void copyHeader(FixMessageHeader header) {
+        this.header.setMessageType(header.getMessageType());
+        this.header.setMsgSeqNum(header.getMsgSeqNum());
+        this.header.setSenderCompID(header.getSenderCompID());
+        this.header.setSenderSubID(header.getSenderSubID());
+        this.header.setBeginString(header.getBeginString());
+        this.header.setTargetCompID(header.getTargetCompID());
+        this.header.setTargetSubID(header.getTargetSubID());
     }
 
     public int getMsgSeqNum() {
