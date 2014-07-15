@@ -117,4 +117,13 @@ public class Group implements FieldListBuilder<Group> {
         return contents;
     }
 
+    @Override
+    public String toString() {
+        StringBuilder sb = new StringBuilder();
+        for (FixMessageFragment fragment : contents){
+            int tagNum = fragment.getTagNum();
+            sb.append(FieldType.forTag(tagNum) + "(" + tagNum + ")=" + fragment.getValue()).append(", ");
+        }
+        return sb.toString();
+    }
 }

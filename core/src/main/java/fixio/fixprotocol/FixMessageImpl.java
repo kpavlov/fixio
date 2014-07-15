@@ -37,6 +37,16 @@ public class FixMessageImpl implements FixMessage {
         return add(tagNum, value, 0, value.length);
     }
 
+    public FixMessageImpl addBody(int tagNum, String value) {
+        body.add(new StringField(tagNum, value));
+        return this;
+    }
+
+    public FixMessageImpl addBody(GroupField group) {
+        body.add(group);
+        return this;
+    }
+
     public FixMessageImpl add(int tagNum, byte[] value, int offset, int length) {
         assert (tagNum > 0) : "TagNum must be positive. Got " + tagNum;
         assert (value != null) : "Value must be specified.";

@@ -33,7 +33,7 @@ public class GroupField implements FixMessageFragment {
         groups = new ArrayList<>(expectedSize);
     }
 
-    protected GroupField(int tagNum) {
+    public GroupField(int tagNum) {
         this(tagNum, DEFAULT_SIZE);
     }
 
