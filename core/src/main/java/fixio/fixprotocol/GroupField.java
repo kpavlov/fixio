@@ -17,6 +17,7 @@ package fixio.fixprotocol;
 
 
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.List;
 
 /**
@@ -38,7 +39,7 @@ public class GroupField implements FixMessageFragment {
     }
 
     @Override
-    public Object getValue() {
+    public Collection<Group> getValue() {
         return groups;
     }
 
@@ -53,10 +54,6 @@ public class GroupField implements FixMessageFragment {
 
     public int getGroupCount() {
         return groups.size();
-    }
-
-    public List<Group> getGroups() {
-        return groups;
     }
 
     @Override

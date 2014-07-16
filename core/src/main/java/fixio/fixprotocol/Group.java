@@ -18,8 +18,7 @@ package fixio.fixprotocol;
 import fixio.fixprotocol.fields.FixedPointNumber;
 import fixio.fixprotocol.fields.StringField;
 
-import java.util.ArrayList;
-import java.util.List;
+import java.util.*;
 
 /**
  * Represents FIX Protocol field Group or Component - a sequence of Fields or other Groups.
@@ -27,23 +26,23 @@ import java.util.List;
 public class Group implements FieldListBuilder<Group> {
 
     private static final int DEFAULT_GROUP_SIZE = 8;
-    private final ArrayList<FixMessageFragment> contents;
+    private final Map<Integer, FixMessageFragment> contents;
 
     public Group(int expectedSize) {
-        this.contents = new ArrayList<>(expectedSize);
+        this.contents = new LinkedHashMap<>(expectedSize);
     }
 
     public Group() {
-        this.contents = new ArrayList<>(DEFAULT_GROUP_SIZE);
+        this.contents = new LinkedHashMap<>(DEFAULT_GROUP_SIZE);
     }
 
     public void add(FixMessageFragment element) {
-        contents.add(element);
+        contents.put(element.getTagNum(), element);
     }
 
     @Override
     public Group add(FieldType fieldType, String value) {
-        contents.add(new StringField(fieldType.tag(), value));
+        contents.put(fieldType.tag(), new StringField(fieldType.tag(), value));
         return this;
     }
 
@@ -113,14 +112,28 @@ public class Group implements FieldListBuilder<Group> {
         return this;
     }
 
+    public <T> T getValue(int tagNum) {
+        FixMessageFragment field = contents.get(tagNum);
+        if (field != null)
+            return (T) field.getValue();
+        return null;
+    }
+
+    public <T> T getValue(FieldType fieldType) {
+        FixMessageFragment field = contents.get(fieldType.tag());
+        if (field != null)
+            return (T) field.getValue();
+        return null;
+    }
+
     public List<FixMessageFragment> getContents() {
-        return contents;
+        return new ArrayList<>(contents.values());
     }
 
     @Override
     public String toString() {
         StringBuilder sb = new StringBuilder();
-        for (FixMessageFragment fragment : contents){
+        for (FixMessageFragment fragment : contents.values()){
             int tagNum = fragment.getTagNum();
             sb.append(FieldType.forTag(tagNum) + "(" + tagNum + ")=" + fragment.getValue()).append(", ");
         }
