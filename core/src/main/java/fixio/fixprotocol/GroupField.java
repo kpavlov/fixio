@@ -62,7 +62,7 @@ public class GroupField implements FixMessageFragment<List<Group>> {
     @Override
     public String toString() {
         int tagNum = getTagNum();
-        StringBuilder sb = new StringBuilder(FieldType.forTag(tagNum) + "(" + tagNum + ")=" + getGroupCount());
+        StringBuilder sb = new StringBuilder().append(FieldType.forTag(tagNum)).append("(").append(tagNum).append(")=").append(getGroupCount());
         sb.append("[");
         for (Group group : groups) {
             sb.append(group);
