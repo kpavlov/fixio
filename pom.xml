@@ -28,7 +28,7 @@
     <description>FIX Protocol Support for Netty</description>
 
     <properties>
-        <slf4j.version>1.7.5</slf4j.version>
+        <slf4j.version>1.7.7</slf4j.version>
         <netty.version>5.0.0.Alpha1</netty.version>
         <maven.compiler.source>1.7</maven.compiler.source>
         <maven.compiler.target>1.7</maven.compiler.target>
