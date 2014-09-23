@@ -39,7 +39,11 @@ public class FieldFactory {
                 case STRING:
                     return (F) new StringField(tagNum, new String(value, offset, length, US_ASCII));
                 case BOOLEAN:
-                    return (F) new BooleanField(tagNum, (value[offset] == 'Y'));
+                    if (value[offset] == 'Y') {
+                        return (F) new BooleanField(tagNum, true);
+                    } else if (value[offset] == 'N')  {
+                        return (F) new BooleanField(tagNum, false);
+                    }
                 case CHAR:
                     return (F) new CharField(tagNum, (char) value[offset]);
                 case FLOAT:
@@ -146,6 +150,12 @@ public class FieldFactory {
     @SuppressWarnings("unchecked")
     public static <F extends AbstractField<?>> F fromStringValue(DataType type, int tagNum, String value) {
         switch (type) {
+            case BOOLEAN:
+                if ("Y".equalsIgnoreCase(value)) {
+                    return (F) new BooleanField(tagNum, true);
+                } else if ("N".equals(value)) {
+                    return (F) new BooleanField(tagNum, false);
+                }
             case STRING:
                 return (F) new StringField(tagNum, value);
             case FLOAT:

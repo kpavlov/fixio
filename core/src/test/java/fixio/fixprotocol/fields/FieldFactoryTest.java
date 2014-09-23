@@ -15,6 +15,7 @@
  */
 package fixio.fixprotocol.fields;
 
+import fixio.fixprotocol.DataType;
 import fixio.fixprotocol.FieldType;
 import org.junit.Test;
 
@@ -117,7 +118,6 @@ public class FieldFactoryTest {
         assertEquals("tagnum", FieldType.SettlCurrFxRate.tag(), field.getTagNum());
         assertEquals("value", value.doubleValue(), field.getValue().doubleValue(), 0.0);
         assertEquals("value", value.floatValue(), field.floatValue(), 0.0);
-
     }
 
     @Test
@@ -202,5 +202,27 @@ public class FieldFactoryTest {
 
         assertEquals("value", timeInMillis, field.getValue().longValue());
         assertEquals("value", timeInMillis, field.timestampMillis());
+    }
+
+    @Test
+    public void testFromStringValueBooleanTrue() throws Exception {
+        String value = "Y";
+        final int tag = FieldType.PossDupFlag.tag();
+        BooleanField field = FieldFactory.fromStringValue(DataType.BOOLEAN, tag, value);
+
+        assertEquals("tagnum", tag, field.getTagNum());
+        assertSame("value", Boolean.TRUE, field.getValue());
+        assertTrue("value", field.booleanValue());
+    }
+
+    @Test
+    public void testValueStringValueBooleanFalse() throws Exception {
+        String value = "N";
+        final int tag = FieldType.PossDupFlag.tag();
+        BooleanField field = FieldFactory.fromStringValue(DataType.BOOLEAN, tag, value);
+
+        assertEquals("tagnum", tag, field.getTagNum());
+        assertSame("value", Boolean.FALSE, field.getValue());
+        assertFalse("value", field.booleanValue());
     }
 }
