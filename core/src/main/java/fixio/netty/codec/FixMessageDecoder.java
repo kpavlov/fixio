@@ -55,7 +55,9 @@ public class FixMessageDecoder extends MessageToMessageDecoder<ByteBuf> {
 
         int arrayIndex = 0;
         int tagNum = 0;
-        byte[] bytes = in.array();
+//        byte[] bytes = in.array();
+        byte[] bytes = new byte[in.readableBytes()];
+        in.readBytes(bytes);
         int length = bytes.length;
         for (; arrayIndex < length; arrayIndex++) {
             byte b = bytes[arrayIndex];
