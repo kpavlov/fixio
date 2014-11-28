@@ -27,11 +27,4 @@ public interface FixMessageBuilder extends FieldListBuilder<FixMessageBuilder> {
     void copyHeader(FixMessageHeader header);
     List<? extends FixMessageFragment> getBody();
     void copyBody(List<? extends FixMessageFragment> body);
-    Group newGroup(int tagNum);
-
-    Group newGroup(int tagNum, int expectedGroupSize);
-
-    Group newGroup(FieldType fieldType);
-
-    Group newGroup(FieldType fieldType, int expectedGroupSize);
 }

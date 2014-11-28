@@ -126,6 +126,45 @@ public class Group implements FieldListBuilder<Group> {
         return null;
     }
 
+    @Override
+    public Group newGroup(FieldType fieldType) {
+        return newGroup(fieldType.tag());
+    }
+
+    @Override
+    public Group newGroup(FieldType fieldType, int expectedGroupSize) {
+        Group group = new Group(expectedGroupSize);
+        addGroup(fieldType.tag(), group);
+        return group;
+    }
+
+    @Override
+    public Group newGroup(int tagNum) {
+        Group group = new Group();
+        addGroup(tagNum, group);
+        return group;
+    }
+
+    @Override
+    public Group newGroup(int tagNum, int expectedGroupSize) {
+        Group group = new Group(expectedGroupSize);
+        addGroup(tagNum, group);
+        return group;
+    }
+
+    private void addGroup(int tagNum, Group group) {
+        GroupField g = (GroupField) getFragment(tagNum);
+        if (g == null) {
+            g = new GroupField(tagNum);
+            contents.put(tagNum, g);
+        }
+        g.add(group);
+    }
+
+    private FixMessageFragment getFragment(int tagNum) {
+        return contents.get(tagNum);
+    }
+
     public List<FixMessageFragment> getContents() {
         return new ArrayList<>(contents.values());
     }

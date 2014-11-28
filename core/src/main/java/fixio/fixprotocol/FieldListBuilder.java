@@ -47,4 +47,12 @@ interface FieldListBuilder<T> {
     T add(int tagNum, FixedPointNumber value);
 
     T add(DataType type, int tagNum, FixedPointNumber value);
+
+    Group newGroup(int tagNum);
+
+    Group newGroup(int tagNum, int expectedGroupSize);
+
+    Group newGroup(FieldType fieldType);
+
+    Group newGroup(FieldType fieldType, int expectedGroupSize);
 }
