@@ -22,6 +22,7 @@ import java.util.Random;
 
 import static java.nio.charset.StandardCharsets.US_ASCII;
 import static org.junit.Assert.assertArrayEquals;
+import static org.junit.Assert.assertEquals;
 
 public class FloatFieldTest {
     private FixedPointNumber value;
@@ -43,5 +44,16 @@ public class FloatFieldTest {
         byte[] expectedBytes = value.toString().getBytes(US_ASCII);
 
         assertArrayEquals(expectedBytes, bytes);
+    }
+
+    @Test
+    public void testGetDouble() throws Exception {
+        String valueStr = "203.03";
+        byte[] val = valueStr.getBytes();
+        value = new FixedPointNumber(val, 0, val.length);
+        field = new FloatField(tag, value);
+        assertEquals(203.03, field.getValue().doubleValue(), 0);
+        assertEquals(203.03, field.floatValue(), 0.01);
+        assertEquals(valueStr, field.getValue().toString());
     }
 }
