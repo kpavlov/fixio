@@ -69,6 +69,14 @@ public class FixMessageDecoderTest {
         assertEquals(calendar.getTimeInMillis(), fixMessage.getValue(FieldType.SendingTime));
     }
 
+    @Test
+    public void testCmeRealData() throws Exception {
+        List<Object> result = decode("8=FIX.4.29=39635=BZ34=148949=CME50=G52=20141210-04:12:58.68956=17ACPON57=DUMMY369=36701180=0K41181=42811350=428011=ACP141818477867860=20141210-04:12:58.686533=3797=Y893=Y1028=Y1300=991369=9971:21373=31374=91375=1453=2448=000447=D452=7448=US,IL447=D452=54534=341=ACP141818477617384=60535=99499752041=ACP141818477621484=60535=99499752141=ACP141818477625384=180535=99499752210=228");
+        assertEquals(1, result.size());
+        assertTrue(result.get(0) instanceof FixMessageImpl);
+        System.out.println(result.get(0));
+    }
+
     private List<Object> decode(String message) throws Exception {
         String[] tags = message.split("\u0001");
 

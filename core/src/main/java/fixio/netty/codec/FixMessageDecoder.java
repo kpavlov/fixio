@@ -16,7 +16,9 @@
 
 package fixio.netty.codec;
 
-import fixio.fixprotocol.FixMessageImpl;
+import fixio.fixprotocol.*;
+import fixio.fixprotocol.fields.AbstractField;
+import fixio.fixprotocol.fields.FieldFactory;
 import io.netty.buffer.ByteBuf;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.handler.codec.DecoderException;
@@ -48,6 +50,12 @@ public class FixMessageDecoder extends MessageToMessageDecoder<ByteBuf> {
 
     private FixMessageImpl message;
     private int checksum;
+    private int lastTag;
+    private int groupEnd;
+    private int groupCnt;
+    private int groupNum;
+    private GroupField groupField;
+    private Group group;
 
     @Override
     protected void decode(ChannelHandlerContext ctx, ByteBuf in, List<Object> out) throws Exception {
@@ -86,6 +94,8 @@ public class FixMessageDecoder extends MessageToMessageDecoder<ByteBuf> {
                 message.add(tagNum, bytes, offset, valueLength);
                 break;
             case 10: // checksum
+                if (groupField != null)
+                    finishRepeatingGroup();
                 appendField(tagNum, bytes, offset, valueLength);
                 verifyChecksum(message.getChecksum());
                 out.add(message);
@@ -102,7 +112,47 @@ public class FixMessageDecoder extends MessageToMessageDecoder<ByteBuf> {
         if (message == null) {
             throw new DecoderException("BeginString tag expected, but got: " + tag + "=" + value);
         }
-        message.add(tag, value, offset, valueLength);
+
+        //group body
+        if (groupField != null && group != null){
+            AbstractField field = FieldFactory.valueOf(tag, value, offset, valueLength);
+            //repeat in current group. means next group started
+            if (group.getValue(tag) != null){
+                if (groupEnd ==0){//finish first group. we can know the end tag of this repeating group
+                    groupEnd = lastTag;
+                    groupCnt = 1;
+                }
+                groupCnt++;
+                group = new Group();
+                groupField.add(group);
+            }
+            group.add(field);
+            if (tag == groupEnd && groupCnt == groupNum){
+                finishRepeatingGroup();
+            }
+        } else {//normal body
+            message.add(tag, value, offset, valueLength);
+        }
+
+        //check for group tag
+        FieldType type = FieldType.forTag(tag);
+        if (type.type().equals(DataType.NUMINGROUP) && message.getInt(tag) > 0){
+            groupNum = message.getInt(tag);
+            groupField = new GroupField(tag);
+            group = new Group();
+            groupField.add(group);
+        }
+
+        lastTag = tag;
+    }
+
+    private void finishRepeatingGroup() {
+        message.addBody(groupField);
+        groupField = null;
+        group = null;
+        lastTag = 0;
+        groupEnd = 0;
+        groupNum = 0;
     }
 
     private void verifyChecksum(int declaredChecksum) {
