@@ -35,7 +35,7 @@ public abstract class AbstractSessionHandler extends MessageToMessageCodec<FixMe
 
     public static final AttributeKey<FixSession> FIX_SESSION_KEY = AttributeKey.valueOf("fixSession");
     private final FixApplication fixApplication;
-    private final Clock clock;
+    private Clock clock;
 
     protected AbstractSessionHandler(FixApplication fixApplication, Clock clock) {
         assert (fixApplication != null) : "FixApplication is required";
@@ -152,8 +152,8 @@ public abstract class AbstractSessionHandler extends MessageToMessageCodec<FixMe
         return reject;
     }
 
-    public Clock getClock() {
-        return this.clock;
+    public void setClock(Clock clock) {
+        this.clock = clock;
     }
 
     protected FixApplication getFixApplication() {

@@ -95,13 +95,27 @@ public class FixSession {
 
     public void prepareOutgoing(FixMessageBuilder fixMessage) {
         FixMessageHeader header = fixMessage.getHeader();
-        header.setBeginString(beginString);
-        header.setMessageType(fixMessage.getHeader().getMessageType());
-        header.setMsgSeqNum(nextOutgoingMessageSeqNum.getAndIncrement());
-        header.setSenderCompID(senderCompID);
-        header.setSenderSubID(senderSubID);
-        header.setTargetCompID(targetCompID);
-        header.setTargetSubID(targetSubID);
+
+        if (header.getBeginString() == null || "".equals(header.getBeginString())) {
+            header.setBeginString(beginString);
+        }
+        if (header.getMsgSeqNum() == 0) {
+            header.setMsgSeqNum(nextOutgoingMessageSeqNum.getAndIncrement());
+        }
+        if (header.getSenderCompID() == null || "".equals(header.getSenderCompID())) {
+            header.setSenderCompID(senderCompID);
+        }
+        if (header.getSenderSubID() == null || "".equals(header.getSenderSubID())) {
+            header.setSenderSubID(senderSubID);
+        }
+        if (header.getTargetCompID() == null || "".equals(header.getTargetCompID())) {
+            header.setTargetCompID(targetCompID);
+        }
+        if (header.getTargetSubID() == null || "".equals(header.getTargetSubID())) {
+            header.setTargetSubID(targetSubID);
+        }
+
+        header.setMessageType(header.getMessageType());
     }
 
     public SessionId getId() {

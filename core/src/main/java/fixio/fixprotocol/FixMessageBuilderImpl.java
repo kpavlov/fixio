@@ -20,14 +20,16 @@ import fixio.fixprotocol.fields.IntField;
 import fixio.fixprotocol.fields.StringField;
 
 import java.util.ArrayList;
+import java.util.LinkedHashMap;
 import java.util.List;
+import java.util.Map;
 
 public class FixMessageBuilderImpl implements FixMessage, FixMessageBuilder {
 
     private static final int DEFAULT_BODY_FIELD_COUNT = 16;
     private final FixMessageHeader header;
     private final FixMessageTrailer trailer;
-    private final List<FixMessageFragment> body;
+    private final Map<Integer, FixMessageFragment> body;
 
     /**
      * Creates FixMessageBuilderImpl with expected body field count.
@@ -37,7 +39,7 @@ public class FixMessageBuilderImpl implements FixMessage, FixMessageBuilder {
     public FixMessageBuilderImpl(int expectedBodyFieldCount) {
         header = new FixMessageHeader();
         trailer = new FixMessageTrailer();
-        body = new ArrayList<>(expectedBodyFieldCount);
+        body = new LinkedHashMap<>(expectedBodyFieldCount);
     }
 
     /**
@@ -48,7 +50,7 @@ public class FixMessageBuilderImpl implements FixMessage, FixMessageBuilder {
         assert (trailer != null) : "FixMessageTrailer is expected";
         this.header = header;
         this.trailer = trailer;
-        body = new ArrayList<>(DEFAULT_BODY_FIELD_COUNT);
+        body = new LinkedHashMap<>(DEFAULT_BODY_FIELD_COUNT);
     }
 
     /**
@@ -180,12 +182,20 @@ public class FixMessageBuilderImpl implements FixMessage, FixMessageBuilder {
 
     @Override
     public List<FixMessageFragment> getBody() {
-        return body;
+        return new ArrayList<>(body.values());
+    }
+
+    @Override
+    public void copyBody(List<? extends FixMessageFragment> body) {
+        this.body.clear();
+        for (FixMessageFragment fragment : body){
+            this.body.put(fragment.getTagNum(), fragment);
+        }
     }
 
     @Override
     public String getString(int tagNum) {
-        FixMessageFragment item = getFirst(tagNum);
+        FixMessageFragment item = getFragment(tagNum);
         if (item == null) {
             return null;
         }
@@ -197,8 +207,11 @@ public class FixMessageBuilderImpl implements FixMessage, FixMessageBuilder {
     }
 
     @Override
-    public <T> T getValue(FieldType field) {
-        throw new UnsupportedOperationException("Not implemented yet.");
+    public <T> T getValue(FieldType fieldType) {
+        FixMessageFragment field = getFragment(fieldType.tag());
+        if (field != null)
+            return (T) field.getValue();
+        return null;
     }
 
     @Override
@@ -208,7 +221,7 @@ public class FixMessageBuilderImpl implements FixMessage, FixMessageBuilder {
 
     @Override
     public Integer getInt(int tagNum) {
-        FixMessageFragment field = getFirst(tagNum);
+        FixMessageFragment field = getFragment(tagNum);
         if (field instanceof IntField) {
             return ((IntField) field).getValue();
         }
@@ -223,6 +236,17 @@ public class FixMessageBuilderImpl implements FixMessage, FixMessageBuilder {
     @Override
     public FixMessageHeader getHeader() {
         return header;
+    }
+
+    @Override
+    public void copyHeader(FixMessageHeader header) {
+        this.header.setMessageType(header.getMessageType());
+        this.header.setMsgSeqNum(header.getMsgSeqNum());
+        this.header.setSenderCompID(header.getSenderCompID());
+        this.header.setSenderSubID(header.getSenderSubID());
+        this.header.setBeginString(header.getBeginString());
+        this.header.setTargetCompID(header.getTargetCompID());
+        this.header.setTargetSubID(header.getTargetSubID());
     }
 
     public int getMsgSeqNum() {
@@ -250,39 +274,15 @@ public class FixMessageBuilderImpl implements FixMessage, FixMessageBuilder {
         header.setMessageType(messageType);
     }
 
-    public List<Group> getGroups(int tagNum) {
-        FixMessageFragment fragment = getFirst(tagNum);
-        if (fragment instanceof GroupField) {
-            return ((GroupField) fragment).getGroups();
-        }
-        return null;
-    }
-
-    private FixMessageFragment getFirst(int tagNum) {
-        for (int i = 0; i < body.size(); i++) {
-            FixMessageFragment item = body.get(i);
-            if (item.getTagNum() == tagNum) {
-                return item;
-            }
-        }
-        return null;
-    }
-
-    private FixMessageFragment getLast(int tagNum) {
-        for (int i = body.size() - 1; i >= 0; i--) {
-            FixMessageFragment item = body.get(i);
-            if (item.getTagNum() == tagNum) {
-                return item;
-            }
-        }
-        return null;
+    private FixMessageFragment getFragment(int tagNum) {
+        return body.get(tagNum);
     }
 
     private void addGroup(int tagNum, Group group) {
-        GroupField g = (GroupField) getLast(tagNum);
+        GroupField g = (GroupField) getFragment(tagNum);
         if (g == null) {
             g = new GroupField(tagNum);
-            body.add(g);
+            body.put(tagNum, g);
         }
         g.add(group);
     }

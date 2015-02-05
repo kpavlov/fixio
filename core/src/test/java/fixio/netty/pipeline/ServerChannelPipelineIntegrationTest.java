@@ -25,7 +25,7 @@ import fixio.netty.pipeline.server.FixAuthenticator;
 import io.netty.bootstrap.ServerBootstrap;
 import io.netty.channel.Channel;
 import io.netty.channel.ChannelPipeline;
-import io.netty.channel.DefaultEventLoopGroup;
+import io.netty.channel.nio.NioEventLoopGroup;
 import io.netty.channel.EventLoopGroup;
 import io.netty.channel.local.LocalAddress;
 import io.netty.channel.local.LocalServerChannel;
@@ -54,14 +54,14 @@ public class ServerChannelPipelineIntegrationTest {
 
         LocalAddress address = LocalAddress.ANY;
 
-        EventLoopGroup workerGroup = new DefaultEventLoopGroup();
+        EventLoopGroup workerGroup = new NioEventLoopGroup();
         final FixAcceptorChannelInitializer<Channel> channelInitializer = new FixAcceptorChannelInitializer<>(
                 workerGroup,
                 authenticator,
                 new FixApplicationAdapter()
         );
 
-        serverChannel = (LocalServerChannel) b.group(new DefaultEventLoopGroup())
+        serverChannel = (LocalServerChannel) b.group(new NioEventLoopGroup())
                 .channel(LocalServerChannel.class)
                 .handler(channelInitializer)
                 .childHandler(new FixApplicationAdapter())

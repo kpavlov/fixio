@@ -24,14 +24,7 @@ import java.util.List;
  */
 public interface FixMessageBuilder extends FieldListBuilder<FixMessageBuilder> {
     FixMessageHeader getHeader();
-
+    void copyHeader(FixMessageHeader header);
     List<? extends FixMessageFragment> getBody();
-
-    Group newGroup(int tagNum);
-
-    Group newGroup(int tagNum, int expectedGroupSize);
-
-    Group newGroup(FieldType fieldType);
-
-    Group newGroup(FieldType fieldType, int expectedGroupSize);
+    void copyBody(List<? extends FixMessageFragment> body);
 }

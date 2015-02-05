@@ -30,16 +30,6 @@ public class PropertyFixSessionSettingsProviderImplTest {
     }
 
     @Test
-    public void testGetMsgInSeqNumber() {
-        assertEquals(10, provider.getMsgInSeqNum());
-    }
-
-    @Test
-    public void testGetMsgOutSeqNumber() {
-        assertEquals(20, provider.getMsgOutSeqNum());
-    }
-
-    @Test
     public void testGetHeartbeatInterval() {
         assertEquals(40, provider.getHeartbeatInterval());
     }

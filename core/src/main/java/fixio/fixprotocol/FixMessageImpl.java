@@ -21,8 +21,7 @@ import fixio.fixprotocol.fields.FieldFactory;
 import fixio.fixprotocol.fields.IntField;
 import fixio.fixprotocol.fields.StringField;
 
-import java.util.ArrayList;
-import java.util.List;
+import java.util.*;
 
 /**
  * Read-only view implementation of received {@link FixMessage}.
@@ -31,10 +30,20 @@ public class FixMessageImpl implements FixMessage {
 
     private final FixMessageHeader header = new FixMessageHeader();
     private final FixMessageTrailer trailer = new FixMessageTrailer();
-    private final List<FixMessageFragment> body = new ArrayList<>();
+    private final Map<Integer, FixMessageFragment> body = new LinkedHashMap<>();
 
     public FixMessageImpl add(int tagNum, byte[] value) {
         return add(tagNum, value, 0, value.length);
+    }
+
+    public FixMessageImpl addBody(int tagNum, String value) {
+        body.put(tagNum, new StringField(tagNum, value));
+        return this;
+    }
+
+    public FixMessageImpl addBody(GroupField group) {
+        body.put(group.getTagNum(), group);
+        return this;
     }
 
     public FixMessageImpl add(int tagNum, byte[] value, int offset, int length) {
@@ -63,7 +72,7 @@ public class FixMessageImpl implements FixMessage {
                 header.setMessageType(((StringField) field).getValue().intern());
                 break;
             default:
-                body.add(field);
+                body.put(tagNum, field);
                 break;
         }
         return this;
@@ -71,7 +80,7 @@ public class FixMessageImpl implements FixMessage {
 
     @Override
     public List<FixMessageFragment> getBody() {
-        return body;
+        return new ArrayList<>(body.values());
     }
 
     @Override
@@ -91,9 +100,8 @@ public class FixMessageImpl implements FixMessage {
     @Override
     public <T> T getValue(FieldType fieldType) {
         FixMessageFragment field = getFirst(fieldType.tag());
-        if (field instanceof AbstractField) {
-            return (T) ((AbstractField) field).getValue();
-        }
+        if (field != null)
+            return (T) field.getValue();
         return null;
     }
 
@@ -138,21 +146,8 @@ public class FixMessageImpl implements FixMessage {
         return trailer.getCheckSum();
     }
 
-    public List<Group> getGroups(int tagNum) {
-        FixMessageFragment fragment = getFirst(tagNum);
-        if (fragment instanceof GroupField) {
-            return ((GroupField) fragment).getGroups();
-        }
-        return null;
-    }
-
     private FixMessageFragment getFirst(int tagNum) {
-        for (FixMessageFragment item : body) {
-            if (item.getTagNum() == tagNum) {
-                return item;
-            }
-        }
-        return null;
+        return body.get(tagNum);
     }
 
     @Override

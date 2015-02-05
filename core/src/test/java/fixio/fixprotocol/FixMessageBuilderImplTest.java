@@ -75,7 +75,7 @@ public class FixMessageBuilderImplTest {
 
         // read
 
-        List<Group> instruments = quoteRequest.getGroups(146);
+        List<Group> instruments = quoteRequest.getValue(FieldType.NoRelatedSym);
         assertEquals(2, instruments.size());
 
         assertSame(instrument1, instruments.get(0));

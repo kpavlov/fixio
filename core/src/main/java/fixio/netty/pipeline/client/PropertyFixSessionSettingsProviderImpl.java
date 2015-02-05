@@ -23,7 +23,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.util.Properties;
 
-public class PropertyFixSessionSettingsProviderImpl implements FixSessionSettingsProvider, MessageSequenceProvider {
+public class PropertyFixSessionSettingsProviderImpl implements FixSessionSettingsProvider {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(PropertyFixSessionSettingsProviderImpl.class);
     private final Properties properties;
@@ -46,16 +46,6 @@ public class PropertyFixSessionSettingsProviderImpl implements FixSessionSetting
             LOGGER.error(message, e);
             throw new IllegalArgumentException(message, e);
         }
-    }
-
-    @Override
-    public int getMsgOutSeqNum() {
-        return Integer.parseInt(properties.getProperty("MsgSeqOutNum", "1"));
-    }
-
-    @Override
-    public int getMsgInSeqNum() {
-        return Integer.parseInt(properties.getProperty("MsgSeqInNum", "1"));
     }
 
     @Override

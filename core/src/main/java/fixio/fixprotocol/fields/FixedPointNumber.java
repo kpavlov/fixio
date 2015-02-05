@@ -100,7 +100,7 @@ public class FixedPointNumber extends Number {
         return scaledValue / ((long) Math.pow(10.0, scale));
     }
 
-    @Override
+    @Override@Deprecated
     public float floatValue() {
         return (float) doubleValue();
     }
@@ -139,10 +139,19 @@ public class FixedPointNumber extends Number {
         return result;
     }
 
+    private String insertPointBefore(int idx){
+        StringBuilder sb = new StringBuilder("0.");
+        for (int i=idx ; i<0 ; i++){
+            sb.append("0");
+        }
+        return sb.toString();
+    }
+
     @Override
     public String toString() {
+        String scaledStr = String.valueOf(scaledValue);
         if (scale == 0) {
-            return String.valueOf(scaledValue);
+            return scaledStr;
         }
         int factor = (int) Math.pow(10.0, scale);
         long beforePoint = scaledValue / factor;
@@ -151,7 +160,16 @@ public class FixedPointNumber extends Number {
         if (beforePoint == 0 && scaledValue < 0) {
             return "-0." + afterPoint;
         } else {
-            return beforePoint + "." + afterPoint;
+//            return beforePoint + "." + afterPoint;
+            int idx = scaledStr.length()-scale;
+            String insertPoint;
+            if (idx <= 0){
+                insertPoint = insertPointBefore(idx);
+                idx = 0;
+            } else{
+                insertPoint = ".";
+            }
+            return new StringBuilder(scaledStr).insert(idx,insertPoint).toString();
         }
     }
 }

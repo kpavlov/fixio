@@ -58,8 +58,9 @@ public class FieldFactory {
                 case UTCTIMESTAMP:
                     return (F) new UTCTimestampField(tagNum, value, offset, length);
                 default:
-                    throw new UnsupportedOperationException("Unsupported field type: " + fieldType
-                            + '(' + fieldType.type() + ')');
+                    return (F) new StringField(tagNum, new String(value, offset, length, US_ASCII));
+//                    throw new UnsupportedOperationException("Unsupported field type: " + fieldType
+//                            + '(' + fieldType.type() + ')');
             }
         } catch (ParseException | NumberFormatException e) {
             throw new IllegalArgumentException("Invalid value for field " + fieldType + ": " + e.getMessage(), e);
@@ -151,11 +152,13 @@ public class FieldFactory {
     public static <F extends AbstractField<?>> F fromStringValue(DataType type, int tagNum, String value) {
         switch (type) {
             case BOOLEAN:
-                if ("Y".equalsIgnoreCase(value)) {
+                if ("Y".equals(value)){
                     return (F) new BooleanField(tagNum, true);
-                } else if ("N".equals(value)) {
+                } else if("N".equals(value)){
                     return (F) new BooleanField(tagNum, false);
                 }
+                return (F) new BooleanField(tagNum, Boolean.parseBoolean(value));
+            case CHAR:
             case STRING:
                 return (F) new StringField(tagNum, value);
             case FLOAT:
@@ -171,8 +174,9 @@ public class FieldFactory {
             case NUMINGROUP:
                 return (F) new IntField(tagNum, Integer.parseInt(value));
             default:
-                throw new IllegalArgumentException("Value " + value + " is not applicable for field : " + tagNum
-                        + '(' + type + ')');
+                return (F) new StringField(tagNum, value);
+//                throw new IllegalArgumentException("Value " + value + " is not applicable for field : " + tagNum
+//                        + '(' + type + ')');
         }
     }
 
