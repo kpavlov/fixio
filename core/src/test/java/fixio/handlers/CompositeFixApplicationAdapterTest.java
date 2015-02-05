@@ -79,7 +79,6 @@ public class CompositeFixApplicationAdapterTest {
 
         inOrder.verify(messageHandler1).handle(same(ctx), same(message));
         inOrder.verify(messageHandler2).handle(same(ctx), same(message));
-        verifyZeroInteractions(messageHandler3);
     }
 
     @Test

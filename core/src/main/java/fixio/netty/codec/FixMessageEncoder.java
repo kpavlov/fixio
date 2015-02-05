@@ -144,7 +144,7 @@ public class FixMessageEncoder extends MessageToByteEncoder<FixMessageBuilder> {
         } else if (messageFragment instanceof GroupField) {
             GroupField groupField = (GroupField) messageFragment;
             writeField(groupField.getTagNum(), Integer.toString(groupField.getGroupCount()), payloadBuf);
-            for (Group c : groupField.getGroups()) {
+            for (Group c : groupField.getValue()) {
                 List<FixMessageFragment> contents = c.getContents();
                 for (int j = 0; j < contents.size(); j++) {
                     encodeMessageFragment(payloadBuf, contents.get(j));

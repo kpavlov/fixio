@@ -33,6 +33,10 @@ public class FixSession {
     private final String targetCompID;
     private final String targetSubID;
     private final SessionId sessionId;
+    private String senderCompId;
+    private final String senderSubId;
+    private final String targetCompId;
+    private final String targetSubId;
     private volatile int nextIncomingMessageSeqNum;
 
     private FixSession(String beginString,
@@ -53,6 +57,12 @@ public class FixSession {
         return new Builder();
     }
 
+    public void setSenderCompId(String senderCompId) {
+        this.senderCompId = senderCompId;
+    }
+
+    public String getSenderCompId() {
+        return senderCompId;
     public String getSenderCompID() {
         return senderCompID;
     }
@@ -95,6 +105,20 @@ public class FixSession {
 
     public void prepareOutgoing(FixMessageBuilder fixMessage) {
         FixMessageHeader header = fixMessage.getHeader();
+        if(header.getBeginString()==null || "".equals(header.getBeginString()))
+            header.setBeginString(beginString);
+        if(header.getMsgSeqNum() == 0)
+            header.setMsgSeqNum(nextOutgoingMessageSeqNum.getAndIncrement());
+        if(header.getSenderCompID()==null || "".equals(header.getSenderCompID()))
+            header.setSenderCompID(senderCompId);
+        if(header.getSenderSubID()==null || "".equals(header.getSenderSubID()))
+            header.setSenderSubID(senderSubId);
+        if(header.getTargetCompID()==null || "".equals(header.getTargetCompID()))
+            header.setTargetCompID(targetCompId);
+        if(header.getTargetSubID()==null || "".equals(header.getTargetSubID()))
+            header.setTargetSubID(targetSubId);
+        
+        //
         header.setBeginString(beginString);
         header.setMessageType(fixMessage.getHeader().getMessageType());
         header.setMsgSeqNum(nextOutgoingMessageSeqNum.getAndIncrement());
