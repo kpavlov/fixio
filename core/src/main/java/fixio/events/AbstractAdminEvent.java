@@ -33,13 +33,9 @@ public abstract class AbstractAdminEvent implements AdminEvent {
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
-
-        AbstractAdminEvent that = (AbstractAdminEvent) o;
-
-        if (!session.equals(that.session)) return false;
-
-        return true;
+        if (!(o instanceof AbstractAdminEvent)) return false;
+        final AbstractAdminEvent that = (AbstractAdminEvent) o;
+        return session.equals(that.session);
     }
 
     @Override

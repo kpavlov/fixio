@@ -100,7 +100,8 @@ public class FixedPointNumber extends Number {
         return scaledValue / ((long) Math.pow(10.0, scale));
     }
 
-    @Override@Deprecated
+    @Override
+    @Deprecated
     public float floatValue() {
         return (float) doubleValue();
     }
@@ -121,15 +122,12 @@ public class FixedPointNumber extends Number {
 
     @Override
     public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
-
-        FixedPointNumber that = (FixedPointNumber) o;
-
-        if (scale != that.scale) return false;
-        if (scaledValue != that.scaledValue) return false;
-
-        return true;
+        if (this == o)
+            return true;
+        if (o == null || !(o instanceof FixedPointNumber))
+            return false;
+        final FixedPointNumber that = (FixedPointNumber) o;
+        return scale == that.scale && scaledValue == that.scaledValue;
     }
 
     @Override
@@ -139,9 +137,9 @@ public class FixedPointNumber extends Number {
         return result;
     }
 
-    private String insertPointBefore(int idx){
+    private String insertPointBefore(int idx) {
         StringBuilder sb = new StringBuilder("0.");
-        for (int i=idx ; i<0 ; i++){
+        for (int i = idx; i < 0; i++) {
             sb.append("0");
         }
         return sb.toString();
@@ -161,15 +159,15 @@ public class FixedPointNumber extends Number {
             return "-0." + afterPoint;
         } else {
 //            return beforePoint + "." + afterPoint;
-            int idx = scaledStr.length()-scale;
+            int idx = scaledStr.length() - scale;
             String insertPoint;
-            if (idx <= 0){
+            if (idx <= 0) {
                 insertPoint = insertPointBefore(idx);
                 idx = 0;
-            } else{
+            } else {
                 insertPoint = ".";
             }
-            return new StringBuilder(scaledStr).insert(idx,insertPoint).toString();
+            return new StringBuilder(scaledStr).insert(idx, insertPoint).toString();
         }
     }
 }

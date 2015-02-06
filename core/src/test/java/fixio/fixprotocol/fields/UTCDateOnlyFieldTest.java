@@ -15,43 +15,31 @@
  */
 package fixio.fixprotocol.fields;
 
-import org.junit.Before;
+import org.joda.time.LocalDate;
 import org.junit.Test;
 
-import java.util.Calendar;
 import java.util.Random;
-import java.util.TimeZone;
 
+import static org.joda.time.DateTimeZone.UTC;
 import static org.junit.Assert.assertArrayEquals;
 import static org.junit.Assert.assertEquals;
 
 public class UTCDateOnlyFieldTest {
 
     private static final String DATE_STR = "19980604";
-    private Calendar utcCalendar = Calendar.getInstance(TimeZone.getTimeZone("UTC"));
 
-    @Before
-    public void setUp() {
-        utcCalendar.set(Calendar.YEAR, 1998);
-        utcCalendar.set(Calendar.MONTH, Calendar.JUNE);
-        utcCalendar.set(Calendar.DAY_OF_MONTH, 4);
-        utcCalendar.clear(Calendar.HOUR_OF_DAY);
-        utcCalendar.clear(Calendar.MINUTE);
-        utcCalendar.clear(Calendar.SECOND);
-        utcCalendar.clear(Calendar.MILLISECOND);
-    }
+    private final LocalDate testDate = new LocalDate(1998, 6, 4);
 
     @Test
     public void testParse() throws Exception {
-        assertEquals(utcCalendar.getTimeInMillis(), UTCDateOnlyField.parse((DATE_STR.getBytes())));
+        assertEquals(testDate.toDateTimeAtCurrentTime(UTC).getMillis(), UTCDateOnlyField.parse((DATE_STR.getBytes())));
     }
 
     @Test
     public void testCreate() throws Exception {
         int tag = new Random().nextInt();
         UTCDateOnlyField field = new UTCDateOnlyField(tag, DATE_STR.getBytes());
-        assertEquals(utcCalendar.getTimeInMillis(), field.getValue().longValue());
-        assertEquals(utcCalendar.getTimeInMillis(), field.timestampMillis());
+        assertEquals(testDate.toDateTimeAtCurrentTime(UTC).getMillis(), field.getValue().longValue());
     }
 
     @Test
@@ -59,7 +47,6 @@ public class UTCDateOnlyFieldTest {
         int tag = new Random().nextInt();
         byte[] bytes = DATE_STR.getBytes();
         UTCDateOnlyField field = new UTCDateOnlyField(tag, bytes);
-
         assertArrayEquals(bytes, field.getBytes());
     }
 }

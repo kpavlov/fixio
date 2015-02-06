@@ -52,7 +52,7 @@ public class SessionRepositoryTest {
     @Test
     public void normalFlow() throws Exception {
 
-        FixSession session = sessionRepository.createSession(header);
+        FixSession session = sessionRepository.getOrCreateSession(header);
 
         assertNotNull(session);
 

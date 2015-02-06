@@ -22,7 +22,7 @@
     <groupId>kpavlov.fixio</groupId>
     <artifactId>fixio</artifactId>
     <packaging>pom</packaging>
-    <version>1.0-SNAPSHOT</version>
+    <version>1.1-SNAPSHOT</version>
 
     <name>fix.io</name>
     <description>FIX Protocol Support for Netty</description>
@@ -30,8 +30,9 @@
     <properties>
         <slf4j.version>1.7.10</slf4j.version>
         <netty.version>4.0.25.Final</netty.version>
-        <maven.compiler.source>1.7</maven.compiler.source>
-        <maven.compiler.target>1.7</maven.compiler.target>
+        <joda.version>2.7</joda.version>
+        <maven.compiler.source>1.8</maven.compiler.source>
+        <maven.compiler.target>1.8</maven.compiler.target>
         <maven.compiler.optimize>true</maven.compiler.optimize>
         <maven.compiler.debug>true</maven.compiler.debug>
     </properties>

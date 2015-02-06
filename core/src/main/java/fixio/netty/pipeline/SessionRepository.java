@@ -20,12 +20,13 @@ import fixio.fixprotocol.session.FixSession;
 import fixio.fixprotocol.session.SessionId;
 
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.ConcurrentMap;
 
 public class SessionRepository {
 
     private static final SessionRepository INSTANCE = new SessionRepository();
 
-    private final ConcurrentHashMap<SessionId, FixSession> sessions = new ConcurrentHashMap<>();
+    private final ConcurrentMap<SessionId, FixSession> sessions = new ConcurrentHashMap<>();
 
     public static SessionRepository getInstance() {
         return INSTANCE;
@@ -34,10 +35,10 @@ public class SessionRepository {
     private SessionRepository() {
     }
 
-    public FixSession createSession(FixMessageHeader header) {
-        SessionId id = createSessionId(header);
+    public FixSession getOrCreateSession(FixMessageHeader header) {
+        final SessionId id = createSessionId(header);
 
-        FixSession session = FixSession.newBuilder()
+        final FixSession newSession = FixSession.newBuilder()
                 .beginString(header.getBeginString())
                 .senderCompId(header.getSenderCompID())
                 .senderSubId(header.getSenderSubID())
@@ -45,11 +46,11 @@ public class SessionRepository {
                 .targetSubId(header.getTargetSubID())
                 .build();
 
-        session.setNextIncomingMessageSeqNum(1);
-        session.setNextOutgoingMessageSeqNum(1);
+        newSession.setNextIncomingMessageSeqNum(1);
+        newSession.setNextOutgoingMessageSeqNum(1);
 
-        sessions.put(id, session);
-        return session;
+        final FixSession existingSession = sessions.putIfAbsent(id, newSession);
+        return existingSession == null ? newSession : existingSession;
     }
 
     /**
@@ -59,9 +60,7 @@ public class SessionRepository {
      * @return null if no session found in repository
      */
     public FixSession getSession(FixMessageHeader header) {
-        SessionId id = createSessionId(header);
-
-        return sessions.get(id);
+        return getOrCreateSession(header);
     }
 
     private static SessionId createSessionId(FixMessageHeader header) {
