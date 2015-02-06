@@ -28,6 +28,7 @@ import java.util.ArrayList;
 import java.util.Map;
 import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.stream.Collectors;
 
 public class QuickFixStreamingApp implements Application {
     private static final Logger LOGGER = LoggerFactory.getLogger(QuickFixStreamingApp.class);
@@ -102,14 +103,8 @@ public class QuickFixStreamingApp implements Application {
 
     private void stopStreaming(SessionID sessionID) {
         ArrayList<String> requestsToCancel = new ArrayList<>(subscriptions.size());
-        for (Map.Entry<String, SessionID> entry : subscriptions.entrySet()) {
-            if (entry.getValue() == sessionID) {
-                requestsToCancel.add(entry.getKey());
-            }
-        }
-        for (String reqId : requestsToCancel) {
-            subscriptions.remove(reqId);
-        }
+        requestsToCancel.addAll(subscriptions.entrySet().stream().filter(entry -> entry.getValue() == sessionID).map(Map.Entry::getKey).collect(Collectors.toList()));
+        requestsToCancel.forEach(subscriptions::remove);
         LOGGER.info("Streaming Stopped for {}", sessionID);
     }
 

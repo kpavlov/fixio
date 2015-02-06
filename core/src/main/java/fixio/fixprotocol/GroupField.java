@@ -17,7 +17,6 @@ package fixio.fixprotocol;
 
 
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.List;
 
 /**
@@ -61,9 +60,7 @@ public class GroupField implements FixMessageFragment<List<Group>> {
         int tagNum = getTagNum();
         StringBuilder sb = new StringBuilder().append(FieldType.forTag(tagNum)).append("(").append(tagNum).append(")=").append(getGroupCount());
         sb.append("[");
-        for (Group group : groups) {
-            sb.append(group);
-        }
+        groups.forEach(sb::append);
         sb.append("]");
         return sb.toString();
     }
