@@ -24,6 +24,7 @@ import io.netty.channel.ChannelHandlerContext;
 import io.netty.handler.codec.DecoderException;
 import io.netty.handler.codec.MessageToMessageDecoder;
 
+import java.nio.charset.StandardCharsets;
 import java.util.List;
 
 /**
@@ -110,7 +111,12 @@ public class FixMessageDecoder extends MessageToMessageDecoder<ByteBuf> {
 
     private void appendField(int tag, byte[] value, int offset, int valueLength) {
         if (message == null) {
-            throw new DecoderException("BeginString tag expected, but got: " + tag + "=" + value);
+            String strValue = new String(value, offset, Math.min(10, valueLength), StandardCharsets.US_ASCII);
+            if (valueLength > 10)                                   {
+                strValue += "...";
+            }
+            throw new DecoderException("BeginString tag expected, but got: "
+                    + tag + "=" + strValue);
         }
 
         //group body

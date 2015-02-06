@@ -20,6 +20,7 @@ import fixio.fixprotocol.FixMessageHeader;
 import fixio.fixprotocol.FixMessageImpl;
 import fixio.fixprotocol.MessageTypes;
 import io.netty.buffer.Unpooled;
+import io.netty.handler.codec.DecoderException;
 import org.junit.BeforeClass;
 import org.junit.Test;
 
@@ -29,8 +30,8 @@ import java.util.Calendar;
 import java.util.List;
 import java.util.TimeZone;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertTrue;
+import static org.apache.commons.lang3.RandomStringUtils.randomAlphanumeric;
+import static org.junit.Assert.*;
 
 public class FixMessageDecoderTest {
 
@@ -85,5 +86,17 @@ public class FixMessageDecoderTest {
             decoder.decode(null, Unpooled.wrappedBuffer(tag.getBytes(StandardCharsets.US_ASCII)), result);
         }
         return result;
+    }
+
+    @Test
+    public void testNoBeginTag() throws Exception {
+        String random=randomAlphanumeric(50);
+
+        try {
+            decode("100=" + random + "\u00018=FIX.4.2...");
+            fail("DecoderException is expected");
+        } catch (DecoderException e) {
+            assertEquals("BeginString tag expected, but got: 100=" + random.substring(0,10) + "...", e.getMessage());
+        }
     }
 }
