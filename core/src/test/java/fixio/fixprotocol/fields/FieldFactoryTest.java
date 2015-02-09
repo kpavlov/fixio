@@ -17,16 +17,17 @@ package fixio.fixprotocol.fields;
 
 import fixio.fixprotocol.DataType;
 import fixio.fixprotocol.FieldType;
+import org.joda.time.LocalDate;
+import org.joda.time.LocalTime;
 import org.junit.Test;
 
 import java.math.BigDecimal;
-import java.util.Calendar;
 import java.util.Random;
-import java.util.TimeZone;
 
 import static java.nio.charset.StandardCharsets.US_ASCII;
 import static org.apache.commons.lang3.RandomStringUtils.randomAlphanumeric;
 import static org.apache.commons.lang3.RandomStringUtils.randomAscii;
+import static org.joda.time.DateTimeZone.UTC;
 import static org.junit.Assert.*;
 
 public class FieldFactoryTest {
@@ -168,19 +169,7 @@ public class FieldFactoryTest {
         UTCTimestampField field = FieldFactory.valueOf(FieldType.OrigTime.tag(), value.getBytes(US_ASCII));
 
         assertEquals("tagnum", FieldType.OrigTime.tag(), field.getTagNum());
-
-        Calendar calendar = Calendar.getInstance(TimeZone.getTimeZone("UTC"));
-        calendar.set(Calendar.YEAR, 1998);
-        calendar.set(Calendar.MONTH, Calendar.JUNE);
-        calendar.set(Calendar.DAY_OF_MONTH, 4);
-        calendar.set(Calendar.HOUR_OF_DAY, 8);
-        calendar.set(Calendar.MINUTE, 3);
-        calendar.set(Calendar.SECOND, 31);
-        calendar.set(Calendar.MILLISECOND, 537);
-        long timeInMillis = calendar.getTimeInMillis();
-
-        assertEquals("value", timeInMillis, field.getValue().longValue());
-        assertEquals("value", timeInMillis, field.timestampMillis());
+        assertEquals("value", new LocalDate(1998, 6, 4).toDateTime(new LocalTime(8, 3, 31, 537), UTC).getMillis(), field.getValue().longValue());
     }
 
     @Test
@@ -189,19 +178,7 @@ public class FieldFactoryTest {
         UTCTimestampField field = FieldFactory.valueOf(FieldType.OrigTime.tag(), value.getBytes(US_ASCII));
 
         assertEquals("tagnum", FieldType.OrigTime.tag(), field.getTagNum());
-
-        Calendar calendar = Calendar.getInstance(TimeZone.getTimeZone("UTC"));
-        calendar.set(Calendar.YEAR, 1998);
-        calendar.set(Calendar.MONTH, Calendar.JUNE);
-        calendar.set(Calendar.DAY_OF_MONTH, 4);
-        calendar.set(Calendar.HOUR_OF_DAY, 8);
-        calendar.set(Calendar.MINUTE, 3);
-        calendar.set(Calendar.SECOND, 31);
-        calendar.set(Calendar.MILLISECOND, 0);
-        long timeInMillis = calendar.getTimeInMillis();
-
-        assertEquals("value", timeInMillis, field.getValue().longValue());
-        assertEquals("value", timeInMillis, field.timestampMillis());
+        assertEquals("value", new LocalDate(1998, 6, 4).toDateTime(new LocalTime(8, 3, 31, 0), UTC).getMillis(), field.getValue().longValue());
     }
 
     @Test

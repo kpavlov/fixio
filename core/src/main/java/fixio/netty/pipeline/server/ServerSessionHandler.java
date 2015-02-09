@@ -114,7 +114,7 @@ public class ServerSessionHandler extends AbstractSessionHandler {
     }
 
     private FixSession initSession(ChannelHandlerContext ctx, FixMessageHeader header) {
-        FixSession session = SessionRepository.getInstance().createSession(header);
+        FixSession session = SessionRepository.getInstance().getOrCreateSession(header);
 
         session.setNextOutgoingMessageSeqNum(1);
 

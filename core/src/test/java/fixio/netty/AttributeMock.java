@@ -23,7 +23,6 @@ public class AttributeMock<T> implements Attribute<T> {
     @Override
     public void set(T value) {
         this.holder.set(value);
-        ;
     }
 
     @Override
