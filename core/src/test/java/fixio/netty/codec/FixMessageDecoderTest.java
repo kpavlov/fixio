@@ -67,7 +67,7 @@ public class FixMessageDecoderTest {
         calendar.set(Calendar.MINUTE, 3);
         calendar.set(Calendar.SECOND, 31);
         calendar.set(Calendar.MILLISECOND, 0);
-        assertEquals(calendar.getTimeInMillis(), fixMessage.getValue(FieldType.SendingTime));
+        assertEquals(calendar.getTimeInMillis(), (long)fixMessage.getValue(FieldType.SendingTime));
     }
 
     @Test
