@@ -20,6 +20,7 @@ import fixio.fixprotocol.FixMessage;
 import fixio.fixprotocol.FixMessageBuilder;
 import fixio.handlers.FixApplication;
 import fixio.netty.pipeline.FixChannelInitializer;
+import fixio.netty.pipeline.SessionRepository;
 import io.netty.channel.Channel;
 import io.netty.channel.EventLoopGroup;
 import io.netty.handler.codec.MessageToMessageCodec;
@@ -27,17 +28,20 @@ import io.netty.handler.codec.MessageToMessageCodec;
 public class FixAcceptorChannelInitializer<C extends Channel> extends FixChannelInitializer<C> {
 
     private final FixAuthenticator authenticator;
+    private final SessionRepository sessionRepository;
 
     public FixAcceptorChannelInitializer(EventLoopGroup workerGroup,
+                                         FixApplication fixApplication,
                                          FixAuthenticator authenticator,
-                                         FixApplication fixApplication) {
+                                         SessionRepository sessionRepository) {
         super(workerGroup, fixApplication);
         this.authenticator = authenticator;
+        this.sessionRepository = sessionRepository;
     }
 
     @Override
     protected MessageToMessageCodec<FixMessage, FixMessageBuilder> createSessionHandler() {
-        return new ServerSessionHandler(authenticator, getFixApplication());
+        return new ServerSessionHandler(getFixApplication(), authenticator, sessionRepository);
     }
 
 }

@@ -18,6 +18,7 @@ package fixio;
 import fixio.events.LogonEvent;
 import fixio.fixprotocol.*;
 import fixio.handlers.FixApplicationAdapter;
+import fixio.netty.pipeline.InMemorySessionRepository;
 import fixio.netty.pipeline.server.AcceptAllAuthenticator;
 import io.netty.channel.ChannelFuture;
 import io.netty.channel.ChannelHandlerContext;
@@ -40,7 +41,10 @@ public class FixConversationIT {
 
     @BeforeClass
     public static void beforeClass() throws InterruptedException {
-        server = new FixServer(PORT, new AcceptAllAuthenticator(), new ServerLogicHandler());
+        server = new FixServer(PORT,
+                new ServerLogicHandler(),
+                new AcceptAllAuthenticator(),
+                new InMemorySessionRepository());
         server.start();
     }
 
@@ -68,7 +72,7 @@ public class FixConversationIT {
 
     @Before
     public void beforeMethod() throws InterruptedException {
-        client = new FixClient(new ClientApp());
+        client = new FixClient(new ClientApp(), new InMemorySessionRepository());
         client.setSettingsResource("/fixClient.properties");
         clientCloseFuture = client.connect("127.0.0.1", PORT);
         conversation.clear();

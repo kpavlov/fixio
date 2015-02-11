@@ -16,6 +16,7 @@
 package fixio;
 
 import fixio.handlers.FixApplication;
+import fixio.netty.pipeline.SessionRepository;
 import fixio.netty.pipeline.server.FixAuthenticator;
 import org.junit.Before;
 import org.junit.Test;
@@ -31,10 +32,12 @@ public class FixServerTest {
     private FixApplication fixApplication;
     @Mock
     private FixAuthenticator fixAuthenticator;
+    @Mock
+    private SessionRepository sessionRepository;
 
     @Before
     public void setUp() throws Exception {
-        server = new FixServer(10100, fixAuthenticator, fixApplication);
+        server = new FixServer(10100, fixApplication, fixAuthenticator, sessionRepository);
     }
 
     @Test

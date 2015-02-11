@@ -18,6 +18,7 @@ package fixio.examples.priceserver;
 import fixio.FixServer;
 import fixio.examples.generator.Quote;
 import fixio.examples.generator.QuoteGeneratorTask;
+import fixio.netty.pipeline.InMemorySessionRepository;
 import fixio.netty.pipeline.server.AcceptAllAuthenticator;
 
 import java.util.concurrent.ArrayBlockingQueue;
@@ -34,7 +35,10 @@ public class PriceServer {
 
     public PriceServer(int port) {
         PriceStreamingApp app = new PriceStreamingApp(quoteQueue);
-        server = new FixServer(port, new AcceptAllAuthenticator(), app);
+        server = new FixServer(port, app,
+                new AcceptAllAuthenticator(),
+                new InMemorySessionRepository()
+        );
     }
 
     public static void main(String[] args) throws InterruptedException {

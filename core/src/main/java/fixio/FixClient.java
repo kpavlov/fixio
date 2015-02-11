@@ -18,6 +18,7 @@ package fixio;
 
 import fixio.fixprotocol.FixMessageBuilder;
 import fixio.handlers.FixApplication;
+import fixio.netty.pipeline.SessionRepository;
 import fixio.netty.pipeline.client.FixInitiatorChannelInitializer;
 import fixio.netty.pipeline.client.FixSessionSettingsProvider;
 import fixio.netty.pipeline.client.MessageSequenceProvider;
@@ -46,8 +47,9 @@ public class FixClient extends AbstractFixConnector {
     private FixSessionSettingsProvider sessionSettingsProvider;
     private MessageSequenceProvider messageSequenceProvider;
 
-    public FixClient(FixApplication fixApplication) {
-        super(fixApplication);
+    public FixClient(FixApplication fixApplication,
+                     SessionRepository sessionRepository) {
+        super(fixApplication, sessionRepository);
     }
 
     /**
@@ -105,7 +107,7 @@ public class FixClient extends AbstractFixConnector {
         channel.close().sync();
         if (workerEventLoopGroup != null)
             workerEventLoopGroup.shutdownGracefully();
-        if(bossEventLoopGroup != null)
+        if (bossEventLoopGroup != null)
             bossEventLoopGroup.shutdownGracefully();
         bossEventLoopGroup = null;
         workerEventLoopGroup = null;

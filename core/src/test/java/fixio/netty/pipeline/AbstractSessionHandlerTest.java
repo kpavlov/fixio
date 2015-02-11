@@ -21,6 +21,7 @@ import fixio.fixprotocol.FixMessage;
 import fixio.fixprotocol.FixMessageBuilder;
 import fixio.fixprotocol.MessageTypes;
 import fixio.fixprotocol.session.FixSession;
+import fixio.fixprotocol.session.SessionId;
 import fixio.handlers.FixApplication;
 import fixio.validator.BusinessRejectException;
 import io.netty.channel.Channel;
@@ -61,10 +62,12 @@ public class AbstractSessionHandlerTest {
     private Attribute<FixSession> sessonAttr;
     @Captor
     private ArgumentCaptor<FixMessage> rejectCaptor;
+    @Mock
+    private SessionRepository sessionRepository;
 
     @Before
     public void setUp() {
-        sessionHandler = new AbstractSessionHandler(fixApplication) {
+        sessionHandler = new AbstractSessionHandler(fixApplication, Clock.systemUTC(), sessionRepository) {
             @Override
             protected void encode(ChannelHandlerContext ctx, FixMessageBuilder msg, List<Object> out) throws Exception {
             }
@@ -103,11 +106,14 @@ public class AbstractSessionHandlerTest {
     public void testChannelInactiveSessionExists() throws Exception {
         when(ctx.attr(AbstractSessionHandler.FIX_SESSION_KEY)).thenReturn(sessonAttr);
         when(sessonAttr.getAndRemove()).thenReturn(fixSession);
+        SessionId sessionId  = mock(SessionId.class);
+        when(fixSession.getId()).thenReturn(sessionId);
 
         sessionHandler.channelInactive(ctx);
 
         verify(ctx).fireChannelRead(any(LogoutEvent.class));
         verify(sessonAttr).getAndRemove();
+        verify(sessionRepository).removeSession(sessionId);
     }
 
     @Test

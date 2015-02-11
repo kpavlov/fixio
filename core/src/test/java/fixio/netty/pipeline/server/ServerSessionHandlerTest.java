@@ -25,6 +25,7 @@ import fixio.handlers.FixApplication;
 import fixio.netty.AttributeMock;
 import fixio.netty.pipeline.AbstractSessionHandler;
 import fixio.netty.pipeline.FixMessageAsserts;
+import fixio.netty.pipeline.SessionRepository;
 import io.netty.channel.ChannelFuture;
 import io.netty.channel.ChannelFutureListener;
 import io.netty.channel.ChannelHandlerContext;
@@ -59,10 +60,12 @@ public class ServerSessionHandlerTest {
     private ArgumentCaptor<FixMessageBuilderImpl> messageCaptor;
     private FixMessage logonMsg;
     private List<Object> outgoingMessages;
+    @Mock
+    private SessionRepository sessionRepository;
 
     @Before
     public void setUp() {
-        handler = new ServerSessionHandler(authenticator, fixApplication);
+        handler = new ServerSessionHandler(fixApplication, authenticator, sessionRepository);
         outgoingMessages = new ArrayList<>();
 
         logonMsg = new FixMessageBuilderImpl(MessageTypes.LOGON);
@@ -142,5 +145,10 @@ public class ServerSessionHandlerTest {
         verifyNoMoreInteractions(ctx);
 
         FixMessageAsserts.assertLogout(messageCaptor.getValue());
+    }
+
+    @Test
+    public void testLogout() {
+
     }
 }

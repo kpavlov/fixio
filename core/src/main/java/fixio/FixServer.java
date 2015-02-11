@@ -17,6 +17,7 @@
 package fixio;
 
 import fixio.handlers.FixApplication;
+import fixio.netty.pipeline.SessionRepository;
 import fixio.netty.pipeline.server.FixAcceptorChannelInitializer;
 import fixio.netty.pipeline.server.FixAuthenticator;
 import io.netty.bootstrap.ServerBootstrap;
@@ -43,9 +44,10 @@ public class FixServer extends AbstractFixConnector {
     private FixAuthenticator authenticator;
 
     public FixServer(int port,
+                     FixApplication fixApplication,
                      FixAuthenticator authenticator,
-                     FixApplication fixApplication) {
-        super(fixApplication);
+                     SessionRepository sessionRepository) {
+        super(fixApplication, sessionRepository);
         assert (authenticator != null) : "Authenticator is required";
         this.authenticator = authenticator;
         this.port = port;
@@ -57,8 +59,9 @@ public class FixServer extends AbstractFixConnector {
         final ServerBootstrap bootstrap = new ServerBootstrap();
         final FixAcceptorChannelInitializer<SocketChannel> channelInitializer = new FixAcceptorChannelInitializer<>(
                 workerGroup,
-                authenticator,
-                getFixApplication()
+                getFixApplication(),
+                authenticator ,
+                getSessionRepository()
         );
 
 

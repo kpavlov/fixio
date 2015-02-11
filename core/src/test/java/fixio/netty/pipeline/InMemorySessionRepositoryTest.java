@@ -17,14 +17,14 @@ package fixio.netty.pipeline;
 
 import fixio.fixprotocol.FixMessageHeader;
 import fixio.fixprotocol.session.FixSession;
+import fixio.fixprotocol.session.SessionId;
 import org.junit.Before;
 import org.junit.Test;
 
 import static org.apache.commons.lang3.RandomStringUtils.randomAscii;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertSame;
+import static org.junit.Assert.*;
 
-public class SessionRepositoryTest {
+public class InMemorySessionRepositoryTest {
 
     private SessionRepository sessionRepository;
     private String senderCompID;
@@ -46,11 +46,11 @@ public class SessionRepositoryTest {
         header.setTargetCompID(targetCompID);
         header.setTargetSubID(targetSubID);
 
-        sessionRepository = SessionRepository.getInstance();
+        sessionRepository = new InMemorySessionRepository();
     }
 
     @Test
-    public void normalFlow() throws Exception {
+    public void testNormalLifecycle() throws Exception {
 
         FixSession session = sessionRepository.createSession(header);
 
@@ -64,5 +64,11 @@ public class SessionRepositoryTest {
         assertSame(senderSubID, session.getSenderSubID());
         assertSame(targetCompID, session.getTargetCompID());
         assertSame(targetSubID, session.getTargetSubID());
+
+        final SessionId sessionId = session.getId();
+
+        sessionRepository.removeSession(sessionId);
+
+        assertNull("Session was not destroyed.", sessionRepository.getSession(header));
     }
 }
