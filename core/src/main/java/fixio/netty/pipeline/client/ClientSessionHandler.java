@@ -99,15 +99,7 @@ public class ClientSessionHandler extends AbstractSessionHandler {
     }
 
     private FixSession createSession(FixSessionSettingsProvider settingsProvider) {
-
-        int nextIncomingSeqNum;
-        if (settingsProvider.isResetMsgSeqNum()) {
-            nextIncomingSeqNum = 1;
-        } else {
-            nextIncomingSeqNum = messageSequenceProvider.getMsgInSeqNum();
-        }
-
-        FixSession session = FixSession.newBuilder()
+        final FixSession session = FixSession.newBuilder()
                 .beginString(settingsProvider.getBeginString())
                 .senderCompId(settingsProvider.getSenderCompID())
                 .senderSubId(settingsProvider.getSenderSubID())
@@ -115,17 +107,8 @@ public class ClientSessionHandler extends AbstractSessionHandler {
                 .targetSubId(settingsProvider.getTargetSubID())
                 .build();
 
-        session.setNextIncomingMessageSeqNum(nextIncomingSeqNum);
-
-
-        if (settingsProvider.isResetMsgSeqNum()) {
-            nextIncomingSeqNum = 1;
-        } else {
-            nextIncomingSeqNum = messageSequenceProvider.getMsgInSeqNum();
-        }
-
         session.setNextOutgoingMessageSeqNum(messageSequenceProvider.getMsgOutSeqNum());
-        session.setNextIncomingMessageSeqNum(nextIncomingSeqNum);
+        session.setNextIncomingMessageSeqNum(settingsProvider.isResetMsgSeqNum() ? 1 : messageSequenceProvider.getMsgInSeqNum());
         return session;
     }
 

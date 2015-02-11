@@ -115,6 +115,7 @@ public class Group implements FieldListBuilder<Group> {
         return this;
     }
 
+    @SuppressWarnings("unchecked")
     public <T> T getValue(int tagNum) {
         FixMessageFragment field = contents.get(tagNum);
         if (field != null)
@@ -122,6 +123,7 @@ public class Group implements FieldListBuilder<Group> {
         return null;
     }
 
+    @SuppressWarnings("unchecked")
     public <T> T getValue(FieldType fieldType) {
         FixMessageFragment field = contents.get(fieldType.tag());
         if (field != null)
@@ -177,7 +179,7 @@ public class Group implements FieldListBuilder<Group> {
         StringBuilder sb = new StringBuilder();
         for (FixMessageFragment fragment : contents.values()){
             int tagNum = fragment.getTagNum();
-            sb.append(FieldType.forTag(tagNum) + "(" + tagNum + ")=" + fragment.getValue()).append(", ");
+            sb.append(FieldType.forTag(tagNum)).append("(").append(tagNum).append(")=").append(fragment.getValue()).append(", ");
         }
         return sb.toString();
     }
