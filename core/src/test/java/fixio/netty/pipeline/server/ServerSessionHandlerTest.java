@@ -25,7 +25,7 @@ import fixio.handlers.FixApplication;
 import fixio.netty.AttributeMock;
 import fixio.netty.pipeline.AbstractSessionHandler;
 import fixio.netty.pipeline.FixMessageAsserts;
-import fixio.netty.pipeline.SessionRepository;
+import fixio.netty.pipeline.InMemorySessionRepository;
 import io.netty.channel.ChannelFuture;
 import io.netty.channel.ChannelFutureListener;
 import io.netty.channel.ChannelHandlerContext;
@@ -60,12 +60,10 @@ public class ServerSessionHandlerTest {
     private ArgumentCaptor<FixMessageBuilderImpl> messageCaptor;
     private FixMessage logonMsg;
     private List<Object> outgoingMessages;
-    @Mock
-    private SessionRepository sessionRepository;
 
     @Before
     public void setUp() {
-        handler = new ServerSessionHandler(fixApplication, authenticator, sessionRepository);
+        handler = new ServerSessionHandler(fixApplication, authenticator, new InMemorySessionRepository());
         outgoingMessages = new ArrayList<>();
 
         logonMsg = new FixMessageBuilderImpl(MessageTypes.LOGON);
