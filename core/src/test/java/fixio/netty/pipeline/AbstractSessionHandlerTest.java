@@ -67,7 +67,7 @@ public class AbstractSessionHandlerTest {
 
     @Before
     public void setUp() {
-        sessionHandler = new AbstractSessionHandler(fixApplication, Clock.systemUTC(), sessionRepository) {
+        sessionHandler = new AbstractSessionHandler(fixApplication, FixClock.systemUTC(), sessionRepository) {
             @Override
             protected void encode(ChannelHandlerContext ctx, FixMessageBuilder msg, List<Object> out) throws Exception {
             }

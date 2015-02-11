@@ -21,7 +21,7 @@ import fixio.fixprotocol.*;
 import fixio.fixprotocol.session.FixSession;
 import fixio.handlers.FixApplication;
 import fixio.netty.pipeline.AbstractSessionHandler;
-import fixio.netty.pipeline.Clock;
+import fixio.netty.pipeline.FixClock;
 import fixio.netty.pipeline.InMemorySessionRepository;
 import io.netty.channel.ChannelHandlerContext;
 import org.slf4j.Logger;
@@ -38,7 +38,7 @@ public class ClientSessionHandler extends AbstractSessionHandler {
     public ClientSessionHandler(FixSessionSettingsProvider settingsProvider,
                                 MessageSequenceProvider messageSequenceProvider,
                                 FixApplication fixApplication) {
-        super(fixApplication, Clock.systemUTC(), new InMemorySessionRepository());
+        super(fixApplication, FixClock.systemUTC(), new InMemorySessionRepository());
         assert (settingsProvider != null) : "FixSessionSettingsProvider is expected.";
         this.sessionSettingsProvider = settingsProvider;
         this.messageSequenceProvider = messageSequenceProvider;
