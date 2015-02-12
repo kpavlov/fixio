@@ -104,16 +104,15 @@ class PriceStreamingApp extends FixApplicationAdapter {
 
     private class StreamingWorker implements Runnable {
 
-        private volatile boolean stopping;
-
         @Override
         public void run() {
             Quote quote = null;
-            while (!stopping) {
+            final Thread currentThread = Thread.currentThread();
+            while (!currentThread.isInterrupted()) {
                 try {
                     quote = quoteQueue.take();
                 } catch (InterruptedException e) {
-                    Thread.currentThread().interrupt();
+                    currentThread.interrupt();
                     LOGGER.error("Interrupted queue", e);
                 }
                 for (Map.Entry<String, ChannelHandlerContext> subscriptionEntry : subscriptions.entrySet()) {
@@ -122,8 +121,8 @@ class PriceStreamingApp extends FixApplicationAdapter {
             }
         }
 
-        public void stopWorker() {
-            stopping = true;
+        public void stop() {
+            Thread.currentThread().interrupt();
         }
     }
 }

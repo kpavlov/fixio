@@ -20,8 +20,11 @@ import fixio.fixprotocol.fields.AbstractField;
 import fixio.fixprotocol.fields.FieldFactory;
 import fixio.fixprotocol.fields.IntField;
 import fixio.fixprotocol.fields.StringField;
+import it.unimi.dsi.fastutil.ints.Int2ObjectLinkedOpenHashMap;
+import it.unimi.dsi.fastutil.ints.Int2ObjectMap;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * Read-only view implementation of received {@link FixMessage}.
@@ -30,7 +33,7 @@ public class FixMessageImpl implements FixMessage {
 
     private final FixMessageHeader header = new FixMessageHeader();
     private final FixMessageTrailer trailer = new FixMessageTrailer();
-    private final Map<Integer, FixMessageFragment> body = new LinkedHashMap<>();
+    private final Int2ObjectMap<FixMessageFragment> body = new Int2ObjectLinkedOpenHashMap<>();
 
     public FixMessageImpl add(int tagNum, byte[] value) {
         return add(tagNum, value, 0, value.length);

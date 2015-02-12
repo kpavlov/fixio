@@ -15,10 +15,7 @@
  */
 package fixio.netty.pipeline;
 
-import fixio.fixprotocol.FieldType;
-import fixio.fixprotocol.FixMessage;
-import fixio.fixprotocol.FixMessageBuilderImpl;
-import fixio.fixprotocol.MessageTypes;
+import fixio.fixprotocol.*;
 import fixio.handlers.FixApplicationAdapter;
 import fixio.netty.pipeline.server.FixAcceptorChannelInitializer;
 import fixio.netty.pipeline.server.FixAuthenticator;
@@ -47,8 +44,6 @@ public class ServerChannelPipelineIntegrationTest {
     private FixAuthenticator authenticator;
     private LocalServerChannel serverChannel;
     private ChannelPipeline pipeline;
-    @Mock
-    private SessionRepository sessionRepository;
 
     @Before
     public void setUp() throws Exception {
@@ -61,7 +56,7 @@ public class ServerChannelPipelineIntegrationTest {
                 workerGroup,
                 new FixApplicationAdapter(),
                 authenticator,
-                sessionRepository
+                new InMemorySessionRepository()
         );
 
         serverChannel = (LocalServerChannel) b.group(new NioEventLoopGroup())
@@ -86,8 +81,9 @@ public class ServerChannelPipelineIntegrationTest {
     @Test
     public void processLogonSuccess() {
         final FixMessageBuilderImpl logon = new FixMessageBuilderImpl(MessageTypes.LOGON);
-        logon.getHeader().setSenderCompID(randomAscii(3));
-        logon.getHeader().setTargetCompID(randomAscii(4));
+        final FixMessageHeader header = logon.getHeader();
+        header.setSenderCompID(randomAscii(3));
+        header.setTargetCompID(randomAscii(4));
 
         pipeline.fireChannelRead(logon);
         pipeline.flush();
@@ -96,10 +92,13 @@ public class ServerChannelPipelineIntegrationTest {
     @Test
     public void processHeartbeat() {
         final FixMessageBuilderImpl testRequest = new FixMessageBuilderImpl(MessageTypes.TEST_REQUEST);
-        testRequest.getHeader().setSenderCompID(randomAscii(3));
-        testRequest.getHeader().setTargetCompID(randomAscii(4));
+        final FixMessageHeader header = testRequest.getHeader();
+        header.setSenderCompID(randomAscii(3));
+        header.setTargetCompID(randomAscii(4));
 
         testRequest.add(FieldType.TestReqID, randomAscii(5));
+
+
 
         pipeline.fireChannelRead(testRequest);
         pipeline.flush();

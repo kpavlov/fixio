@@ -18,18 +18,18 @@ package fixio.fixprotocol;
 import fixio.fixprotocol.fields.FixedPointNumber;
 import fixio.fixprotocol.fields.IntField;
 import fixio.fixprotocol.fields.StringField;
+import it.unimi.dsi.fastutil.ints.Int2ObjectLinkedOpenHashMap;
+import it.unimi.dsi.fastutil.ints.Int2ObjectMap;
 
 import java.util.ArrayList;
-import java.util.LinkedHashMap;
 import java.util.List;
-import java.util.Map;
 
 public class FixMessageBuilderImpl implements FixMessage, FixMessageBuilder {
 
     private static final int DEFAULT_BODY_FIELD_COUNT = 16;
     private final FixMessageHeader header;
     private final FixMessageTrailer trailer;
-    private final Map<Integer, FixMessageFragment> body;
+    private final Int2ObjectMap<FixMessageFragment> body;
 
     /**
      * Creates FixMessageBuilderImpl with expected body field count.
@@ -39,7 +39,7 @@ public class FixMessageBuilderImpl implements FixMessage, FixMessageBuilder {
     public FixMessageBuilderImpl(int expectedBodyFieldCount) {
         header = new FixMessageHeader();
         trailer = new FixMessageTrailer();
-        body = new LinkedHashMap<>(expectedBodyFieldCount);
+        body = new Int2ObjectLinkedOpenHashMap<>(expectedBodyFieldCount);
     }
 
     /**
@@ -50,7 +50,7 @@ public class FixMessageBuilderImpl implements FixMessage, FixMessageBuilder {
         assert (trailer != null) : "FixMessageTrailer is expected";
         this.header = header;
         this.trailer = trailer;
-        body = new LinkedHashMap<>(DEFAULT_BODY_FIELD_COUNT);
+        body = new Int2ObjectLinkedOpenHashMap<>(DEFAULT_BODY_FIELD_COUNT);
     }
 
     /**
