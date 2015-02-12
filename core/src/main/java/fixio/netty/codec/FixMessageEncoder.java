@@ -23,32 +23,20 @@ import io.netty.buffer.ByteBufAllocator;
 import io.netty.channel.ChannelHandler;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.handler.codec.MessageToByteEncoder;
+import org.joda.time.DateTime;
+import org.joda.time.format.DateTimeFormat;
+import org.joda.time.format.DateTimeFormatter;
 
 import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;
-import java.text.DateFormat;
-import java.text.DateFormatSymbols;
-import java.text.SimpleDateFormat;
-import java.util.Date;
 import java.util.List;
-import java.util.Locale;
-import java.util.TimeZone;
 
 @ChannelHandler.Sharable
 public class FixMessageEncoder extends MessageToByteEncoder<FixMessageBuilder> {
 
-    private static final TimeZone UTC = TimeZone.getTimeZone("UTC");
     private static final Charset CHARSET = StandardCharsets.US_ASCII;
     private static final String UTC_TIMESTAMP_WITH_MILLIS_PATTERN = "yyyyMMdd-HH:mm:ss.SSS";
-    private static final ThreadLocal<DateFormat> sdf = new ThreadLocal<DateFormat>() {
-        @Override
-        protected DateFormat initialValue() {
-            SimpleDateFormat sdf = new SimpleDateFormat(UTC_TIMESTAMP_WITH_MILLIS_PATTERN);
-            sdf.setTimeZone(UTC);
-            sdf.setDateFormatSymbols(new DateFormatSymbols(Locale.US));
-            return sdf;
-        }
-    };
+    private static final DateTimeFormatter SDF = DateTimeFormat.forPattern(UTC_TIMESTAMP_WITH_MILLIS_PATTERN).withZoneUTC();
 
     private static void validateRequiredFields(FixMessageHeader header) {
         if (header.getBeginString() == null) {
@@ -112,14 +100,14 @@ public class FixMessageEncoder extends MessageToByteEncoder<FixMessageBuilder> {
         writeField(34, Integer.toString(header.getMsgSeqNum()), out);
 
         // SendingTime
-        String timeStr = sdf.get().format(new Date(header.getSendingTime()));
+        String timeStr = new DateTime(header.getSendingTime()).toString(SDF);
         writeField(52, timeStr, out);
 
         // customize tag
         List<FixMessageFragment> customFields = header.getCustomFields();
         if (customFields != null) {
-            for (int i = 0; i < customFields.size(); i++) {
-                encodeMessageFragment(out, customFields.get(i));
+            for (FixMessageFragment customField : customFields) {
+                encodeMessageFragment(out, customField);
             }
         }
     }
@@ -146,8 +134,8 @@ public class FixMessageEncoder extends MessageToByteEncoder<FixMessageBuilder> {
             writeField(groupField.getTagNum(), Integer.toString(groupField.getGroupCount()), payloadBuf);
             for (Group c : groupField.getValue()) {
                 List<FixMessageFragment> contents = c.getContents();
-                for (int j = 0; j < contents.size(); j++) {
-                    encodeMessageFragment(payloadBuf, contents.get(j));
+                for (FixMessageFragment content : contents) {
+                    encodeMessageFragment(payloadBuf, content);
                 }
             }
         }

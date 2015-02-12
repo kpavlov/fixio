@@ -15,41 +15,22 @@
  */
 package fixio.fixprotocol.fields;
 
-import java.text.DateFormat;
+import org.joda.time.DateTime;
+import org.joda.time.LocalDate;
+import org.joda.time.LocalTime;
+import org.joda.time.format.DateTimeFormat;
+import org.joda.time.format.DateTimeFormatter;
+
 import java.text.ParseException;
-import java.text.SimpleDateFormat;
-import java.util.Calendar;
-import java.util.Date;
-import java.util.Locale;
-import java.util.TimeZone;
 
 import static java.nio.charset.StandardCharsets.US_ASCII;
+import static org.joda.time.DateTimeZone.UTC;
 
 public class UTCTimestampField extends AbstractField<Long> {
 
-    private static final TimeZone UTC = TimeZone.getTimeZone("UTC");
-    private static final ThreadLocal<DateFormat> FORMAT_WITH_MILLIS_THREAD_LOCAL = new ThreadLocal<DateFormat>() {
-        @Override
-        protected DateFormat initialValue() {
-            SimpleDateFormat sdf = new SimpleDateFormat("yyyyMMdd-HH:mm:ss.SSS", Locale.US);
-            sdf.setTimeZone(UTC);
-            return sdf;
-        }
-    };
-    private static final ThreadLocal<DateFormat> FORMAT_THREAD_LOCAL = new ThreadLocal<DateFormat>() {
-        @Override
-        protected DateFormat initialValue() {
-            SimpleDateFormat sdf = new SimpleDateFormat("yyyyMMdd-HH:mm:ss", Locale.US);
-            sdf.setTimeZone(UTC);
-            return sdf;
-        }
-    };
-    private static final ThreadLocal<Calendar> CALENDAR_THREAD_LOCAL = new ThreadLocal<Calendar>() {
-        @Override
-        protected Calendar initialValue() {
-            return Calendar.getInstance(UTC);
-        }
-    };
+    private static final DateTimeFormatter FORMATTER_WITH_MILLIS = DateTimeFormat.forPattern("yyyyMMdd-HH:mm:ss.SSS").withZone(UTC);
+    private static final DateTimeFormatter FORMATTER = DateTimeFormat.forPattern("yyyyMMdd-HH:mm:ss").withZone(UTC);
+
     private final long value;
 
     protected UTCTimestampField(int tagNum, byte[] bytes, int offset, int length) throws ParseException {
@@ -80,8 +61,8 @@ public class UTCTimestampField extends AbstractField<Long> {
         if (bytes[offset + 14] != ':') {
             throwParseException(bytes, offset, length, offset + 14);
         }
-        int year = (bytes[offset + 0] - '0') * 1000 + (bytes[offset + 1] - '0') * 100 + (bytes[offset + 2] - '0') * 10 + (bytes[offset + 3] - '0');
-        int month = (bytes[offset + 4] - '0') * 10 + (bytes[offset + 5] - '0') - 1;
+        int year = (bytes[offset] - '0') * 1000 + (bytes[offset + 1] - '0') * 100 + (bytes[offset + 2] - '0') * 10 + (bytes[offset + 3] - '0');
+        int month = (bytes[offset + 4] - '0') * 10 + (bytes[offset + 5] - '0');
         int date = (bytes[offset + 6] - '0') * 10 + (bytes[offset + 7] - '0');
         int hour = (bytes[offset + 9] - '0') * 10 + (bytes[offset + 10] - '0');
         int minute = (bytes[offset + 12] - '0') * 10 + (bytes[offset + 13] - '0');
@@ -93,19 +74,11 @@ public class UTCTimestampField extends AbstractField<Long> {
             }
             millisecond = (bytes[offset + 18] - '0') * 100 + (bytes[offset + 19] - '0') * 10 + (bytes[offset + 20] - '0');
         }
-        Calendar calendar = CALENDAR_THREAD_LOCAL.get();
-        calendar.set(Calendar.YEAR, year);
-        calendar.set(Calendar.MONTH, month);
-        calendar.set(Calendar.DAY_OF_MONTH, date);
-        calendar.set(Calendar.HOUR_OF_DAY, hour);
-        calendar.set(Calendar.MINUTE, minute);
-        calendar.set(Calendar.SECOND, second);
-        calendar.set(Calendar.MILLISECOND, millisecond);
-        return calendar.getTimeInMillis();
+        return new LocalDate(year, month, date).toDateTime(new LocalTime(hour, minute, second, millisecond), UTC).getMillis();
     }
 
     static long parse(String timestampString) throws ParseException {
-        return FORMAT_WITH_MILLIS_THREAD_LOCAL.get().parse(timestampString).getTime();
+        return FORMATTER_WITH_MILLIS.parseDateTime(timestampString).getMillis();
     }
 
     static long parse(byte[] bytes) throws ParseException {
@@ -121,18 +94,9 @@ public class UTCTimestampField extends AbstractField<Long> {
         return value;
     }
 
-    public long timestampMillis() {
-        return value;
-    }
-
     @Override
     public byte[] getBytes() {
-        if (value % 1000 != 0) {
-            // with millis
-            return FORMAT_WITH_MILLIS_THREAD_LOCAL.get().format(new Date(value)).getBytes(US_ASCII);
-        } else {
-            return FORMAT_THREAD_LOCAL.get().format(new Date(value)).getBytes(US_ASCII);
-        }
+        return new DateTime(value).toString(value % 1000 != 0 ? FORMATTER_WITH_MILLIS : FORMATTER).getBytes(US_ASCII);
     }
 
 }
