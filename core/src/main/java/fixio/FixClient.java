@@ -81,7 +81,7 @@ public class FixClient extends AbstractFixConnector {
     public ChannelFuture connect(SocketAddress serverAddress) throws InterruptedException {
         Bootstrap b = new Bootstrap();
         bossEventLoopGroup = new NioEventLoopGroup();
-        workerEventLoopGroup = new NioEventLoopGroup(8);
+        workerEventLoopGroup = new NioEventLoopGroup(Runtime.getRuntime().availableProcessors());
         b.group(bossEventLoopGroup)
                 .channel(NioSocketChannel.class)
                 .remoteAddress(serverAddress)

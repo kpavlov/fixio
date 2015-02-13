@@ -35,7 +35,7 @@ public class FixConversationIT {
     public static final int TEST_TIMEOUT = 5000;
     public static final int PORT = 10453;
     private static FixServer server;
-    private static List<FixMessage> conversation = new ArrayList<>();
+    private static final List<FixMessage> conversation = new ArrayList<>();
     private FixClient client;
     private ChannelFuture clientCloseFuture;
 
@@ -94,11 +94,6 @@ public class FixConversationIT {
     }
 
     private static class ServerLogicHandler extends FixApplicationAdapter {
-
-        @Override
-        public void channelRead(ChannelHandlerContext ctx, Object msg) throws Exception {
-            super.channelRead(ctx, msg);
-        }
 
         @Override
         public void onMessage(ChannelHandlerContext ctx, FixMessage msg, List<Object> out) throws Exception {

@@ -21,7 +21,7 @@ import fixio.fixprotocol.*;
 import fixio.fixprotocol.session.FixSession;
 import fixio.handlers.FixApplication;
 import fixio.netty.pipeline.AbstractSessionHandler;
-import fixio.netty.pipeline.Clock;
+import fixio.netty.pipeline.FixClock;
 import fixio.netty.pipeline.InMemorySessionRepository;
 import io.netty.channel.ChannelHandlerContext;
 import org.slf4j.Logger;
@@ -38,7 +38,7 @@ public class ClientSessionHandler extends AbstractSessionHandler {
     public ClientSessionHandler(FixSessionSettingsProvider settingsProvider,
                                 MessageSequenceProvider messageSequenceProvider,
                                 FixApplication fixApplication) {
-        super(fixApplication, Clock.systemUTC(), new InMemorySessionRepository());
+        super(fixApplication, FixClock.systemUTC(), new InMemorySessionRepository());
         assert (settingsProvider != null) : "FixSessionSettingsProvider is expected.";
         this.sessionSettingsProvider = settingsProvider;
         this.messageSequenceProvider = messageSequenceProvider;
@@ -99,15 +99,7 @@ public class ClientSessionHandler extends AbstractSessionHandler {
     }
 
     private FixSession createSession(FixSessionSettingsProvider settingsProvider) {
-
-        int nextIncomingSeqNum;
-        if (settingsProvider.isResetMsgSeqNum()) {
-            nextIncomingSeqNum = 1;
-        } else {
-            nextIncomingSeqNum = messageSequenceProvider.getMsgInSeqNum();
-        }
-
-        FixSession session = FixSession.newBuilder()
+        final FixSession session = FixSession.newBuilder()
                 .beginString(settingsProvider.getBeginString())
                 .senderCompId(settingsProvider.getSenderCompID())
                 .senderSubId(settingsProvider.getSenderSubID())
@@ -115,17 +107,8 @@ public class ClientSessionHandler extends AbstractSessionHandler {
                 .targetSubId(settingsProvider.getTargetSubID())
                 .build();
 
-        session.setNextIncomingMessageSeqNum(nextIncomingSeqNum);
-
-
-        if (settingsProvider.isResetMsgSeqNum()) {
-            nextIncomingSeqNum = 1;
-        } else {
-            nextIncomingSeqNum = messageSequenceProvider.getMsgInSeqNum();
-        }
-
         session.setNextOutgoingMessageSeqNum(messageSequenceProvider.getMsgOutSeqNum());
-        session.setNextIncomingMessageSeqNum(nextIncomingSeqNum);
+        session.setNextIncomingMessageSeqNum(settingsProvider.isResetMsgSeqNum() ? 1 : messageSequenceProvider.getMsgInSeqNum());
         return session;
     }
 

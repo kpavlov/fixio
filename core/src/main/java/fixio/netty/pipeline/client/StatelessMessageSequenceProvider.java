@@ -21,7 +21,7 @@ package fixio.netty.pipeline.client;
  */
 public class StatelessMessageSequenceProvider implements MessageSequenceProvider {
 
-    private static StatelessMessageSequenceProvider INSTANCE = new StatelessMessageSequenceProvider();
+    private static final StatelessMessageSequenceProvider INSTANCE = new StatelessMessageSequenceProvider();
 
     private StatelessMessageSequenceProvider() {
     }

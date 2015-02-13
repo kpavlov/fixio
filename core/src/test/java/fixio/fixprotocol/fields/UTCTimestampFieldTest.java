@@ -15,13 +15,15 @@
  */
 package fixio.fixprotocol.fields;
 
-import org.junit.Before;
 import org.junit.Test;
 
-import java.util.Calendar;
+import java.time.LocalDate;
+import java.time.LocalTime;
+import java.time.ZonedDateTime;
 import java.util.Random;
-import java.util.TimeZone;
+import java.util.concurrent.TimeUnit;
 
+import static fixio.netty.pipeline.FixClock.systemUTC;
 import static org.junit.Assert.assertArrayEquals;
 import static org.junit.Assert.assertEquals;
 
@@ -30,28 +32,19 @@ public class UTCTimestampFieldTest {
     private static final String TIMESTAMP_WITH_MILLIS = "19980604-08:03:31.537";
     private static final String TIMESTAMP_NO_MILLIS = "19980604-08:03:31";
 
-    private Calendar utcCalendar = Calendar.getInstance(TimeZone.getTimeZone("UTC"));
+    private final LocalDate testDate = LocalDate.of(1998, 6, 4);
 
-    @Before
-    public void setUp() {
-        utcCalendar.set(Calendar.YEAR, 1998);
-        utcCalendar.set(Calendar.MONTH, Calendar.JUNE);
-        utcCalendar.set(Calendar.DAY_OF_MONTH, 4);
-        utcCalendar.set(Calendar.HOUR_OF_DAY, 8);
-        utcCalendar.set(Calendar.MINUTE, 3);
-        utcCalendar.set(Calendar.SECOND, 31);
-        utcCalendar.clear(Calendar.MILLISECOND);
-    }
+    private final long testDateTime = ZonedDateTime.of(testDate, LocalTime.of(8, 3, 31), systemUTC().zone()).toInstant().toEpochMilli();
+    private final long testDateTimeWithMillis = ZonedDateTime.of(testDate, LocalTime.of(8, 3, 31, (int) TimeUnit.MILLISECONDS.toNanos(537)), systemUTC().zone()).toInstant().toEpochMilli();
 
     @Test
     public void testParseNoMillis() throws Exception {
-        assertEquals(utcCalendar.getTimeInMillis(), UTCTimestampField.parse(TIMESTAMP_NO_MILLIS.getBytes()));
+        assertEquals(testDateTime, UTCTimestampField.parse(TIMESTAMP_NO_MILLIS.getBytes()));
     }
 
     @Test
     public void testParseWithMillis() throws Exception {
-        utcCalendar.set(Calendar.MILLISECOND, 537);
-        assertEquals(utcCalendar.getTimeInMillis(), UTCTimestampField.parse((TIMESTAMP_WITH_MILLIS.getBytes())));
+        assertEquals(testDateTimeWithMillis, UTCTimestampField.parse((TIMESTAMP_WITH_MILLIS.getBytes())));
     }
 
     @Test
@@ -59,18 +52,15 @@ public class UTCTimestampFieldTest {
         int tag = new Random().nextInt();
         byte[] bytes = TIMESTAMP_NO_MILLIS.getBytes();
         UTCTimestampField field = new UTCTimestampField(tag, bytes, 0, bytes.length);
-        assertEquals(utcCalendar.getTimeInMillis(), field.getValue().longValue());
-        assertEquals(utcCalendar.getTimeInMillis(), field.timestampMillis());
+        assertEquals(testDateTime, field.getValue().longValue());
     }
 
     @Test
     public void testCreateWithMillis() throws Exception {
         int tag = new Random().nextInt();
-        utcCalendar.set(Calendar.MILLISECOND, 537);
         byte[] bytes = TIMESTAMP_WITH_MILLIS.getBytes();
         UTCTimestampField field = new UTCTimestampField(tag, bytes, 0, bytes.length);
-        assertEquals(utcCalendar.getTimeInMillis(), field.getValue().longValue());
-        assertEquals(utcCalendar.getTimeInMillis(), field.timestampMillis());
+        assertEquals(testDateTimeWithMillis, field.getValue().longValue());
     }
 
     @Test
@@ -78,7 +68,6 @@ public class UTCTimestampFieldTest {
         int tag = new Random().nextInt();
         byte[] bytes = TIMESTAMP_WITH_MILLIS.getBytes();
         UTCTimestampField field = new UTCTimestampField(tag, bytes, 0, bytes.length);
-
         assertArrayEquals(bytes, field.getBytes());
     }
 
@@ -87,7 +76,6 @@ public class UTCTimestampFieldTest {
         int tag = new Random().nextInt();
         byte[] bytes = TIMESTAMP_NO_MILLIS.getBytes();
         UTCTimestampField field = new UTCTimestampField(tag, bytes, 0, bytes.length);
-
         assertArrayEquals(bytes, field.getBytes());
     }
 }

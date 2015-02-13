@@ -36,8 +36,8 @@ public class FixMessageDecoderChecksumTest {
 
     private static FixMessageDecoder decoder;
     private final boolean checksumValid;
-    private String fixMessage;
-    private int expectedChecksum;
+    private final String fixMessage;
+    private final int expectedChecksum;
 
     public FixMessageDecoderChecksumTest(String fixMessage, int expectedChecksum, boolean checksumValid) {
         this.fixMessage = fixMessage;

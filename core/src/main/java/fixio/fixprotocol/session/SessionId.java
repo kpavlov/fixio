@@ -57,21 +57,13 @@ public class SessionId {
     public boolean equals(Object o) {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
-
         SessionId other = (SessionId) o;
+        return this.hashCode() == other.hashCode() &&
+                senderCompID.equals(other.senderCompID) &&
+                !(senderSubID != null ? !senderSubID.equals(other.senderSubID) : other.senderSubID != null) &&
+                targetCompID.equals(other.targetCompID) &&
+                !(targetSubID != null ? !targetSubID.equals(other.targetSubID) : other.targetSubID != null);
 
-        if (this.hashCode() != other.hashCode()) {
-            return false;
-        }
-
-        if (!senderCompID.equals(other.senderCompID)) return false;
-        if (senderSubID != null ? !senderSubID.equals(other.senderSubID) : other.senderSubID != null)
-            return false;
-        if (!targetCompID.equals(other.targetCompID)) return false;
-        if (targetSubID != null ? !targetSubID.equals(other.targetSubID) : other.targetSubID != null)
-            return false;
-
-        return true;
     }
 
     @Override

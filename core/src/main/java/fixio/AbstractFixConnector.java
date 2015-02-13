@@ -29,7 +29,7 @@ import io.netty.util.internal.logging.Slf4JLoggerFactory;
 public abstract class AbstractFixConnector {
 
     private final FixApplication fixApplication;
-    private SessionRepository sessionRepository;
+    private final SessionRepository sessionRepository;
 
     static {
         InternalLoggerFactory.setDefaultFactory(new Slf4JLoggerFactory());
