@@ -15,13 +15,15 @@
  */
 package fixio.fixprotocol.fields;
 
-import org.junit.Before;
 import org.junit.Test;
 
-import java.util.Calendar;
+import java.time.LocalDate;
+import java.time.LocalTime;
+import java.time.ZonedDateTime;
 import java.util.Random;
-import java.util.TimeZone;
+import java.util.concurrent.TimeUnit;
 
+import static fixio.netty.pipeline.FixClock.systemUTC;
 import static org.junit.Assert.assertArrayEquals;
 import static org.junit.Assert.assertEquals;
 
@@ -33,51 +35,41 @@ public class UTCTimeOnlyFieldTest {
     private static final long MILLIS_PER_MINUTE = 60 * MILLIS_PER_SECOND;
     private static final long MILLIS_PER_HOUR = 60 * MILLIS_PER_MINUTE;
 
-    private Calendar utcCalendar = Calendar.getInstance(TimeZone.getTimeZone("UTC"));
+    private final LocalDate testDate = LocalDate.of(1970, 1, 1);
+    private final LocalTime testTime = LocalTime.of(8, 3, 31);
+    private final LocalTime testTimeWihMillis = testTime.plusNanos(TimeUnit.MILLISECONDS.toNanos(537));
 
-    @Before
-    public void setUp() {
-        utcCalendar.set(Calendar.YEAR, 1970);
-        utcCalendar.set(Calendar.MONTH, 0);
-        utcCalendar.set(Calendar.DAY_OF_MONTH, 1);
-        utcCalendar.set(Calendar.HOUR_OF_DAY, 8);
-        utcCalendar.set(Calendar.MINUTE, 3);
-        utcCalendar.set(Calendar.SECOND, 31);
-        utcCalendar.clear(Calendar.MILLISECOND);
-    }
+    private final long testDateTime = ZonedDateTime.of(testDate, testTime, systemUTC().zone()).toInstant().toEpochMilli();
+    private final long testDateTimeWithMillis = ZonedDateTime.of(testDate, testTimeWihMillis, systemUTC().zone()).toInstant().toEpochMilli();
 
     @Test
     public void testParseNoMillis() throws Exception {
-        assertEquals(utcCalendar.getTimeInMillis(), UTCTimeOnlyField.parse(TIMESTAMP_NO_MILLIS.getBytes()));
+        assertEquals(testDateTime, UTCTimeOnlyField.parse(TIMESTAMP_NO_MILLIS.getBytes()));
     }
 
     @Test
     public void testParseWithMillis() throws Exception {
-        utcCalendar.set(Calendar.MILLISECOND, 537);
-        assertEquals(utcCalendar.getTimeInMillis(), UTCTimeOnlyField.parse((TIMESTAMP_WITH_MILLIS.getBytes())));
+        assertEquals(testDateTimeWithMillis, UTCTimeOnlyField.parse((TIMESTAMP_WITH_MILLIS.getBytes())));
     }
 
     @Test
     public void testParseLastMillisecond() throws Exception {
-        long lastMillisecondOfDay = MILLIS_PER_HOUR * 24 - 1;
-        assertEquals(lastMillisecondOfDay, UTCTimeOnlyField.parse(("23:59:59.999".getBytes())));
+        long lastMilliSecondOfDay = MILLIS_PER_HOUR * 24 - 1;
+        assertEquals(lastMilliSecondOfDay, UTCTimeOnlyField.parse(("23:59:59.999".getBytes())));
     }
 
     @Test
     public void testCreateNoMillis() throws Exception {
         int tag = new Random().nextInt();
         UTCTimeOnlyField field = new UTCTimeOnlyField(tag, TIMESTAMP_NO_MILLIS.getBytes());
-        assertEquals(utcCalendar.getTimeInMillis(), field.getValue().longValue());
-        assertEquals(utcCalendar.getTimeInMillis(), field.timestampMillis());
+        assertEquals(testDateTime, field.getValue().longValue());
     }
 
     @Test
     public void testCreateWithMillis() throws Exception {
         int tag = new Random().nextInt();
-        utcCalendar.set(Calendar.MILLISECOND, 537);
         UTCTimeOnlyField field = new UTCTimeOnlyField(tag, TIMESTAMP_WITH_MILLIS.getBytes());
-        assertEquals(utcCalendar.getTimeInMillis(), field.getValue().longValue());
-        assertEquals(utcCalendar.getTimeInMillis(), field.timestampMillis());
+        assertEquals(testDateTimeWithMillis, field.getValue().longValue());
     }
 
     @Test
@@ -85,7 +77,6 @@ public class UTCTimeOnlyFieldTest {
         int tag = new Random().nextInt();
         byte[] bytes = TIMESTAMP_WITH_MILLIS.getBytes();
         UTCTimeOnlyField field = new UTCTimeOnlyField(tag, bytes);
-
         assertArrayEquals(bytes, field.getBytes());
     }
 
@@ -94,7 +85,6 @@ public class UTCTimeOnlyFieldTest {
         int tag = new Random().nextInt();
         byte[] bytes = TIMESTAMP_NO_MILLIS.getBytes();
         UTCTimeOnlyField field = new UTCTimeOnlyField(tag, bytes);
-
         assertArrayEquals(bytes, field.getBytes());
     }
 }

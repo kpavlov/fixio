@@ -15,14 +15,11 @@
  */
 package fixio.fixprotocol.fields;
 
-import java.text.DateFormat;
 import java.text.ParseException;
-import java.text.SimpleDateFormat;
-import java.util.Calendar;
-import java.util.Date;
-import java.util.Locale;
-import java.util.TimeZone;
+import java.time.*;
+import java.time.format.DateTimeFormatter;
 
+import static fixio.netty.pipeline.FixClock.systemUTC;
 import static java.nio.charset.StandardCharsets.US_ASCII;
 
 /**
@@ -37,28 +34,7 @@ import static java.nio.charset.StandardCharsets.US_ASCII;
  */
 public class UTCDateOnlyField extends AbstractField<Long> {
 
-    private static final TimeZone UTC = TimeZone.getTimeZone("UTC");
-
-    private static final ThreadLocal<DateFormat> FORMAT_THREAD_LOCAL = new ThreadLocal<DateFormat>() {
-        @Override
-        protected DateFormat initialValue() {
-            SimpleDateFormat sdf = new SimpleDateFormat("yyyyMMdd", Locale.US);
-            sdf.setTimeZone(UTC);
-            return sdf;
-        }
-    };
-
-    private static final ThreadLocal<Calendar> CALENDAR_THREAD_LOCAL = new ThreadLocal<Calendar>() {
-        @Override
-        protected Calendar initialValue() {
-            Calendar calendar = Calendar.getInstance(UTC);
-            calendar.clear(Calendar.HOUR_OF_DAY);
-            calendar.clear(Calendar.MINUTE);
-            calendar.clear(Calendar.SECOND);
-            calendar.clear(Calendar.MILLISECOND);
-            return calendar;
-        }
-    };
+    private static final DateTimeFormatter FORMATTER = DateTimeFormatter.ofPattern("yyyyMMdd").withZone(systemUTC().zone());
 
     private final long value;
 
@@ -78,7 +54,8 @@ public class UTCDateOnlyField extends AbstractField<Long> {
     }
 
     static long parse(String timestampString) throws ParseException {
-        return FORMAT_THREAD_LOCAL.get().parse(timestampString).getTime();
+        final ZoneId zone = systemUTC().zone();
+        return ZonedDateTime.of(LocalDate.now(zone), LocalTime.parse(timestampString, FORMATTER), zone).toInstant().toEpochMilli();
     }
 
     static long parse(byte[] bytes) throws ParseException {
@@ -86,13 +63,10 @@ public class UTCDateOnlyField extends AbstractField<Long> {
             throwParseException(bytes, 0);
         }
         int year = (bytes[0] - '0') * 1000 + (bytes[1] - '0') * 100 + (bytes[2] - '0') * 10 + (bytes[3] - '0');
-        int month = (bytes[4] - '0') * 10 + (bytes[5] - '0') - 1;
+        int month = (bytes[4] - '0') * 10 + (bytes[5] - '0');
         int date = (bytes[6] - '0') * 10 + (bytes[7] - '0');
-        Calendar calendar = CALENDAR_THREAD_LOCAL.get();
-        calendar.set(Calendar.YEAR, year);
-        calendar.set(Calendar.MONTH, month);
-        calendar.set(Calendar.DAY_OF_MONTH, date);
-        return calendar.getTimeInMillis();
+        final ZoneId zone = systemUTC().zone();
+        return ZonedDateTime.of(LocalDate.of(year, month, date), LocalTime.now(zone), zone).toInstant().toEpochMilli();
     }
 
     private static void throwParseException(byte[] bytes, int errorOffset) throws ParseException {
@@ -104,13 +78,9 @@ public class UTCDateOnlyField extends AbstractField<Long> {
         return value;
     }
 
-    public long timestampMillis() {
-        return value;
-    }
-
     @Override
     public byte[] getBytes() {
-        return FORMAT_THREAD_LOCAL.get().format(new Date(value)).getBytes(US_ASCII);
+        return FORMATTER.format(Instant.ofEpochMilli(value)).getBytes(US_ASCII);
     }
 
 }

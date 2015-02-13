@@ -21,7 +21,7 @@ import fixio.fixprotocol.*;
 import fixio.fixprotocol.session.FixSession;
 import fixio.handlers.FixApplication;
 import fixio.netty.pipeline.AbstractSessionHandler;
-import fixio.netty.pipeline.Clock;
+import fixio.netty.pipeline.FixClock;
 import fixio.netty.pipeline.SessionRepository;
 import io.netty.channel.ChannelFutureListener;
 import io.netty.channel.ChannelHandlerContext;
@@ -34,12 +34,12 @@ public class ServerSessionHandler extends AbstractSessionHandler {
 
     private final static Logger LOGGER = LoggerFactory.getLogger(ServerSessionHandler.class);
     private final FixAuthenticator authenticator;
-    private int heartbeatIntervalSec = 30;
+    private final int heartbeatIntervalSec = 30;
 
     public ServerSessionHandler(FixApplication fixApplication,
                                 FixAuthenticator authenticator,
                                 SessionRepository sessionRepository) {
-        super(fixApplication, Clock.systemUTC(), sessionRepository);
+        super(fixApplication, FixClock.systemUTC(), sessionRepository);
         assert (authenticator != null) : "FixAuthenticator is required for ServerSessionHandler";
         this.authenticator = authenticator;
     }

@@ -45,7 +45,7 @@ public class FixMessageEncoderTest {
     private ByteBufAllocator byteBufAllocator;
     private FixMessageBuilder messageBuilder;
     private ByteBuf out;
-    private long timestamp = 123456789;
+    private final long timestamp = 123456789;
 
     @BeforeClass
     public static void beforeClass() {

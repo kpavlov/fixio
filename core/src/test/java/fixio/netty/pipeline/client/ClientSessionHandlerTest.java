@@ -40,7 +40,6 @@ import java.util.Random;
 import static org.apache.commons.lang3.RandomStringUtils.randomAscii;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
-import static org.mockito.Matchers.same;
 import static org.mockito.Mockito.*;
 
 

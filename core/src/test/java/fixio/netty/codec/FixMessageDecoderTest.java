@@ -25,11 +25,13 @@ import org.junit.BeforeClass;
 import org.junit.Test;
 
 import java.nio.charset.StandardCharsets;
+import java.time.LocalDate;
+import java.time.LocalTime;
+import java.time.ZonedDateTime;
 import java.util.ArrayList;
-import java.util.Calendar;
 import java.util.List;
-import java.util.TimeZone;
 
+import static fixio.netty.pipeline.FixClock.systemUTC;
 import static org.apache.commons.lang3.RandomStringUtils.randomAlphanumeric;
 import static org.junit.Assert.*;
 
@@ -59,15 +61,8 @@ public class FixMessageDecoderTest {
         assertEquals(240, header.getMsgSeqNum());
         assertEquals(129, fixMessage.getChecksum());
 
-        Calendar calendar = Calendar.getInstance(TimeZone.getTimeZone("UTC"));
-        calendar.set(Calendar.YEAR, 1998);
-        calendar.set(Calendar.MONTH, Calendar.JUNE);
-        calendar.set(Calendar.DAY_OF_MONTH, 4);
-        calendar.set(Calendar.HOUR_OF_DAY, 8);
-        calendar.set(Calendar.MINUTE, 3);
-        calendar.set(Calendar.SECOND, 31);
-        calendar.set(Calendar.MILLISECOND, 0);
-        assertEquals(calendar.getTimeInMillis(), (long)fixMessage.getValue(FieldType.SendingTime));
+        final Long value = fixMessage.getValue(FieldType.SendingTime);
+        assertEquals(ZonedDateTime.of(LocalDate.of(1998, 6, 4), LocalTime.of(8, 3, 31), systemUTC().zone()).toInstant().toEpochMilli(), value.longValue());
     }
 
     @Test
@@ -90,13 +85,13 @@ public class FixMessageDecoderTest {
 
     @Test
     public void testNoBeginTag() throws Exception {
-        String random=randomAlphanumeric(50);
+        String random = randomAlphanumeric(50);
 
         try {
             decode("100=" + random + "\u00018=FIX.4.2...");
             fail("DecoderException is expected");
         } catch (DecoderException e) {
-            assertEquals("BeginString tag expected, but got: 100=" + random.substring(0,10) + "...", e.getMessage());
+            assertEquals("BeginString tag expected, but got: 100=" + random.substring(0, 10) + "...", e.getMessage());
         }
     }
 }

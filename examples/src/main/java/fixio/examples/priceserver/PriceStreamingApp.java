@@ -30,6 +30,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.stream.Collectors;
 
 class PriceStreamingApp extends FixApplicationAdapter {
 
@@ -67,14 +68,8 @@ class PriceStreamingApp extends FixApplicationAdapter {
 
     private void stopStreaming(ChannelHandlerContext ctx) {
         ArrayList<String> requestsToCancel = new ArrayList<>(subscriptions.size());
-        for (Map.Entry<String, ChannelHandlerContext> entry : subscriptions.entrySet()) {
-            if (entry.getValue() == ctx) {
-                requestsToCancel.add(entry.getKey());
-            }
-        }
-        for (String reqId : requestsToCancel) {
-            subscriptions.remove(reqId);
-        }
+        requestsToCancel.addAll(subscriptions.entrySet().stream().filter(entry -> entry.getValue() == ctx).map(Map.Entry::getKey).collect(Collectors.toList()));
+        requestsToCancel.forEach(subscriptions::remove);
         LOGGER.info("Streaming Stopped for {}", ctx);
     }
 

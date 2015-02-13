@@ -29,9 +29,9 @@ import static org.junit.Assert.assertEquals;
 @RunWith(Parameterized.class)
 public class FixMessageEncoderChecksumTest {
 
-    private ByteBuf byteBuf;
-    private int offset;
-    private int expectedChecksum;
+    private final ByteBuf byteBuf;
+    private final int offset;
+    private final int expectedChecksum;
 
     @Parameterized.Parameters
     public static Iterable<Object[]> data() {
