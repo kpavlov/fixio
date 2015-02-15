@@ -147,9 +147,8 @@ public class FixedPointNumber extends Number {
 
     @Override
     public String toString() {
-        String scaledStr = String.valueOf(scaledValue);
-        if (scale == 0) {
-            return scaledStr;
+        if (scale == 0 || scaledValue == 0) {
+            return String.valueOf(scaledValue);
         }
         int factor = (int) Math.pow(10.0, scale);
         long beforePoint = scaledValue / factor;
@@ -158,7 +157,7 @@ public class FixedPointNumber extends Number {
         if (beforePoint == 0 && scaledValue < 0) {
             return "-0." + afterPoint;
         } else {
-//            return beforePoint + "." + afterPoint;
+            String scaledStr = String.valueOf(scaledValue);
             int idx = scaledStr.length() - scale;
             String insertPoint;
             if (idx <= 0) {
@@ -167,7 +166,9 @@ public class FixedPointNumber extends Number {
             } else {
                 insertPoint = ".";
             }
-            return new StringBuilder(scaledStr).insert(idx, insertPoint).toString();
+            return new StringBuilder(scaledStr)
+                    .insert(idx, insertPoint)
+                    .toString();
         }
     }
 }
