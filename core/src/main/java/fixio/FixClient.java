@@ -79,16 +79,15 @@ public class FixClient extends AbstractFixConnector {
     }
 
     public ChannelFuture connect(SocketAddress serverAddress) throws InterruptedException {
-        ChannelFuture connectFuture = connectAsync(serverAddress);
-
-        channel = connectFuture.sync().channel();
+        connectAsync(serverAddress).sync();
         LOGGER.info("FixClient is started and connected to {}", channel.remoteAddress());
+        assert (channel != null) : "Channel must be set";
         return channel.closeFuture();
     }
 
     public ChannelFuture connectAsync(SocketAddress serverAddress) {
         LOGGER.info("FixClient is starting");
-        Bootstrap b = new Bootstrap();
+        final Bootstrap b = new Bootstrap();
         bossEventLoopGroup = new NioEventLoopGroup();
         workerEventLoopGroup = new NioEventLoopGroup(Runtime.getRuntime().availableProcessors());
         b.group(bossEventLoopGroup)
@@ -106,7 +105,8 @@ public class FixClient extends AbstractFixConnector {
                 ))
                 .validate();
 
-        return b.connect();
+        final ChannelFuture connectFuture = b.connect();
+        return connectFuture.addListener(future -> channel = connectFuture.channel());
     }
 
     public ChannelFuture disconnectAsync() {
