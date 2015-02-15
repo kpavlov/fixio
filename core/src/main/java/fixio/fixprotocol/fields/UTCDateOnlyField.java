@@ -32,25 +32,20 @@ import static java.nio.charset.StandardCharsets.US_ASCII;
  * <p/>
  * Example(s): <code>MDEntryDate="20030910"</code>
  */
-public class UTCDateOnlyField extends AbstractField<Long> {
+public class UTCDateOnlyField extends AbstractTemporalField {
 
     private static final DateTimeFormatter FORMATTER = DateTimeFormatter.ofPattern("yyyyMMdd").withZone(systemUTC().zone());
 
-    private final long value;
-
     protected UTCDateOnlyField(int tagNum, byte[] bytes) throws ParseException {
-        super(tagNum);
-        this.value = parse(bytes);
+        super(tagNum,  parse(bytes));
     }
 
     protected UTCDateOnlyField(int tagNum, String timestampString) throws ParseException {
-        super(tagNum);
-        this.value = parse(timestampString);
+        super(tagNum, parse(timestampString));
     }
 
     protected UTCDateOnlyField(int tagNum, long value) {
-        super(tagNum);
-        this.value = value;
+        super(tagNum, value);
     }
 
     static long parse(String timestampString) throws ParseException {
@@ -74,13 +69,7 @@ public class UTCDateOnlyField extends AbstractField<Long> {
     }
 
     @Override
-    public Long getValue() {
-        return value;
-    }
-
-    @Override
     public byte[] getBytes() {
         return FORMATTER.format(Instant.ofEpochMilli(value)).getBytes(US_ASCII);
     }
-
 }

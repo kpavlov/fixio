@@ -26,26 +26,21 @@ import java.util.concurrent.TimeUnit;
 import static fixio.netty.pipeline.FixClock.systemUTC;
 import static java.nio.charset.StandardCharsets.US_ASCII;
 
-public class UTCTimestampField extends AbstractField<Long> {
+public class UTCTimestampField extends AbstractTemporalField {
 
     private static final DateTimeFormatter FORMATTER_WITH_MILLIS = DateTimeFormatter.ofPattern("yyyyMMdd-HH:mm:ss.SSS").withZone(systemUTC().zone());
     private static final DateTimeFormatter FORMATTER = DateTimeFormatter.ofPattern("yyyyMMdd-HH:mm:ss").withZone(systemUTC().zone());
 
-    private final long value;
-
     protected UTCTimestampField(int tagNum, byte[] bytes, int offset, int length) throws ParseException {
-        super(tagNum);
-        this.value = parse(bytes, offset, length);
+        super(tagNum, parse(bytes, offset, length));
     }
 
     protected UTCTimestampField(int tagNum, String timestampString) throws ParseException {
-        super(tagNum);
-        this.value = parse(timestampString);
+        super(tagNum, parse(timestampString));
     }
 
     protected UTCTimestampField(int tagNum, long value) {
-        super(tagNum);
-        this.value = value;
+        super(tagNum, value);
     }
 
     static long parse(byte[] bytes, int offset, int length) throws ParseException {
@@ -93,13 +88,7 @@ public class UTCTimestampField extends AbstractField<Long> {
     }
 
     @Override
-    public Long getValue() {
-        return value;
-    }
-
-    @Override
     public byte[] getBytes() {
         return (value % 1000 != 0 ? FORMATTER_WITH_MILLIS.format(Instant.ofEpochMilli(value)) : FORMATTER.format(Instant.ofEpochMilli(value))).getBytes(US_ASCII);
     }
-
 }

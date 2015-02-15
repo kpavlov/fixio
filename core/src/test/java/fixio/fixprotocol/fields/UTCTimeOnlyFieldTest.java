@@ -29,15 +29,17 @@ import static org.junit.Assert.assertEquals;
 
 public class UTCTimeOnlyFieldTest {
 
+    public static final int MILLIS = 537;
     private static final String TIMESTAMP_WITH_MILLIS = "08:03:31.537";
     private static final String TIMESTAMP_NO_MILLIS = "08:03:31";
+
     private static final long MILLIS_PER_SECOND = 1000L;
     private static final long MILLIS_PER_MINUTE = 60 * MILLIS_PER_SECOND;
     private static final long MILLIS_PER_HOUR = 60 * MILLIS_PER_MINUTE;
 
     private final LocalDate testDate = LocalDate.of(1970, 1, 1);
     private final LocalTime testTime = LocalTime.of(8, 3, 31);
-    private final LocalTime testTimeWihMillis = testTime.plusNanos(TimeUnit.MILLISECONDS.toNanos(537));
+    private final LocalTime testTimeWihMillis = testTime.plusNanos(TimeUnit.MILLISECONDS.toNanos(MILLIS));
 
     private final long testDateTime = ZonedDateTime.of(testDate, testTime, systemUTC().zone()).toInstant().toEpochMilli();
     private final long testDateTimeWithMillis = ZonedDateTime.of(testDate, testTimeWihMillis, systemUTC().zone()).toInstant().toEpochMilli();

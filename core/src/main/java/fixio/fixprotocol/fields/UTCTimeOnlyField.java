@@ -23,7 +23,7 @@ import java.time.format.DateTimeFormatter;
 import static fixio.netty.pipeline.FixClock.systemUTC;
 import static java.nio.charset.StandardCharsets.US_ASCII;
 
-public class UTCTimeOnlyField extends AbstractField<Long> {
+public class UTCTimeOnlyField extends AbstractTemporalField {
 
     private static final long MILLIS_PER_SECOND = 1000;
     private static final long MILLIS_PER_MINUTE = 60 * MILLIS_PER_SECOND;
@@ -32,21 +32,16 @@ public class UTCTimeOnlyField extends AbstractField<Long> {
     private static final DateTimeFormatter FORMATTER_WITH_MILLIS = DateTimeFormatter.ofPattern("HH:mm:ss.SSS").withZone(systemUTC().zone());
     private static final DateTimeFormatter FORMATTER = DateTimeFormatter.ofPattern("HH:mm:ss").withZone(systemUTC().zone());
 
-    private final long value;
-
     protected UTCTimeOnlyField(int tagNum, byte[] bytes) throws ParseException {
-        super(tagNum);
-        this.value = parse(bytes);
+        super(tagNum, parse(bytes));
     }
 
     protected UTCTimeOnlyField(int tagNum, String timestampString) throws ParseException {
-        super(tagNum);
-        this.value = parse(timestampString);
+        super(tagNum, parse(timestampString));
     }
 
     protected UTCTimeOnlyField(int tagNum, long value) {
-        super(tagNum);
-        this.value = value;
+        super(tagNum, value);
     }
 
     static long parse(String timestampString) throws ParseException {
@@ -85,11 +80,6 @@ public class UTCTimeOnlyField extends AbstractField<Long> {
 
     private static void throwParseException(byte[] bytes, int errorOffset) throws ParseException {
         throw new ParseException("Unparseable date: " + new String(bytes, StandardCharsets.US_ASCII), errorOffset);
-    }
-
-    @Override
-    public Long getValue() {
-        return value;
     }
 
     @Override
