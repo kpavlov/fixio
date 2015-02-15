@@ -17,7 +17,10 @@ package fixio.fixprotocol.fields;
 
 import fixio.fixprotocol.DataType;
 import fixio.fixprotocol.FieldType;
+import junitparams.JUnitParamsRunner;
+import junitparams.Parameters;
 import org.junit.Test;
+import org.junit.runner.RunWith;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
@@ -32,6 +35,7 @@ import static org.apache.commons.lang3.RandomStringUtils.randomAlphanumeric;
 import static org.apache.commons.lang3.RandomStringUtils.randomAscii;
 import static org.junit.Assert.*;
 
+@RunWith(JUnitParamsRunner.class)
 public class FieldFactoryTest {
 
     @Test(expected = IllegalArgumentException.class)
@@ -166,8 +170,9 @@ public class FieldFactoryTest {
     }
 
     @Test(expected = IllegalArgumentException.class)
-    public void testFailValueOfIncorrectBoolean() throws Exception {
-        FieldFactory.valueOf(FieldType.PossDupFlag.tag(), "XXX".getBytes(US_ASCII));
+    @Parameters({"XXX","", "-"})
+    public void testFailValueOfIncorrectBoolean(String value) throws Exception {
+        FieldFactory.valueOf(FieldType.PossDupFlag.tag(), value.getBytes(US_ASCII));
     }
 
     @Test
@@ -189,8 +194,8 @@ public class FieldFactoryTest {
     }
 
     @Test
-    public void testFromStringValueBooleanTrue() throws Exception {
-        String value = "Y";
+    @Parameters({"Y","true", "TRUE"})
+    public void testFromStringValueBooleanTrue(final String value) throws Exception {
         final int tag = FieldType.PossDupFlag.tag();
         BooleanField field = FieldFactory.fromStringValue(DataType.BOOLEAN, tag, value);
 
@@ -200,8 +205,8 @@ public class FieldFactoryTest {
     }
 
     @Test
-    public void testValueStringValueBooleanFalse() throws Exception {
-        String value = "N";
+    @Parameters({"N","false", "FALSE"})
+    public void testValueStringValueBooleanFalse(final String value) throws Exception {
         final int tag = FieldType.PossDupFlag.tag();
         BooleanField field = FieldFactory.fromStringValue(DataType.BOOLEAN, tag, value);
 

@@ -33,6 +33,9 @@ public class FieldFactory {
         if (tagNum <= 0) {
             throw new IllegalArgumentException("Invalid tagNum=" + tagNum);
         }
+        if (length <= 0) {
+            throw new IllegalArgumentException("Value length must be positive but was " + length);
+        }
         FieldType fieldType = FieldType.forTag(tagNum);
         try {
             final DataType dataType = fieldType.type();
@@ -161,7 +164,7 @@ public class FieldFactory {
                 } else if ("N".equals(value)) {
                     return (F) new BooleanField(tagNum, false);
                 }
-                return (F) new BooleanField(tagNum, Boolean.parseBoolean(value));
+                return (F) new BooleanField(tagNum, Boolean.parseBoolean(value.toLowerCase()));
             case CHAR:
             case STRING:
                 return (F) new StringField(tagNum, value);
