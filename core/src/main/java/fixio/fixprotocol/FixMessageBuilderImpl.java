@@ -131,6 +131,12 @@ public class FixMessageBuilderImpl implements FixMessage, FixMessageBuilder {
     }
 
     @Override
+    public FixMessageBuilder add(FieldType field, char value) {
+        FieldListBuilderHelper.add(body, field, value);
+        return this;
+    }
+
+    @Override
     public FixMessageBuilder add(DataType type, int tagNum, String value) {
         FieldListBuilderHelper.add(body, type, tagNum, value);
         return this;
@@ -188,7 +194,7 @@ public class FixMessageBuilderImpl implements FixMessage, FixMessageBuilder {
     @Override
     public void copyBody(List<? extends FixMessageFragment> body) {
         this.body.clear();
-        for (FixMessageFragment fragment : body){
+        for (FixMessageFragment fragment : body) {
             this.body.put(fragment.getTagNum(), fragment);
         }
     }

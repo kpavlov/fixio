@@ -15,6 +15,7 @@
  */
 package fixio.fixprotocol;
 
+import fixio.fixprotocol.fields.CharField;
 import fixio.fixprotocol.fields.FieldFactory;
 import fixio.fixprotocol.fields.FixedPointNumber;
 
@@ -69,6 +70,13 @@ final class FieldListBuilderHelper {
         assert (value != null) : "Value must be specified.";
         map.put(fieldType.tag(),FieldFactory.fromStringValue(fieldType.type(), fieldType.tag(), value));
     }
+
+    static void add(Map<Integer, FixMessageFragment> map, FieldType fieldType, char value) {
+         if(fieldType.type() != DataType.CHAR) {
+             throw new IllegalArgumentException("FieldType " + fieldType + " must be CHAR");
+             }
+        map.put(fieldType.tag(),new CharField(fieldType.tag(), value));
+         }
 
     static void add(Map<Integer, FixMessageFragment> map, int tagNum, String value) {
         assert (tagNum > 0) : "TagNum must be positive. Got " + tagNum;

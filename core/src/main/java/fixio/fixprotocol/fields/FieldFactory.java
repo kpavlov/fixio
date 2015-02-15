@@ -79,6 +79,8 @@ public class FieldFactory {
         switch (type) {
             case STRING:
                 return (F) new StringField(tagNum, String.valueOf(value));
+            case CHAR:
+                return (F) new CharField(tagNum, Character.forDigit(value, Character.MAX_RADIX));
             case FLOAT:
             case PRICE:
             case QTY:

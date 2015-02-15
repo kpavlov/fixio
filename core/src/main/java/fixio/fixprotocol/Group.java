@@ -56,6 +56,12 @@ public class Group implements FieldListBuilder<Group> {
     }
 
     @Override
+    public Group add(FieldType field, char value) {
+        FieldListBuilderHelper.add(contents, field.tag(), value);
+        return this;
+    }
+
+    @Override
     public Group add(DataType type, int tagNum, String value) {
         FieldListBuilderHelper.add(contents, type, tagNum, value);
         return this;
@@ -171,11 +177,11 @@ public class Group implements FieldListBuilder<Group> {
     public List<FixMessageFragment> getContents() {
         return new ArrayList<>(contents.values());
     }
-    
+
     @Override
     public String toString() {
         StringBuilder sb = new StringBuilder();
-        for (FixMessageFragment fragment : contents.values()){
+        for (FixMessageFragment fragment : contents.values()) {
             int tagNum = fragment.getTagNum();
             sb.append(FieldType.forTag(tagNum)).append("(").append(tagNum).append(")=").append(fragment.getValue()).append(", ");
         }
