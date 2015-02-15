@@ -79,6 +79,15 @@ public class FixClient extends AbstractFixConnector {
     }
 
     public ChannelFuture connect(SocketAddress serverAddress) throws InterruptedException {
+        ChannelFuture connectFuture = connectAsync(serverAddress);
+
+        channel = connectFuture.sync().channel();
+        LOGGER.info("FixClient is started and connected to {}", channel.remoteAddress());
+        return channel.closeFuture();
+    }
+
+    public ChannelFuture connectAsync(SocketAddress serverAddress) {
+        LOGGER.info("FixClient is starting");
         Bootstrap b = new Bootstrap();
         bossEventLoopGroup = new NioEventLoopGroup();
         workerEventLoopGroup = new NioEventLoopGroup(Runtime.getRuntime().availableProcessors());
@@ -97,20 +106,24 @@ public class FixClient extends AbstractFixConnector {
                 ))
                 .validate();
 
-        channel = b.connect().sync().channel();
-        LOGGER.info("FixClient is started and connected to {}", channel.remoteAddress());
-        return channel.closeFuture();
+        return b.connect();
+    }
+
+    public ChannelFuture disconnectAsync() {
+        LOGGER.info("Closing connection to {}", channel.remoteAddress());
+        return channel.close().addListener(future -> {
+            if (workerEventLoopGroup != null)
+                workerEventLoopGroup.shutdownGracefully();
+            if (bossEventLoopGroup != null)
+                bossEventLoopGroup.shutdownGracefully();
+            bossEventLoopGroup = null;
+            workerEventLoopGroup = null;
+            LOGGER.info("Connection to {} was closed.", channel.remoteAddress());
+        });
     }
 
     public void disconnect() throws InterruptedException {
-        LOGGER.info("Closing connection to {}", channel.remoteAddress());
-        channel.close().sync();
-        if (workerEventLoopGroup != null)
-            workerEventLoopGroup.shutdownGracefully();
-        if (bossEventLoopGroup != null)
-            bossEventLoopGroup.shutdownGracefully();
-        bossEventLoopGroup = null;
-        workerEventLoopGroup = null;
+        disconnectAsync().await();
     }
 
     public void send(FixMessageBuilder fixMessageBuilder) throws InterruptedException {
