@@ -35,14 +35,18 @@ public class FieldFactory {
         }
         FieldType fieldType = FieldType.forTag(tagNum);
         try {
-            switch (fieldType.type()) {
+            final DataType dataType = fieldType.type();
+            switch (dataType) {
                 case STRING:
                     return (F) new StringField(tagNum, new String(value, offset, length, US_ASCII));
                 case BOOLEAN:
-                    if (value[offset] == 'Y') {
-                        return (F) new BooleanField(tagNum, true);
-                    } else if (value[offset] == 'N')  {
-                        return (F) new BooleanField(tagNum, false);
+                    switch (value[offset]) {
+                        case 'Y':
+                            return (F) new BooleanField(tagNum, true);
+                        case 'N':
+                            return (F) new BooleanField(tagNum, false);
+                        default:
+                            throw new ParseException("Invalid Boolean value. 'Y'/'N' is expected.", offset);
                     }
                 case CHAR:
                     return (F) new CharField(tagNum, (char) value[offset]);
@@ -152,9 +156,9 @@ public class FieldFactory {
     public static <F extends AbstractField<?>> F fromStringValue(DataType type, int tagNum, String value) {
         switch (type) {
             case BOOLEAN:
-                if ("Y".equals(value)){
+                if ("Y".equals(value)) {
                     return (F) new BooleanField(tagNum, true);
-                } else if("N".equals(value)){
+                } else if ("N".equals(value)) {
                     return (F) new BooleanField(tagNum, false);
                 }
                 return (F) new BooleanField(tagNum, Boolean.parseBoolean(value));

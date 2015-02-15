@@ -165,6 +165,11 @@ public class FieldFactoryTest {
         assertFalse("value", field.booleanValue());
     }
 
+    @Test(expected = IllegalArgumentException.class)
+    public void testFailValueOfIncorrectBoolean() throws Exception {
+        FieldFactory.valueOf(FieldType.PossDupFlag.tag(), "XXX".getBytes(US_ASCII));
+    }
+
     @Test
     public void testValueOfUtcTimestampWithMillis() throws Exception {
         String value = "19980604-08:03:31.537";
