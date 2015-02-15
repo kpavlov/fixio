@@ -73,6 +73,7 @@ public class FixedPointNumber extends Number {
     }
 
     public FixedPointNumber(long scaledValue, byte scale) {
+        assert (scale >= 0) : "Scale should not be negative";
         this.scaledValue = scaledValue;
         this.scale = scale;
     }

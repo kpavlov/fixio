@@ -16,12 +16,12 @@
 
 package fixio.fixprotocol;
 
-import fixio.fixprotocol.fields.AbstractField;
-import fixio.fixprotocol.fields.FieldFactory;
-import fixio.fixprotocol.fields.IntField;
-import fixio.fixprotocol.fields.StringField;
+import fixio.fixprotocol.fields.*;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.LinkedHashMap;
+import java.util.List;
+import java.util.Map;
 
 /**
  * Read-only view implementation of received {@link FixMessage}.
@@ -108,6 +108,24 @@ public class FixMessageImpl implements FixMessage {
     @Override
     public String getString(FieldType field) {
         return getString(field.tag());
+    }
+
+    @Override
+    public Character getChar(FieldType fieldType) {
+        return getChar(fieldType.tag());
+    }
+
+    @Override
+    public Character getChar(int tagNum) {
+        FixMessageFragment field = getFirst(tagNum);
+        if (field == null) {
+            return null;
+        }
+        if (field instanceof CharField) {
+            return ((CharField) field).getValue();
+        } else {
+            throw new IllegalArgumentException("Tag " + tagNum + " is not a Field.");
+        }
     }
 
     @Override

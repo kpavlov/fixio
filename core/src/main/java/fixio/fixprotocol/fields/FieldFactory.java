@@ -55,7 +55,10 @@ public class FieldFactory {
                     return (F) new CharField(tagNum, (char) value[offset]);
                 case FLOAT:
                 case PRICE:
+                case PRICEOFFSET:
                 case QTY:
+                case AMT:
+                case PERCENTAGE:
                     return (F) new FloatField(tagNum, value, offset, length);
                 case INT:
                 case LENGTH:
@@ -172,6 +175,10 @@ public class FieldFactory {
                 case MONTHYEAR:
                 case CHAR:
                 case STRING:
+                case CURRENCY:
+                case COUNTRY:
+                case EXCHANGE:
+                case LANGUAGE:
                     return (F) new StringField(tagNum, value);
                 case FLOAT:
                 case PRICE:
@@ -199,7 +206,7 @@ public class FieldFactory {
         }
     }
 
-    public static <T, F extends AbstractField<?>> F fromFixedPointValue(int tagNum, FixedPointNumber value) {
+    public static <F extends AbstractField<?>> F fromFixedPointValue(int tagNum, FixedPointNumber value) {
         FieldType fieldType = FieldType.forTag(tagNum);
         return fromFixedPointValue(fieldType, value);
     }
