@@ -165,6 +165,7 @@ public class FieldFactory {
                     return (F) new BooleanField(tagNum, false);
                 }
                 return (F) new BooleanField(tagNum, Boolean.parseBoolean(value.toLowerCase()));
+            case MONTHYEAR:
             case CHAR:
             case STRING:
                 return (F) new StringField(tagNum, value);

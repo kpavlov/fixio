@@ -194,6 +194,16 @@ public class FieldFactoryTest {
     }
 
     @Test
+    @Parameters({"200303", "20030320", "200303w2"})
+    public void testFromStringValueMonthYear(final String value) throws Exception {
+        final int tag = FieldType.MaturityMonthYear.tag();
+        StringField field = FieldFactory.fromStringValue(DataType.MONTHYEAR, tag, value);
+
+        assertEquals("tagnum", tag, field.getTagNum());
+        assertSame("value", value, field.getValue());
+    }
+
+    @Test
     @Parameters({"Y","true", "TRUE"})
     public void testFromStringValueBooleanTrue(final String value) throws Exception {
         final int tag = FieldType.PossDupFlag.tag();
