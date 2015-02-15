@@ -126,7 +126,7 @@ public class FixClient extends AbstractFixConnector {
         disconnectAsync().await();
     }
 
-    public void send(FixMessageBuilder fixMessageBuilder) throws InterruptedException {
+    public void send(FixMessageBuilder fixMessageBuilder) {
         channel.writeAndFlush(fixMessageBuilder);
     }
 }
