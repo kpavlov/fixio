@@ -204,6 +204,16 @@ public class FieldFactoryTest {
     }
 
     @Test
+    @Parameters({"2003-09-10"})
+    public void testFromStringValueLocalMktDate(final String value) throws Exception {
+        final int tag = FieldType.TradeOriginationDate.tag();
+        StringField field = FieldFactory.fromStringValue(DataType.LOCALMKTDATE, tag, value);
+
+        assertEquals("tagnum", tag, field.getTagNum());
+        assertSame("value", value, field.getValue());
+    }
+
+    @Test
     @Parameters({"Y","true", "TRUE"})
     public void testFromStringValueBooleanTrue(final String value) throws Exception {
         final int tag = FieldType.PossDupFlag.tag();
