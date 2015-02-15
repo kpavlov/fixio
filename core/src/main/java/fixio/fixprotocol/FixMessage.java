@@ -39,10 +39,13 @@ public interface FixMessage {
 
     String getString(int tagNum);
 
-    <T> T getValue(FieldType field);
-
     String getString(FieldType field);
 
-    String getMessageType();
+    <T> T getValue(FieldType field);
 
+    Character getChar(int tagNum);
+
+    Character getChar(FieldType fieldType);
+
+    String getMessageType();
 }
