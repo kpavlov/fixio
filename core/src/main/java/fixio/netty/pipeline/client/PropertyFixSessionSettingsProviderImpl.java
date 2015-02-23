@@ -82,4 +82,9 @@ public class PropertyFixSessionSettingsProviderImpl implements FixSessionSetting
     public String getBeginString() {
         return properties.getProperty("BeginString");
     }
+
+    @Override
+    public String getProperty(String key, String defaultValue) {
+        return properties.getProperty(key, defaultValue);
+    }
 }
