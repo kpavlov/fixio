@@ -92,4 +92,9 @@ public class SimpleFixSessionSettingsProvider implements FixSessionSettingsProvi
     public void setHeartbeatInterval(int heartbeatInterval) {
         this.heartbeatInterval = heartbeatInterval;
     }
+
+    @Override
+    public String getProperty(String key, String defaultValue) {
+        throw new UnsupportedOperationException("Get custom property operation not supported");
+    }
 }
