@@ -79,9 +79,9 @@ public class FixClient extends AbstractFixConnector {
     }
 
     public ChannelFuture connect(SocketAddress serverAddress) throws InterruptedException {
-        connectAsync(serverAddress).sync().await();
-        LOGGER.info("FixClient is started and connected to {}", channel.remoteAddress());
+        final Channel channel = connectAsync(serverAddress).sync().await().channel();
         assert (channel != null) : "Channel must be set";
+        LOGGER.info("FixClient is started and connected to {}", channel.remoteAddress());
         return channel.closeFuture();
     }
 
