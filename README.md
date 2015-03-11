@@ -24,7 +24,8 @@ The API has a number of [limitations](#Limitations), so it may be not suitable f
 1. Logon message encryption is not supported. EncryptMethod(98)=0
 2. XmlData is not supported
 3. Message encodings other than US-ASCII are not supported.
-4. ...
+4. Message resending and resend requests are not supported.
+5. ...
 
 ## Performance
 
