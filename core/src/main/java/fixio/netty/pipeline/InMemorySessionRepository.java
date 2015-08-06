@@ -25,6 +25,15 @@ public class InMemorySessionRepository implements SessionRepository {
 
     private final ConcurrentHashMap<SessionId, FixSession> sessions = new ConcurrentHashMap<>();
 
+    private static SessionId createSessionId(FixMessageHeader header) {
+        return new SessionId(
+                header.getSenderCompID(),
+                header.getTargetCompID(),
+                header.getSenderSubID(),
+                header.getTargetSubID()
+        );
+    }
+
     @Override
     public FixSession createSession(FixMessageHeader header) {
         SessionId id = createSessionId(header);
@@ -55,15 +64,6 @@ public class InMemorySessionRepository implements SessionRepository {
         SessionId id = createSessionId(header);
 
         return sessions.get(id);
-    }
-
-    private static SessionId createSessionId(FixMessageHeader header) {
-        return new SessionId(
-                header.getSenderCompID(),
-                header.getTargetCompID(),
-                header.getSenderSubID(),
-                header.getTargetSubID()
-        );
     }
 
     @Override

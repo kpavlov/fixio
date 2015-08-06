@@ -46,6 +46,26 @@ public abstract class AbstractSessionHandler extends MessageToMessageCodec<FixMe
         this.sessionRepository = sessionRepository;
     }
 
+    private static FixMessageBuilderImpl createReject(FixMessage originalMsg) {
+        final FixMessageBuilderImpl reject = new FixMessageBuilderImpl(MessageTypes.REJECT);
+        reject.add(FieldType.RefSeqNum, originalMsg.getInt(FieldType.MsgSeqNum.tag()));
+        reject.add(FieldType.RefMsgType, originalMsg.getMessageType());
+        return reject;
+    }
+
+    private static FixMessageBuilderImpl createBusinessReject(BusinessRejectException exception) {
+        final FixMessageBuilderImpl reject = new FixMessageBuilderImpl(MessageTypes.BUSINESS_MESSAGE_REJECT);
+        if (exception.getRefSeqNum() > 0) {
+            reject.add(FieldType.RefSeqNum, exception.getRefSeqNum());
+        }
+        reject.add(FieldType.RefMsgType, exception.getRefMsgType());
+        reject.add(FieldType.BusinessRejectReason, exception.getBusinessRejectReason());
+        if (exception.getText() != null) {
+            reject.add(FieldType.Text, exception.getText());
+        }
+        return reject;
+    }
+
     @Override
     public void channelInactive(ChannelHandlerContext ctx) throws Exception {
         Attribute<FixSession> fixSessionAttribute = ctx.attr(FIX_SESSION_KEY);
@@ -130,26 +150,6 @@ public abstract class AbstractSessionHandler extends MessageToMessageCodec<FixMe
         if (closeConnection) {
             channelFuture.addListener(ChannelFutureListener.CLOSE);
         }
-    }
-
-    private static FixMessageBuilderImpl createReject(FixMessage originalMsg) {
-        final FixMessageBuilderImpl reject = new FixMessageBuilderImpl(MessageTypes.REJECT);
-        reject.add(FieldType.RefSeqNum, originalMsg.getInt(FieldType.MsgSeqNum.tag()));
-        reject.add(FieldType.RefMsgType, originalMsg.getMessageType());
-        return reject;
-    }
-
-    private static FixMessageBuilderImpl createBusinessReject(BusinessRejectException exception) {
-        final FixMessageBuilderImpl reject = new FixMessageBuilderImpl(MessageTypes.BUSINESS_MESSAGE_REJECT);
-        if (exception.getRefSeqNum() > 0) {
-            reject.add(FieldType.RefSeqNum, exception.getRefSeqNum());
-        }
-        reject.add(FieldType.RefMsgType, exception.getRefMsgType());
-        reject.add(FieldType.BusinessRejectReason, exception.getBusinessRejectReason());
-        if (exception.getText() != null) {
-            reject.add(FieldType.Text, exception.getText());
-        }
-        return reject;
     }
 
     protected FixApplication getFixApplication() {

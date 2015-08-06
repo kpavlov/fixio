@@ -37,7 +37,7 @@ public class UTCDateOnlyField extends AbstractTemporalField {
     private static final DateTimeFormatter FORMATTER = DateTimeFormatter.ofPattern("yyyyMMdd").withZone(systemUTC().zone());
 
     protected UTCDateOnlyField(int tagNum, byte[] bytes) throws ParseException {
-        super(tagNum,  parse(bytes));
+        super(tagNum, parse(bytes));
     }
 
     protected UTCDateOnlyField(int tagNum, String timestampString) throws ParseException {

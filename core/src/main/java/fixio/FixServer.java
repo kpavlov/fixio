@@ -60,7 +60,7 @@ public class FixServer extends AbstractFixConnector {
         final FixAcceptorChannelInitializer<SocketChannel> channelInitializer = new FixAcceptorChannelInitializer<>(
                 workerGroup,
                 getFixApplication(),
-                authenticator ,
+                authenticator,
                 getSessionRepository()
         );
 

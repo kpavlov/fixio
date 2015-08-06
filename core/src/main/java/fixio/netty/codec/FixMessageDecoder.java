@@ -64,7 +64,6 @@ public class FixMessageDecoder extends MessageToMessageDecoder<ByteBuf> {
 
         int arrayIndex = 0;
         int tagNum = 0;
-//        byte[] bytes = in.array();
         byte[] bytes = new byte[in.readableBytes()];
         in.readBytes(bytes);
         int length = bytes.length;
@@ -112,7 +111,7 @@ public class FixMessageDecoder extends MessageToMessageDecoder<ByteBuf> {
     private void appendField(int tag, byte[] value, int offset, int valueLength) {
         if (message == null) {
             String strValue = new String(value, offset, Math.min(10, valueLength), StandardCharsets.US_ASCII);
-            if (valueLength > 10)                                   {
+            if (valueLength > 10) {
                 strValue += "...";
             }
             throw new DecoderException("BeginString tag expected, but got: "
@@ -120,11 +119,11 @@ public class FixMessageDecoder extends MessageToMessageDecoder<ByteBuf> {
         }
 
         //group body
-        if (groupField != null && group != null){
+        if (groupField != null && group != null) {
             AbstractField field = FieldFactory.valueOf(tag, value, offset, valueLength);
             //repeat in current group. means next group started
-            if (group.getValue(tag) != null){
-                if (groupEnd ==0){//finish first group. we can know the end tag of this repeating group
+            if (group.getValue(tag) != null) {
+                if (groupEnd == 0) {//finish first group. we can know the end tag of this repeating group
                     groupEnd = lastTag;
                     groupCnt = 1;
                 }
@@ -133,7 +132,7 @@ public class FixMessageDecoder extends MessageToMessageDecoder<ByteBuf> {
                 groupField.add(group);
             }
             group.add(field);
-            if (tag == groupEnd && groupCnt == groupNum){
+            if (tag == groupEnd && groupCnt == groupNum) {
                 finishRepeatingGroup();
             }
         } else {//normal body
@@ -142,7 +141,7 @@ public class FixMessageDecoder extends MessageToMessageDecoder<ByteBuf> {
 
         //check for group tag
         FieldType type = FieldType.forTag(tag);
-        if (type.type().equals(DataType.NUMINGROUP) && message.getInt(tag) > 0){
+        if (type.type().equals(DataType.NUMINGROUP) && message.getInt(tag) > 0) {
             groupNum = message.getInt(tag);
             groupField = new GroupField(tag);
             group = new Group();

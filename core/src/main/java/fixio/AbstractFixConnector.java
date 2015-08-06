@@ -18,8 +18,6 @@ package fixio;
 
 import fixio.handlers.FixApplication;
 import fixio.netty.pipeline.SessionRepository;
-import io.netty.util.internal.logging.InternalLoggerFactory;
-import io.netty.util.internal.logging.Slf4JLoggerFactory;
 
 /**
  * AbstractFixConnector is base class for {@link FixClient} and {@link FixServer}.
@@ -30,10 +28,6 @@ public abstract class AbstractFixConnector {
 
     private final FixApplication fixApplication;
     private final SessionRepository sessionRepository;
-
-    static {
-        InternalLoggerFactory.setDefaultFactory(new Slf4JLoggerFactory());
-    }
 
     public AbstractFixConnector(FixApplication fixApplication, SessionRepository sessionRepository) {
         this.fixApplication = fixApplication;

@@ -32,7 +32,7 @@ public class PropertyFixSessionSettingsProviderImpl implements FixSessionSetting
         this.properties = properties;
     }
 
-public PropertyFixSessionSettingsProviderImpl(String resource) {
+    public PropertyFixSessionSettingsProviderImpl(String resource) {
         this(new Properties());
         loadProperties(resource);
     }

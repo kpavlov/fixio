@@ -106,7 +106,7 @@ public class AbstractSessionHandlerTest {
     public void testChannelInactiveSessionExists() throws Exception {
         when(ctx.attr(AbstractSessionHandler.FIX_SESSION_KEY)).thenReturn(sessonAttr);
         when(sessonAttr.getAndRemove()).thenReturn(fixSession);
-        SessionId sessionId  = mock(SessionId.class);
+        SessionId sessionId = mock(SessionId.class);
         when(fixSession.getId()).thenReturn(sessionId);
 
         sessionHandler.channelInactive(ctx);

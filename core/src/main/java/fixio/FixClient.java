@@ -19,10 +19,7 @@ package fixio;
 import fixio.fixprotocol.FixMessageBuilder;
 import fixio.handlers.FixApplication;
 import fixio.netty.pipeline.SessionRepository;
-import fixio.netty.pipeline.client.FixInitiatorChannelInitializer;
-import fixio.netty.pipeline.client.FixSessionSettingsProvider;
-import fixio.netty.pipeline.client.MessageSequenceProvider;
-import fixio.netty.pipeline.client.PropertyFixSessionSettingsProviderImpl;
+import fixio.netty.pipeline.client.*;
 import io.netty.bootstrap.Bootstrap;
 import io.netty.buffer.PooledByteBufAllocator;
 import io.netty.channel.Channel;
@@ -46,6 +43,7 @@ public class FixClient extends AbstractFixConnector {
     private EventLoopGroup workerEventLoopGroup;
     private FixSessionSettingsProvider sessionSettingsProvider;
     private MessageSequenceProvider messageSequenceProvider;
+    private AuthenticationProvider authenticationProvider;
 
     public FixClient(FixApplication fixApplication,
                      SessionRepository sessionRepository) {
@@ -69,6 +67,10 @@ public class FixClient extends AbstractFixConnector {
 
     public void setMessageSequenceProvider(MessageSequenceProvider messageSequenceProvider) {
         this.messageSequenceProvider = messageSequenceProvider;
+    }
+
+    public void setAuthenticationProvider(AuthenticationProvider authenticationProvider) {
+        this.authenticationProvider = authenticationProvider;
     }
 
     /**
@@ -100,6 +102,7 @@ public class FixClient extends AbstractFixConnector {
                 .handler(new FixInitiatorChannelInitializer<SocketChannel>(
                         workerEventLoopGroup,
                         sessionSettingsProvider,
+                        authenticationProvider,
                         messageSequenceProvider,
                         getFixApplication()
                 ))
@@ -129,4 +132,5 @@ public class FixClient extends AbstractFixConnector {
     public void send(FixMessageBuilder fixMessageBuilder) {
         channel.writeAndFlush(fixMessageBuilder);
     }
+
 }

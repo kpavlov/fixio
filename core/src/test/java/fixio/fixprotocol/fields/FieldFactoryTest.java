@@ -170,7 +170,7 @@ public class FieldFactoryTest {
     }
 
     @Test(expected = IllegalArgumentException.class)
-    @Parameters({"XXX","", "-"})
+    @Parameters({"XXX", "", "-"})
     public void testFailValueOfIncorrectBoolean(String value) throws Exception {
         FieldFactory.valueOf(FieldType.PossDupFlag.tag(), value.getBytes(US_ASCII));
     }
@@ -214,7 +214,7 @@ public class FieldFactoryTest {
     }
 
     @Test
-    @Parameters({"Y","true", "TRUE"})
+    @Parameters({"Y", "true", "TRUE"})
     public void testFromStringValueBooleanTrue(final String value) throws Exception {
         final int tag = FieldType.PossDupFlag.tag();
         BooleanField field = FieldFactory.fromStringValue(DataType.BOOLEAN, tag, value);
@@ -225,7 +225,7 @@ public class FieldFactoryTest {
     }
 
     @Test
-    @Parameters({"N","false", "FALSE"})
+    @Parameters({"N", "false", "FALSE"})
     public void testValueStringValueBooleanFalse(final String value) throws Exception {
         final int tag = FieldType.PossDupFlag.tag();
         BooleanField field = FieldFactory.fromStringValue(DataType.BOOLEAN, tag, value);
