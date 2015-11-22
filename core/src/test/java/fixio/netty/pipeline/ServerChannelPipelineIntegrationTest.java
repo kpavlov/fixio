@@ -15,91 +15,131 @@
  */
 package fixio.netty.pipeline;
 
-import fixio.fixprotocol.FieldType;
-import fixio.fixprotocol.FixMessage;
-import fixio.fixprotocol.FixMessageBuilderImpl;
-import fixio.fixprotocol.MessageTypes;
+import fixio.events.LogonEvent;
+import fixio.fixprotocol.*;
 import fixio.handlers.FixApplicationAdapter;
 import fixio.netty.pipeline.server.FixAcceptorChannelInitializer;
 import fixio.netty.pipeline.server.FixAuthenticator;
 import io.netty.bootstrap.ServerBootstrap;
-import io.netty.channel.Channel;
-import io.netty.channel.ChannelPipeline;
-import io.netty.channel.EventLoopGroup;
-import io.netty.channel.local.LocalAddress;
-import io.netty.channel.local.LocalServerChannel;
+import io.netty.channel.*;
+import io.netty.channel.embedded.EmbeddedChannel;
 import io.netty.channel.nio.NioEventLoopGroup;
-import org.junit.After;
+import org.hamcrest.CoreMatchers;
 import org.junit.Before;
+import org.junit.FixMethodOrder;
 import org.junit.Test;
 import org.junit.runner.RunWith;
+import org.junit.runners.MethodSorters;
 import org.mockito.Mock;
 import org.mockito.runners.MockitoJUnitRunner;
 
 import static org.apache.commons.lang3.RandomStringUtils.randomAscii;
+import static org.hamcrest.CoreMatchers.notNullValue;
+import static org.hamcrest.core.Is.is;
+import static org.junit.Assert.assertThat;
 import static org.mockito.Matchers.any;
+import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 @RunWith(MockitoJUnitRunner.class)
+@FixMethodOrder(MethodSorters.NAME_ASCENDING)
 public class ServerChannelPipelineIntegrationTest {
 
     @Mock
     private FixAuthenticator authenticator;
-    private LocalServerChannel serverChannel;
-    private ChannelPipeline pipeline;
+    private FixApplicationAdapter fixApplicationAdapter;
+    private EmbeddedChannel embeddedChannel;
+    private volatile LogonEvent logonEvent;
 
     @Before
     public void setUp() throws Exception {
         ServerBootstrap b = new ServerBootstrap();
 
-        LocalAddress address = LocalAddress.ANY;
+        //address = LocalAddress.ANY;
+        embeddedChannel = new EmbeddedChannel() {
+            @Override
+            public ChannelFuture write(Object msg) {
+                return super.write(msg);
+            }
+
+            @Override
+            public ChannelFuture writeAndFlush(Object msg) {
+                outboundMessages().add(msg);
+                return super.writeAndFlush(msg);
+            }
+        };
 
         EventLoopGroup workerGroup = new NioEventLoopGroup();
+        fixApplicationAdapter = new FixApplicationAdapter() {
+            @Override
+            public void onLogon(ChannelHandlerContext ctx, LogonEvent msg) {
+                logonEvent = msg;
+            }
+        };
         final FixAcceptorChannelInitializer<Channel> channelInitializer = new FixAcceptorChannelInitializer<>(
                 workerGroup,
-                new FixApplicationAdapter(),
+                fixApplicationAdapter,
                 authenticator,
                 new InMemorySessionRepository()
         );
 
-        serverChannel = (LocalServerChannel) b.group(new NioEventLoopGroup())
-                .channel(LocalServerChannel.class)
-                .handler(channelInitializer)
-                .childHandler(new FixApplicationAdapter())
-                .validate()
-                .bind(address)
-                .sync()
-                .channel();
+//        channelInitializer.initChannel(ch);
 
-        pipeline = serverChannel.pipeline();
+        ChannelPipeline pipeline = embeddedChannel.pipeline();
+        pipeline.removeFirst();
+        pipeline.addFirst(new ChannelOutboundHandlerAdapter() {
+
+
+            @Override
+            public void write(ChannelHandlerContext ctx, Object msg, ChannelPromise promise) throws Exception {
+                EmbeddedChannel embeddedChannel = (EmbeddedChannel) ctx.channel();
+                embeddedChannel.outboundMessages().add(msg);
+                super.write(ctx, msg, promise);
+            }
+        });
+        channelInitializer.initChannel(embeddedChannel);
 
         when(authenticator.authenticate(any(FixMessage.class))).thenReturn(true);
     }
 
-    @After
-    public void tearDown() throws InterruptedException {
-        serverChannel.close().sync();
+    @Test
+    public void test01ProcessLogonSuccess() {
+        final FixMessageBuilderImpl logon = createLogonMessage();
+
+        assertThat(embeddedChannel.isOpen(), is(true));
+
+        embeddedChannel.writeInbound(logon);
+
+        verify(authenticator).authenticate(logon);
+        assertThat("channel open", embeddedChannel.isOpen(), is(true));
+        assertThat(logonEvent, notNullValue());
     }
 
-    @Test
-    public void processLogonSuccess() {
+    private FixMessageBuilderImpl createLogonMessage() {
         final FixMessageBuilderImpl logon = new FixMessageBuilderImpl(MessageTypes.LOGON);
-        logon.getHeader().setSenderCompID(randomAscii(3));
-        logon.getHeader().setTargetCompID(randomAscii(4));
-
-        pipeline.fireChannelRead(logon);
-        pipeline.flush();
+        final FixMessageHeader header = logon.getHeader();
+        header.setSenderCompID(randomAscii(3));
+        header.setTargetCompID(randomAscii(4));
+        header.setMsgSeqNum(1);
+        return logon;
     }
 
     @Test
-    public void processHeartbeat() {
+    public void test02ProcessTestRequest() {
+        final FixMessageBuilderImpl logon = createLogonMessage();
+
         final FixMessageBuilderImpl testRequest = new FixMessageBuilderImpl(MessageTypes.TEST_REQUEST);
-        testRequest.getHeader().setSenderCompID(randomAscii(3));
-        testRequest.getHeader().setTargetCompID(randomAscii(4));
+        final FixMessageHeader header = testRequest.getHeader();
+        header.setSenderCompID(logon.getSenderCompID());
+        header.setTargetCompID(logon.getTargetCompID());
+        header.setMsgSeqNum(2);
 
         testRequest.add(FieldType.TestReqID, randomAscii(5));
 
-        pipeline.fireChannelRead(testRequest);
-        pipeline.flush();
+        embeddedChannel.writeInbound(logon, testRequest);
+
+        final Object o = embeddedChannel.readOutbound();
+        assertThat(o, CoreMatchers.instanceOf(FixMessage.class));
+        assertThat(((FixMessage) o).getMessageType(), is(MessageTypes.HEARTBEAT));
     }
 }

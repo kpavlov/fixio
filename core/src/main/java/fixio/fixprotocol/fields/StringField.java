@@ -26,6 +26,7 @@ public class StringField extends AbstractField<String> {
         this.value = value;
     }
 
+    @Override
     public String getValue() {
         return value;
     }
