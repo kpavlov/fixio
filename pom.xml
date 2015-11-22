@@ -35,8 +35,8 @@
     </scm>
 
     <properties>
-        <slf4j.version>1.7.12</slf4j.version>
-        <netty.version>4.0.30.Final</netty.version>
+        <slf4j.version>1.7.13</slf4j.version>
+        <netty.version>4.0.33.Final</netty.version>
         <java.version>1.8</java.version>
         <maven.compiler.source>${java.version}</maven.compiler.source>
         <maven.compiler.target>${java.version}</maven.compiler.target>
