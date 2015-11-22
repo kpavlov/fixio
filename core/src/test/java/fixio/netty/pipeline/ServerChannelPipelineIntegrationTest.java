@@ -20,7 +20,6 @@ import fixio.fixprotocol.*;
 import fixio.handlers.FixApplicationAdapter;
 import fixio.netty.pipeline.server.FixAcceptorChannelInitializer;
 import fixio.netty.pipeline.server.FixAuthenticator;
-import io.netty.bootstrap.ServerBootstrap;
 import io.netty.channel.*;
 import io.netty.channel.embedded.EmbeddedChannel;
 import io.netty.channel.nio.NioEventLoopGroup;
@@ -47,13 +46,11 @@ public class ServerChannelPipelineIntegrationTest {
 
     @Mock
     private FixAuthenticator authenticator;
-    private FixApplicationAdapter fixApplicationAdapter;
     private EmbeddedChannel embeddedChannel;
     private volatile LogonEvent logonEvent;
 
     @Before
     public void setUp() throws Exception {
-        ServerBootstrap b = new ServerBootstrap();
 
         //address = LocalAddress.ANY;
         embeddedChannel = new EmbeddedChannel() {
@@ -70,7 +67,7 @@ public class ServerChannelPipelineIntegrationTest {
         };
 
         EventLoopGroup workerGroup = new NioEventLoopGroup();
-        fixApplicationAdapter = new FixApplicationAdapter() {
+        FixApplicationAdapter fixApplicationAdapter = new FixApplicationAdapter() {
             @Override
             public void onLogon(ChannelHandlerContext ctx, LogonEvent msg) {
                 logonEvent = msg;
@@ -112,16 +109,7 @@ public class ServerChannelPipelineIntegrationTest {
 
         verify(authenticator).authenticate(logon);
         assertThat("channel open", embeddedChannel.isOpen(), is(true));
-        assertThat(logonEvent, notNullValue());
-    }
-
-    private FixMessageBuilderImpl createLogonMessage() {
-        final FixMessageBuilderImpl logon = new FixMessageBuilderImpl(MessageTypes.LOGON);
-        final FixMessageHeader header = logon.getHeader();
-        header.setSenderCompID(randomAscii(3));
-        header.setTargetCompID(randomAscii(4));
-        header.setMsgSeqNum(1);
-        return logon;
+        assertThat("logonEvent",logonEvent, notNullValue());
     }
 
     @Test
@@ -141,5 +129,14 @@ public class ServerChannelPipelineIntegrationTest {
         final Object o = embeddedChannel.readOutbound();
         assertThat(o, CoreMatchers.instanceOf(FixMessage.class));
         assertThat(((FixMessage) o).getMessageType(), is(MessageTypes.HEARTBEAT));
+    }
+
+    private FixMessageBuilderImpl createLogonMessage() {
+        final FixMessageBuilderImpl logon = new FixMessageBuilderImpl(MessageTypes.LOGON);
+        final FixMessageHeader header = logon.getHeader();
+        header.setSenderCompID(randomAscii(3));
+        header.setTargetCompID(randomAscii(4));
+        header.setMsgSeqNum(1);
+        return logon;
     }
 }
