@@ -20,8 +20,6 @@ import fixio.fixprotocol.FieldType;
 
 import java.text.ParseException;
 
-import static java.nio.charset.StandardCharsets.US_ASCII;
-
 public class FieldFactory {
 
     public static <F extends AbstractField> F valueOf(int tagNum, byte[] value) {
@@ -41,7 +39,7 @@ public class FieldFactory {
             final DataType dataType = fieldType.type();
             switch (dataType) {
                 case STRING:
-                    return (F) new StringField(tagNum, new String(value, offset, length, US_ASCII));
+                    return (F) new StringField(tagNum, value, offset, length);
                 case BOOLEAN:
                     switch (value[offset]) {
                         case 'Y':
@@ -68,7 +66,7 @@ public class FieldFactory {
                 case UTCTIMESTAMP:
                     return (F) new UTCTimestampField(tagNum, value, offset, length);
                 default:
-                    return (F) new StringField(tagNum, new String(value, offset, length, US_ASCII));
+                    return (F) new StringField(tagNum, value, offset, length);
 //                    throw new UnsupportedOperationException("Unsupported field type: " + fieldType
 //                            + '(' + fieldType.type() + ')');
             }
@@ -81,7 +79,7 @@ public class FieldFactory {
     public static <F extends AbstractField<?>> F fromIntValue(DataType type, int tagNum, int value) {
         switch (type) {
             case STRING:
-                return (F) new StringField(tagNum, String.valueOf(value));
+                return (F) new StringField(tagNum, Integer.toString(value));
             case CHAR:
                 return (F) new CharField(tagNum, Character.forDigit(value, Character.MAX_RADIX));
             case FLOAT:
@@ -126,7 +124,7 @@ public class FieldFactory {
     public static <F extends AbstractField<?>> F fromLongValue(DataType type, int tagNum, long value) {
         switch (type) {
             case STRING:
-                return (F) new StringField(tagNum, String.valueOf(value));
+                return (F) new StringField(tagNum, Long.toString(value));
             case FLOAT:
             case PRICE:
             case PRICEOFFSET:

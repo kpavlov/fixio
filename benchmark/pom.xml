@@ -71,7 +71,6 @@ THE POSSIBILITY OF SUCH DAMAGE.
     </dependencies>
 
     <properties>
-        <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <jmh.version>1.11.2</jmh.version>
         <uberjar.name>benchmarks</uberjar.name>
         <maven.test.skip>true</maven.test.skip>

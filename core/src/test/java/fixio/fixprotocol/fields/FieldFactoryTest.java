@@ -200,7 +200,7 @@ public class FieldFactoryTest {
         StringField field = FieldFactory.fromStringValue(DataType.MONTHYEAR, tag, value);
 
         assertEquals("tagnum", tag, field.getTagNum());
-        assertSame("value", value, field.getValue());
+        assertEquals("value", value, field.getValue());
     }
 
     @Test
@@ -210,7 +210,7 @@ public class FieldFactoryTest {
         StringField field = FieldFactory.fromStringValue(DataType.LOCALMKTDATE, tag, value);
 
         assertEquals("tagnum", tag, field.getTagNum());
-        assertSame("value", value, field.getValue());
+        assertEquals("value", value, field.getValue());
     }
 
     @Test
