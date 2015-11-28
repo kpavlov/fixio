@@ -14,15 +14,17 @@
   ~ License for the specific language governing permissions and limitations
   ~ under the License.
   -->
-<stylesheet version="1.0"
+<stylesheet version="2.0"
             xmlns="http://www.w3.org/1999/XSL/Transform">
     <output method="text" indent="no" standalone="yes" media-type="text/java" omit-xml-declaration="yes"/>
+
+
     <strip-space elements="*"/>
 
     <!--XHTML document outline-->
     <template match="fix">
         /*
-        * Copyright 2014 The FIX.io Project
+        * Copyright 2015 The FIX.io Project
         *
         * The FIX.io Project licenses this file to you under the Apache License,
         * version 2.0 (the "License"); you may not use this file except in compliance
@@ -52,7 +54,7 @@
         private final DataType type;
         private final String[] enumValues;
 
-        private static final HashMap&lt;Integer,FieldType&gt; TYPES = new HashMap&lt;&gt;();
+        private static final HashMap&lt;Integer,FieldType&gt; TYPES = new HashMap&lt;&gt;(FieldType.values().length);
 
         static {
             for (FieldType fieldType : FieldType.values()) {
@@ -73,38 +75,35 @@
             this.enumValues = null;
         }
 
-        private FieldType(int tag, DataType type, String[] enumValues) {
+        private FieldType(int tag, DataType type, String... enumValues) {
             this.tag = tag;
             this.type = type;
             this.enumValues = enumValues;
         }
 
         public int tag() {
-            return tag;
+        return tag;
         }
 
         public DataType type() {
-            return type;
+        return type;
         }
 
         public String[] enumValues() {
-            return enumValues;
+        return enumValues;
         }
-    }
+        }
     </template>
 
     <template name="field" match="/fix/fields/field">
         <value-of select="@name"/>(<value-of select="@number"/>,
         <value-of select="@type"/>
-        <if test="count(value) &gt; 0">
-            ,new String[]{<apply-templates select="value"/>
-            }
-        </if>
+        <apply-templates select="value"/>
         ),
     </template>
 
     <template match="value">
-        "<value-of select="@enum"/>",//<value-of select="@description"/>
+        ,"<value-of select="@enum"/>"//<value-of select="@description"/>
     </template>
 
 </stylesheet>
