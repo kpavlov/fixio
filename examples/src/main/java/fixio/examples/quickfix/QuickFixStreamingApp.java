@@ -15,7 +15,8 @@
  */
 package fixio.examples.quickfix;
 
-import fixio.examples.generator.Quote;
+import fixio.examples.common.AbstractQouteStreamingWorker;
+import fixio.examples.common.Quote;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import quickfix.*;
@@ -25,6 +26,7 @@ import quickfix.field.MsgType;
 import quickfix.field.QuoteReqID;
 
 import java.util.ArrayList;
+import java.util.List;
 import java.util.Map;
 import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.ConcurrentHashMap;
@@ -32,22 +34,21 @@ import java.util.stream.Collectors;
 
 public class QuickFixStreamingApp implements Application {
     private static final Logger LOGGER = LoggerFactory.getLogger(QuickFixStreamingApp.class);
-    private final BlockingQueue<Quote> quoteQueue;
+    private static final MsgType QUOTE_MSG_TYPE = new MsgType(MsgType.QUOTE);
     private final Map<String, SessionID> subscriptions = new ConcurrentHashMap<>();
 
     public QuickFixStreamingApp(BlockingQueue<Quote> quoteQueue) {
-        this.quoteQueue = quoteQueue;
-
-        StreamingWorker streamingWorker = new StreamingWorker();
+        StreamingWorker streamingWorker = new StreamingWorker(quoteQueue);
         new Thread(streamingWorker, "StreamingWorker").start();
     }
 
-    private static Message createQuoteMessage(String reqId, Quote quote) {
-        quickfix.fix44.Quote message = new quickfix.fix44.Quote();
-        message.setString(QuoteReqID.FIELD, reqId);
+    private static Message createQuoteMessage(String reqId, Quote quote) throws InvalidMessage {
+        Message message = new Message();
+        message.getHeader().setField(QUOTE_MSG_TYPE);
+        message.setField(new QuoteReqID(reqId));
 
-        message.setDouble(MktBidPx.FIELD, quote.getBid(), 2);
-        message.setDouble(MktOfferPx.FIELD, quote.getBid(), 2);
+        message.setField(new DoubleField(MktBidPx.FIELD, quote.getBid(), 2));
+        message.setField(new DoubleField(MktOfferPx.FIELD, quote.getBid(), 2));
 
         return message;
     }
@@ -108,33 +109,26 @@ public class QuickFixStreamingApp implements Application {
         LOGGER.info("Streaming Stopped for {}", sessionID);
     }
 
-    private class StreamingWorker implements Runnable {
+    private class StreamingWorker extends AbstractQouteStreamingWorker {
 
-        private volatile boolean stopping;
+        public StreamingWorker(BlockingQueue<Quote> quoteQueue) {
+            super(quoteQueue);
+        }
 
         @Override
-        public void run() {
-            Quote quote = null;
-            while (!stopping) {
-                try {
-                    quote = quoteQueue.take();
-                } catch (InterruptedException e) {
-                    Thread.currentThread().interrupt();
-                    LOGGER.error("Interrupted queue", e);
-                }
+        protected void sendQuotes(List<Quote> buffer) {
+            buffer.forEach(quote -> {
                 for (Map.Entry<String, SessionID> subscriptionEntry : subscriptions.entrySet()) {
-                    Message quoteMessage = createQuoteMessage(subscriptionEntry.getKey(), quote);
                     try {
+                        Message quoteMessage = createQuoteMessage(subscriptionEntry.getKey(), quote);
                         Session.sendToTarget(quoteMessage, subscriptionEntry.getValue());
                     } catch (SessionNotFound e) {
                         LOGGER.error("Can't send message", e);
+                    } catch (InvalidMessage e) {
+                        LOGGER.error("Can't send invalid message", e);
                     }
                 }
-            }
-        }
-
-        public void stopWorker() {
-            stopping = true;
+            });
         }
     }
 }

@@ -13,7 +13,7 @@
  * License for the specific language governing permissions and limitations
  * under the License.
  */
-package fixio.examples.generator;
+package fixio.examples.common;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -35,18 +35,20 @@ public class QuoteGeneratorTask implements Runnable {
         final Thread thread = Thread.currentThread();
         int t = 0;
         while (!thread.isInterrupted()) {
-            try {
-                double bid = Math.sin((double) t / 100) * 2 + 0.5;
-                double offer = Math.sin((double) t - 10 / 100) * 2 + 0.5;
-                Quote quote = new Quote(bid, offer);
-                t++;
-                receiver.put(quote);
-            } catch (InterruptedException e) {
-                LOGGER.info("Interrupted.");
-                thread.interrupt();
-                return;
-            } catch (Throwable e) {
-                LOGGER.error("Unable to submit quote.", e);
+            if (receiver.remainingCapacity() > 1000) {
+                try {
+                    double bid = Math.sin((double) t / 100) * 2 + 0.5;
+                    double offer = Math.sin((double) t - 10 / 100) * 2 + 0.5;
+                    Quote quote = new Quote(bid, offer);
+                    t++;
+                    receiver.put(quote);
+                } catch (InterruptedException e) {
+                    LOGGER.info("Interrupted.");
+                    thread.interrupt();
+                    return;
+                } catch (Throwable e) {
+                    LOGGER.error("Unable to submit quote.", e);
+                }
             }
             Thread.yield();
         }

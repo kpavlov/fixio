@@ -27,7 +27,7 @@ import java.util.List;
 
 class PriceReadingApp extends FixApplicationAdapter {
 
-    public static final int MAX_QUOTE_COUNT = 300_000;
+    public static final int MAX_QUOTE_COUNT = 1_000_000;
     private static final Logger LOGGER = LoggerFactory.getLogger(PriceReadingApp.class);
     private int counter;
     private long startTimeNanos;
@@ -57,7 +57,7 @@ class PriceReadingApp extends FixApplicationAdapter {
             finished = true;
 
             long timeMillis = (System.nanoTime() - startTimeNanos) / 1000000;
-            LOGGER.info("Read {} Quotes in {} ms, ~{} Quote/sec", counter, timeMillis, counter * 1000.0 / timeMillis);
+            LOGGER.info("Read {} Quotes in {} ms, ~{} Quotes/sec", counter, timeMillis, counter * 1000.0 / timeMillis);
 
             ctx.writeAndFlush(createQuoteCancel()).addListener(ChannelFutureListener.CLOSE);
         }
@@ -73,6 +73,7 @@ class PriceReadingApp extends FixApplicationAdapter {
 
     private FixMessageBuilder createQuoteCancel() {
         FixMessageBuilder quoteCancel = new FixMessageBuilderImpl(MessageTypes.QUOTE_CANCEL);
+        quoteCancel.add(FieldType.QuoteID, "*"); //QuoteCancelType=CANCEL_ALL_QUOTES
         quoteCancel.add(FieldType.QuoteCancelType, "4"); //QuoteCancelType=CANCEL_ALL_QUOTES
         quoteCancel.add(FieldType.QuoteReqID, quoteRequestId);
         return quoteCancel;

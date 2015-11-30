@@ -17,7 +17,8 @@ package fixio.examples.priceserver;
 
 import fixio.events.LogonEvent;
 import fixio.events.LogoutEvent;
-import fixio.examples.generator.Quote;
+import fixio.examples.common.AbstractQouteStreamingWorker;
+import fixio.examples.common.Quote;
 import fixio.fixprotocol.*;
 import fixio.fixprotocol.fields.FixedPointNumber;
 import fixio.handlers.FixApplicationAdapter;
@@ -35,12 +36,10 @@ import java.util.stream.Collectors;
 class PriceStreamingApp extends FixApplicationAdapter {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(PriceStreamingApp.class);
-    private final BlockingQueue<Quote> quoteQueue;
     private final Map<String, ChannelHandlerContext> subscriptions = new ConcurrentHashMap<>();
 
     public PriceStreamingApp(BlockingQueue<Quote> quoteQueue) {
-        this.quoteQueue = quoteQueue;
-        StreamingWorker streamingWorker = new StreamingWorker();
+        StreamingWorker streamingWorker = new StreamingWorker(quoteQueue);
         new Thread(streamingWorker, "StreamingWorker").start();
     }
 
@@ -102,28 +101,20 @@ class PriceStreamingApp extends FixApplicationAdapter {
         return message;
     }
 
-    private class StreamingWorker implements Runnable {
+    private class StreamingWorker extends AbstractQouteStreamingWorker {
 
-        private volatile boolean stopping;
+
+        public StreamingWorker(BlockingQueue<Quote> quoteQueue) {
+            super(quoteQueue);
+        }
 
         @Override
-        public void run() {
-            Quote quote = null;
-            while (!stopping) {
-                try {
-                    quote = quoteQueue.take();
-                } catch (InterruptedException e) {
-                    Thread.currentThread().interrupt();
-                    LOGGER.error("Interrupted queue", e);
-                }
+        protected void sendQuotes(List<Quote> buffer) {
+            buffer.forEach(quote -> {
                 for (Map.Entry<String, ChannelHandlerContext> subscriptionEntry : subscriptions.entrySet()) {
                     publish(subscriptionEntry.getValue(), subscriptionEntry.getKey(), quote);
                 }
-            }
-        }
-
-        public void stopWorker() {
-            stopping = true;
+            });
         }
     }
 }

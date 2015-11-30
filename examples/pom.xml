@@ -26,6 +26,10 @@
 
     <artifactId>examples</artifactId>
 
+    <properties>
+        <quickfix.version>1.5.3</quickfix.version>
+    </properties>
+
     <dependencies>
         <dependency>
             <groupId>${project.groupId}</groupId>
@@ -44,13 +48,18 @@
         <dependency>
             <groupId>quickfixj</groupId>
             <artifactId>quickfixj-all</artifactId>
-            <version>1.5.3</version>
+            <version>${quickfix.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>quickfixj</groupId>
+            <artifactId>quickfixj-msg-fix44</artifactId>
+            <version>${quickfix.version}</version>
         </dependency>
 
         <dependency>
             <groupId>org.apache.mina</groupId>
             <artifactId>mina-core</artifactId>
-            <version>1.1.7</version>
+            <version>1.1.0</version>
             <scope>runtime</scope>
         </dependency>
 

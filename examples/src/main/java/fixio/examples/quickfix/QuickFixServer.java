@@ -15,8 +15,8 @@
  */
 package fixio.examples.quickfix;
 
-import fixio.examples.generator.Quote;
-import fixio.examples.generator.QuoteGeneratorTask;
+import fixio.examples.common.Quote;
+import fixio.examples.common.QuoteGeneratorTask;
 import quickfix.*;
 
 import java.util.concurrent.ArrayBlockingQueue;
