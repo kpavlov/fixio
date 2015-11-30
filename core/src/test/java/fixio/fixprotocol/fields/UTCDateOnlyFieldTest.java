@@ -36,7 +36,8 @@ public class UTCDateOnlyFieldTest {
     @Test
     public void testParse() throws Exception {
         final ZoneId zone = systemUTC().zone();
-        assertEquals(ZonedDateTime.of(testDate, LocalTime.now(zone), zone).toInstant().toEpochMilli(), UTCDateOnlyField.parse((DATE_STR.getBytes())));
+        final long expected = ZonedDateTime.of(testDate, LocalTime.MIDNIGHT, zone).toInstant().toEpochMilli();
+        assertEquals(expected, UTCDateOnlyField.parse((DATE_STR.getBytes())));
     }
 
     @Test
@@ -44,7 +45,7 @@ public class UTCDateOnlyFieldTest {
         int tag = new Random().nextInt();
         UTCDateOnlyField field = new UTCDateOnlyField(tag, DATE_STR.getBytes());
         final ZoneId zone = systemUTC().zone();
-        assertEquals(ZonedDateTime.of(testDate, LocalTime.now(zone), zone).toInstant().toEpochMilli(), field.getValue().longValue());
+        assertEquals(ZonedDateTime.of(testDate, LocalTime.MIDNIGHT, zone).toInstant().toEpochMilli(), field.getValue().longValue());
     }
 
     @Test

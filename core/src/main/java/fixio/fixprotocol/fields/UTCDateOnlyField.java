@@ -61,7 +61,7 @@ public class UTCDateOnlyField extends AbstractTemporalField {
         int month = (bytes[4] - '0') * 10 + (bytes[5] - '0');
         int date = (bytes[6] - '0') * 10 + (bytes[7] - '0');
         final ZoneId zone = systemUTC().zone();
-        return ZonedDateTime.of(LocalDate.of(year, month, date), LocalTime.now(zone), zone).toInstant().toEpochMilli();
+        return ZonedDateTime.of(LocalDate.of(year, month, date), LocalTime.MIDNIGHT, zone).toInstant().toEpochMilli();
     }
 
     private static void throwParseException(byte[] bytes, int errorOffset) throws ParseException {
