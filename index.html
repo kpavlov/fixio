@@ -1,50 +1,38 @@
 <!DOCTYPE html>
-<html>
-
+<html lang="en-us">
   <head>
-    <meta charset='utf-8' />
-    <meta http-equiv="X-UA-Compatible" content="chrome=1" />
-    <meta name="description" content="Fixio : FIX Protocol Support for Netty" />
-
-    <link rel="stylesheet" type="text/css" media="screen" href="stylesheets/stylesheet.css">
-
-    <title>Fixio</title>
+    <meta charset="UTF-8">
+    <title>Fixio by kpavlov</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link rel="stylesheet" type="text/css" href="stylesheets/normalize.css" media="screen">
+    <link href='https://fonts.googleapis.com/css?family=Open+Sans:400,700' rel='stylesheet' type='text/css'>
+    <link rel="stylesheet" type="text/css" href="stylesheets/stylesheet.css" media="screen">
+    <link rel="stylesheet" type="text/css" href="stylesheets/github-light.css" media="screen">
   </head>
-
   <body>
+    <section class="page-header">
+      <h1 class="project-name">Fixio</h1>
+      <h2 class="project-tagline">FIX Protocol Support for Netty</h2>
+      <a href="https://github.com/kpavlov/fixio" class="btn">View on GitHub</a>
+      <a href="https://github.com/kpavlov/fixio/zipball/master" class="btn">Download .zip</a>
+      <a href="https://github.com/kpavlov/fixio/tarball/master" class="btn">Download .tar.gz</a>
+    </section>
 
-    <!-- HEADER -->
-    <div id="header_wrap" class="outer">
-        <header class="inner">
-          <a id="forkme_banner" href="https://github.com/kpavlov/fixio">View on GitHub</a>
-
-          <h1 id="project_title">Fixio</h1>
-          <h2 id="project_tagline">FIX Protocol Support for Netty</h2>
-
-            <section id="downloads">
-              <a class="zip_download_link" href="https://github.com/kpavlov/fixio/zipball/master">Download this project as a .zip file</a>
-              <a class="tar_download_link" href="https://github.com/kpavlov/fixio/tarball/master">Download this project as a tar.gz file</a>
-            </section>
-        </header>
-    </div>
-
-    <!-- MAIN CONTENT -->
-    <div id="main_content_wrap" class="outer">
-      <section id="main_content" class="inner">
-        <h1>
-<a name="fixio---fix-protocol-support-for-netty-" class="anchor" href="#fixio---fix-protocol-support-for-netty-"><span class="octicon octicon-link"></span></a>fixio - FIX Protocol Support for Netty <a href="https://travis-ci.org/kpavlov/fixio"><img src="https://travis-ci.org/kpavlov/fixio.png?branch=master" alt="Build Status"></a>
+    <section class="main-content">
+      <h1>
+<a id="fixio---fix-protocol-support-for-netty-" class="anchor" href="#fixio---fix-protocol-support-for-netty-" aria-hidden="true"><span class="octicon octicon-link"></span></a>fixio - FIX Protocol Support for Netty <a href="https://travis-ci.org/kpavlov/fixio"><img src="https://travis-ci.org/kpavlov/fixio.png?branch=master" alt="Build Status"></a>
 </h1>
 
 <h1>
-<a name="overview" class="anchor" href="#overview"><span class="octicon octicon-link"></span></a>Overview</h1>
+<a id="overview" class="anchor" href="#overview" aria-hidden="true"><span class="octicon octicon-link"></span></a>Overview</h1>
 
 <h2>
-<a name="why-one-more-fix-protocol-api" class="anchor" href="#why-one-more-fix-protocol-api"><span class="octicon octicon-link"></span></a>Why One More FIX Protocol API</h2>
+<a id="why-one-more-fix-protocol-api" class="anchor" href="#why-one-more-fix-protocol-api" aria-hidden="true"><span class="octicon octicon-link"></span></a>Why One More FIX Protocol API</h2>
 
 <p>This API is intended to replace well known <a href="http://www.quickfixj.org/" title="Java Open Source FIX Engine">QuickFIX/J</a> in high-frequency trading scenarios.</p>
 
 <h2>
-<a name="design-goals" class="anchor" href="#design-goals"><span class="octicon octicon-link"></span></a>Design goals</h2>
+<a id="design-goals" class="anchor" href="#design-goals" aria-hidden="true"><span class="octicon octicon-link"></span></a>Design goals</h2>
 
 <ol>
 <li>Implement <a href="http://www.fixprotocol.org/" title="FIX Protocol">FIX Protocol</a> Java API with as low memory footprint as possible in order to eliminate unnecessary GC overhead,
@@ -58,23 +46,27 @@ thus improving overall application performance under high load.</li>
 <li>Reuse java.util.Calendar and java.util.TimeZone instances.</li>
 </ul>
 </li>
-</ol><p>The API has a number of <a href="#Limitations">limitations</a>, so it may be not suitable for any FIX application.</p>
+</ol>
+
+<p>The API has a number of <a href="#Limitations">limitations</a>, so it may be not suitable for any FIX application.</p>
 
 <h2>
-<a name="limitations" class="anchor" href="#limitations"><span class="octicon octicon-link"></span></a>Limitations</h2>
+<a id="limitations" class="anchor" href="#limitations" aria-hidden="true"><span class="octicon octicon-link"></span></a>Limitations</h2>
 
 <ol>
 <li>Logon message encryption is not supported. EncryptMethod(98)=0</li>
 <li>XmlData is not supported</li>
 <li>Message encodings other than US-ASCII are not supported.</li>
 <li>...</li>
-</ol><h2>
-<a name="performance" class="anchor" href="#performance"><span class="octicon octicon-link"></span></a>Performance</h2>
+</ol>
+
+<h2>
+<a id="performance" class="anchor" href="#performance" aria-hidden="true"><span class="octicon octicon-link"></span></a>Performance</h2>
 
 <p>Currently fixio can beat QuickFix performance in simple scenario. See <a href="https://github.com/kpavlov/fixio/wiki/Performance-Comparison">performance comparison</a>.</p>
 
 <h1>
-<a name="getting-started" class="anchor" href="#getting-started"><span class="octicon octicon-link"></span></a>Getting Started</h1>
+<a id="getting-started" class="anchor" href="#getting-started" aria-hidden="true"><span class="octicon octicon-link"></span></a>Getting Started</h1>
 
 <ol>
 <li>
@@ -83,26 +75,26 @@ thus improving overall application performance under high load.</li>
 <code>mvn clean install</code>
 </li>
 <li>Add the dependency to your project</li>
-</ol><div class="highlight highlight-xml"><pre><span class="nt">&lt;dependency&gt;</span>
-    <span class="nt">&lt;groupId&gt;</span>kpavlov.fixio<span class="nt">&lt;/groupId&gt;</span>
-    <span class="nt">&lt;artifactId&gt;</span>core<span class="nt">&lt;/artifactId&gt;</span>
-    <span class="nt">&lt;version&gt;</span>1.0-SNAPSHOT<span class="nt">&lt;/version&gt;</span>
-<span class="nt">&lt;/dependency&gt;</span>
-</pre></div>
+</ol>
+
+<div class="highlight highlight-text-xml"><pre>&lt;<span class="pl-ent">dependency</span>&gt;
+    &lt;<span class="pl-ent">groupId</span>&gt;kpavlov.fixio&lt;/<span class="pl-ent">groupId</span>&gt;
+    &lt;<span class="pl-ent">artifactId</span>&gt;core&lt;/<span class="pl-ent">artifactId</span>&gt;
+    &lt;<span class="pl-ent">version</span>&gt;1.0-SNAPSHOT&lt;/<span class="pl-ent">version</span>&gt;
+&lt;/<span class="pl-ent">dependency</span>&gt;</pre></div>
 
 <p>You'll also need a slf4j API implementation at runtime, so please add appropriate dependency, e.g.:</p>
 
-<div class="highlight highlight-xml"><pre><span class="nt">&lt;dependency&gt;</span>
-    <span class="nt">&lt;groupId&gt;</span>org.slf4j<span class="nt">&lt;/groupId&gt;</span>
-    <span class="nt">&lt;artifactId&gt;</span>slf4j-simple<span class="nt">&lt;/artifactId&gt;</span>
-    <span class="nt">&lt;version&gt;</span>1.7.5<span class="nt">&lt;/version&gt;</span>
-    <span class="nt">&lt;scope&gt;</span>runtime<span class="nt">&lt;/scope&gt;</span>
-    <span class="nt">&lt;optional&gt;</span>true<span class="nt">&lt;/optional&gt;</span>
-<span class="nt">&lt;/dependency&gt;</span>
-</pre></div>
+<div class="highlight highlight-text-xml"><pre>&lt;<span class="pl-ent">dependency</span>&gt;
+    &lt;<span class="pl-ent">groupId</span>&gt;org.slf4j&lt;/<span class="pl-ent">groupId</span>&gt;
+    &lt;<span class="pl-ent">artifactId</span>&gt;slf4j-simple&lt;/<span class="pl-ent">artifactId</span>&gt;
+    &lt;<span class="pl-ent">version</span>&gt;1.7.5&lt;/<span class="pl-ent">version</span>&gt;
+    &lt;<span class="pl-ent">scope</span>&gt;runtime&lt;/<span class="pl-ent">scope</span>&gt;
+    &lt;<span class="pl-ent">optional</span>&gt;true&lt;/<span class="pl-ent">optional</span>&gt;
+&lt;/<span class="pl-ent">dependency</span>&gt;</pre></div>
 
 <h2>
-<a name="examples" class="anchor" href="#examples"><span class="octicon octicon-link"></span></a>Examples</h2>
+<a id="examples" class="anchor" href="#examples" aria-hidden="true"><span class="octicon octicon-link"></span></a>Examples</h2>
 
 <p>You may find working example of <a href="https://github.com/kpavlov/fixio/treemaster/examples/src/main/java/fixio/examples/priceclient">client</a>
 and <a href="https://github.com/kpavlov/fixio/treemaster/examples/src/main/java/fixio/examples/priceserver">server</a> applications in module <a href="https://github.com/kpavlov/fixio/treemaster/examples">"examples"</a>.</p>
@@ -111,7 +103,7 @@ and <a href="https://github.com/kpavlov/fixio/treemaster/examples/src/main/java/
 and increased Survivor spaces (<code>-XX:SurvivorRatio=4</code>).</p>
 
 <h2>
-<a name="writing-simple-fix-client" class="anchor" href="#writing-simple-fix-client"><span class="octicon octicon-link"></span></a>Writing Simple FIX Client</h2>
+<a id="writing-simple-fix-client" class="anchor" href="#writing-simple-fix-client" aria-hidden="true"><span class="octicon octicon-link"></span></a>Writing Simple FIX Client</h2>
 
 <p>To create a simple FIX client you need to:</p>
 
@@ -122,36 +114,35 @@ You may extend <a href="https://github.com/kpavlov/fixio/treemaster/core/src/mai
 <li><p>Invoke <code>FixClient.connect(host, port)</code> to initiate connection.
 Method <code>connect(...)</code> returns a <a href="http://netty.io/5.0/api/io/netty/channel/ChannelFuture.html">ChannelFeature</a> which which will be notified when a channel is closed,
 so you may invoke the method <code>sync()</code> on it if you wish to wait for connection to be closed.</p></li>
-</ol><div class="highlight highlight-java"><pre><span class="n">FixApplication</span> <span class="n">app</span> <span class="o">=</span> <span class="k">new</span> <span class="n">FixApplicationAdapter</span><span class="o">();</span>
-<span class="n">client</span> <span class="o">=</span> <span class="k">new</span> <span class="n">FixClient</span><span class="o">(</span><span class="n">app</span><span class="o">);</span>
+</ol>
 
-<span class="c1">// set settings file location related to classpath</span>
-<span class="n">client</span><span class="o">.</span><span class="na">setSettingsResource</span><span class="o">(</span><span class="s">"/client.properties"</span><span class="o">);</span>
+<div class="highlight highlight-source-java"><pre><span class="pl-smi">FixApplication</span> app <span class="pl-k">=</span> <span class="pl-k">new</span> <span class="pl-smi">FixApplicationAdapter</span>();
+client <span class="pl-k">=</span> <span class="pl-k">new</span> <span class="pl-smi">FixClient</span>(app);
 
-<span class="c1">// connect to specified host and port</span>
-<span class="n">ChannelFeature</span> <span class="n">closeFeature</span> <span class="o">=</span> <span class="n">client</span><span class="o">.</span><span class="na">connect</span><span class="o">(</span><span class="s">"localhost"</span><span class="o">,</span> <span class="mi">10201</span><span class="o">);</span>
+<span class="pl-c">// set settings file location related to classpath</span>
+client<span class="pl-k">.</span>setSettingsResource(<span class="pl-s"><span class="pl-pds">"</span>/client.properties<span class="pl-pds">"</span></span>);
 
-<span class="c1">// wait until FIX Session is closed</span>
-<span class="n">closeFeature</span><span class="o">.</span><span class="na">sync</span><span class="o">();</span>
+<span class="pl-c">// connect to specified host and port</span>
+<span class="pl-smi">ChannelFeature</span> closeFeature <span class="pl-k">=</span> client<span class="pl-k">.</span>connect(<span class="pl-s"><span class="pl-pds">"</span>localhost<span class="pl-pds">"</span></span>, <span class="pl-c1">10201</span>);
 
-<span class="c1">// Shutdown FIX client</span>
-<span class="n">client</span><span class="o">.</span><span class="na">disconnect</span><span class="o">();</span>
-</pre></div>
+<span class="pl-c">// wait until FIX Session is closed</span>
+closeFeature<span class="pl-k">.</span>sync();
+
+<span class="pl-c">// Shutdown FIX client</span>
+client<span class="pl-k">.</span>disconnect();</pre></div>
 
 <p>You may find more information in <a href="https://github.com/kpavlov/fixio/wiki/User-Guide">User Guide</a> and
 <a href="https://github.com/kpavlov/fixio/wiki">Wiki pages</a>.</p>
-      </section>
-    </div>
 
-    <!-- FOOTER  -->
-    <div id="footer_wrap" class="outer">
-      <footer class="inner">
-        <p class="copyright">Fixio maintained by <a href="https://github.com/kpavlov">kpavlov</a></p>
-        <p>Published with <a href="http://pages.github.com">GitHub Pages</a></p>
+      <footer class="site-footer">
+        <span class="site-footer-owner"><a href="https://github.com/kpavlov/fixio">Fixio</a> is maintained by <a href="https://github.com/kpavlov">kpavlov</a>.</span>
+
+        <span class="site-footer-credits">This page was generated by <a href="https://pages.github.com">GitHub Pages</a> using the <a href="https://github.com/jasonlong/cayman-theme">Cayman theme</a> by <a href="https://twitter.com/jasonlong">Jason Long</a>.</span>
       </footer>
-    </div>
 
-              <script type="text/javascript">
+    </section>
+
+            <script type="text/javascript">
             var gaJsHost = (("https:" == document.location.protocol) ? "https://ssl." : "http://www.");
             document.write(unescape("%3Cscript src='" + gaJsHost + "google-analytics.com/ga.js' type='text/javascript'%3E%3C/script%3E"));
           </script>
@@ -161,7 +152,6 @@ so you may invoke the method <code>sync()</code> on it if you wish to wait for c
             pageTracker._trackPageview();
             } catch(err) {}
           </script>
-
 
   </body>
 </html>
