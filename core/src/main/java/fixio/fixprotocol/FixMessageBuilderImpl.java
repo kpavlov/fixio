@@ -19,18 +19,17 @@ import fixio.fixprotocol.fields.CharField;
 import fixio.fixprotocol.fields.FixedPointNumber;
 import fixio.fixprotocol.fields.IntField;
 import fixio.fixprotocol.fields.StringField;
+import it.unimi.dsi.fastutil.ints.Int2ObjectArrayMap;
 
 import java.util.ArrayList;
-import java.util.LinkedHashMap;
 import java.util.List;
-import java.util.Map;
 
 public class FixMessageBuilderImpl implements FixMessage, FixMessageBuilder {
 
     private static final int DEFAULT_BODY_FIELD_COUNT = 16;
     private final FixMessageHeader header;
     private final FixMessageTrailer trailer;
-    private final Map<Integer, FixMessageFragment> body;
+    private final Int2ObjectArrayMap<FixMessageFragment> body;
 
     /**
      * Creates FixMessageBuilderImpl with expected body field count.
@@ -38,20 +37,20 @@ public class FixMessageBuilderImpl implements FixMessage, FixMessageBuilder {
      * Providing expected capacity eliminates unnecessary growing of internal ArrayList storing body fields.
      */
     public FixMessageBuilderImpl(int expectedBodyFieldCount) {
-        header = new FixMessageHeader();
-        trailer = new FixMessageTrailer();
-        body = new LinkedHashMap<>(expectedBodyFieldCount);
+        this.header = new FixMessageHeader();
+        this.trailer = new FixMessageTrailer();
+        this.body = new Int2ObjectArrayMap<>(expectedBodyFieldCount);
     }
 
     /**
      * Creates FixMessageBuilderImpl with specified FixMessageHeader and  FixMessageTrailer.
      */
-    public FixMessageBuilderImpl(FixMessageHeader header, FixMessageTrailer trailer) {
+    public FixMessageBuilderImpl(FixMessageHeader header, final FixMessageTrailer trailer) {
         assert (header != null) : "FixMessageHeader is expected";
         assert (trailer != null) : "FixMessageTrailer is expected";
         this.header = header;
         this.trailer = trailer;
-        body = new LinkedHashMap<>(DEFAULT_BODY_FIELD_COUNT);
+        this.body = new Int2ObjectArrayMap<>(DEFAULT_BODY_FIELD_COUNT);
     }
 
     /**

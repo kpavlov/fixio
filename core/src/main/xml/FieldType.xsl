@@ -40,7 +40,7 @@
         */
         package fixio.fixprotocol;
 
-        import java.util.HashMap;
+        import it.unimi.dsi.fastutil.ints.Int2ObjectArrayMap;
         import static fixio.fixprotocol.DataType.*;
 
         public enum FieldType {
@@ -54,7 +54,7 @@
         private final DataType type;
         private final String[] enumValues;
 
-        private static final HashMap&lt;Integer,FieldType&gt; TYPES = new HashMap&lt;&gt;(FieldType.values().length);
+        private static final Int2ObjectArrayMap&lt;FieldType&gt; TYPES = new Int2ObjectArrayMap&lt;&gt;(FieldType.values().length);
 
         static {
             for (FieldType fieldType : FieldType.values()) {

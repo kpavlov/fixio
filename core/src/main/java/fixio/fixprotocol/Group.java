@@ -17,11 +17,10 @@ package fixio.fixprotocol;
 
 import fixio.fixprotocol.fields.FixedPointNumber;
 import fixio.fixprotocol.fields.StringField;
+import it.unimi.dsi.fastutil.ints.Int2ObjectArrayMap;
 
 import java.util.ArrayList;
-import java.util.LinkedHashMap;
 import java.util.List;
-import java.util.Map;
 
 /**
  * Represents FIX Protocol field Group or Component - a sequence of Fields or other Groups.
@@ -29,14 +28,14 @@ import java.util.Map;
 public class Group implements FieldListBuilder<Group> {
 
     private static final int DEFAULT_GROUP_SIZE = 8;
-    private final Map<Integer, FixMessageFragment> contents;
+    private final Int2ObjectArrayMap<FixMessageFragment> contents;
 
     public Group(int expectedSize) {
-        this.contents = new LinkedHashMap<>(expectedSize);
+        this.contents = new Int2ObjectArrayMap<>(expectedSize);
     }
 
     public Group() {
-        this.contents = new LinkedHashMap<>(DEFAULT_GROUP_SIZE);
+        this.contents = new Int2ObjectArrayMap<>(DEFAULT_GROUP_SIZE);
     }
 
     public void add(FixMessageFragment element) {
