@@ -79,7 +79,8 @@ class PriceStreamingApp extends FixApplicationAdapter {
     @Override
     public void onMessage(ChannelHandlerContext ctx, FixMessage msg, List<Object> out) throws Exception {
         String reqId;
-        switch (msg.getMessageType()) {
+        final String messageType = msg.getMessageType();
+        switch (messageType) {
             case MessageTypes.QUOTE_REQUEST:
                 reqId = msg.getString(FieldType.QuoteReqID);
                 subscriptions.put(reqId, ctx);
@@ -90,6 +91,8 @@ class PriceStreamingApp extends FixApplicationAdapter {
                 subscriptions.remove(reqId);
                 LOGGER.debug("Unsubscribed with QuoteReqID={}", reqId);
                 break;
+            default:
+                LOGGER.debug("Unsupported message type: {}", messageType);
         }
     }
 
