@@ -32,14 +32,14 @@ public class UTCDateOnlyFieldTest {
 
     @Test
     public void testParse() throws Exception {
-        assertEquals(testDate.toDateTimeAtCurrentTime(UTC).getMillis(), UTCDateOnlyField.parse((DATE_STR.getBytes())));
+        assertEquals(testDate.toDateTimeAtStartOfDay(UTC).getMillis(), UTCDateOnlyField.parse((DATE_STR.getBytes())));
     }
 
     @Test
     public void testCreate() throws Exception {
         int tag = new Random().nextInt();
         UTCDateOnlyField field = new UTCDateOnlyField(tag, DATE_STR.getBytes());
-        assertEquals(testDate.toDateTimeAtCurrentTime(UTC).getMillis(), field.getValue().longValue());
+        assertEquals(testDate.toDateTimeAtStartOfDay(UTC).getMillis(), field.getValue().longValue());
     }
 
     @Test
