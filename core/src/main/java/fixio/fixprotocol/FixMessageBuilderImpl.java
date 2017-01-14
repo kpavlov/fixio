@@ -20,8 +20,6 @@ import fixio.fixprotocol.fields.FixedPointNumber;
 import fixio.fixprotocol.fields.IntField;
 import fixio.fixprotocol.fields.StringField;
 import it.unimi.dsi.fastutil.ints.Int2ObjectArrayMap;
-import it.unimi.dsi.fastutil.ints.Int2ObjectLinkedOpenHashMap;
-import it.unimi.dsi.fastutil.ints.Int2ObjectMap;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -214,11 +212,13 @@ public class FixMessageBuilderImpl implements FixMessage, FixMessageBuilder {
         }
     }
 
+    @SuppressWarnings("unchecked")
     @Override
     public <T> T getValue(FieldType fieldType) {
         FixMessageFragment field = getFragment(fieldType.tag());
-        if (field != null)
+        if (field != null) {
             return (T) field.getValue();
+        }
         return null;
     }
 

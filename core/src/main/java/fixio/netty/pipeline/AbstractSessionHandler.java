@@ -17,7 +17,12 @@
 package fixio.netty.pipeline;
 
 import fixio.events.LogoutEvent;
-import fixio.fixprotocol.*;
+import fixio.fixprotocol.FieldType;
+import fixio.fixprotocol.FixMessage;
+import fixio.fixprotocol.FixMessageBuilder;
+import fixio.fixprotocol.FixMessageBuilderImpl;
+import fixio.fixprotocol.FixMessageHeader;
+import fixio.fixprotocol.MessageTypes;
 import fixio.fixprotocol.session.FixSession;
 import fixio.handlers.FixApplication;
 import fixio.validator.BusinessRejectException;
@@ -71,9 +76,9 @@ public abstract class AbstractSessionHandler extends MessageToMessageCodec<FixMe
 
     @Override
     public void channelInactive(ChannelHandlerContext ctx) throws Exception {
-        Attribute<FixSession> fixSessionAttribute = ctx.attr(FIX_SESSION_KEY);
+        Attribute<FixSession> fixSessionAttribute = ctx.channel().attr(FIX_SESSION_KEY);
         if (fixSessionAttribute != null) {
-            FixSession session = fixSessionAttribute.getAndRemove();
+            FixSession session = fixSessionAttribute.getAndSet(null);
             if (session != null) {
                 ctx.fireChannelRead(new LogoutEvent(session));
                 sessionRepository.removeSession(session.getId());
@@ -98,13 +103,13 @@ public abstract class AbstractSessionHandler extends MessageToMessageCodec<FixMe
      * @return null if session not established.
      */
     protected FixSession getSession(ChannelHandlerContext ctx) {
-        Attribute<FixSession> fixSessionAttribute = ctx.attr(FIX_SESSION_KEY);
+        Attribute<FixSession> fixSessionAttribute = ctx.channel().attr(FIX_SESSION_KEY);
         return fixSessionAttribute.get();
     }
 
     protected boolean setSession(ChannelHandlerContext ctx, FixSession fixSession) {
         assert (fixSession != null) : "Parameter 'fixSession' expected.";
-        Attribute<FixSession> fixSessionAttribute = ctx.attr(FIX_SESSION_KEY);
+        Attribute<FixSession> fixSessionAttribute = ctx.channel().attr(FIX_SESSION_KEY);
         return fixSessionAttribute.compareAndSet(null, fixSession);
     }
 
@@ -127,7 +132,7 @@ public abstract class AbstractSessionHandler extends MessageToMessageCodec<FixMe
         FixMessageHeader header = msg.getHeader();
 
         final int msgSeqNum = header.getMsgSeqNum();
-        if (!session.checkIncomingSeqNum(msgSeqNum)) {
+        if (!session.checkAndIncrementIncomingSeqNum(msgSeqNum)) {
             getLogger().error("MessageSeqNum={} != expected {}.", msgSeqNum, session.getNextIncomingMessageSeqNum());
         }
         out.add(msg);

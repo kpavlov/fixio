@@ -26,6 +26,7 @@ import fixio.netty.AttributeMock;
 import fixio.netty.pipeline.AbstractSessionHandler;
 import fixio.netty.pipeline.FixMessageAsserts;
 import fixio.netty.pipeline.InMemorySessionRepository;
+import io.netty.channel.Channel;
 import io.netty.channel.ChannelFuture;
 import io.netty.channel.ChannelFutureListener;
 import io.netty.channel.ChannelHandlerContext;
@@ -44,7 +45,14 @@ import java.util.List;
 import static org.apache.commons.lang3.RandomStringUtils.randomAscii;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
-import static org.mockito.Mockito.*;
+import static org.mockito.Mockito.any;
+import static org.mockito.Mockito.atLeastOnce;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.same;
+import static org.mockito.Mockito.times;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.verifyNoMoreInteractions;
+import static org.mockito.Mockito.when;
 
 @RunWith(MockitoJUnitRunner.class)
 public class ServerSessionHandlerTest {
@@ -54,6 +62,8 @@ public class ServerSessionHandlerTest {
     private FixAuthenticator authenticator;
     @Mock
     private FixApplication fixApplication;
+    @Mock
+    private Channel channel;
     @Mock
     private ChannelHandlerContext ctx;
     @Captor
@@ -73,7 +83,8 @@ public class ServerSessionHandlerTest {
         header.setTargetCompID(randomAscii(4));
 
         Attribute<FixSession> sessionAttribute = new AttributeMock<>();
-        when(ctx.attr(AbstractSessionHandler.FIX_SESSION_KEY)).thenReturn(sessionAttribute);
+        when(channel.attr(AbstractSessionHandler.FIX_SESSION_KEY)).thenReturn(sessionAttribute);
+        when(ctx.channel()).thenReturn(channel);
     }
 
     @Test
@@ -85,10 +96,10 @@ public class ServerSessionHandlerTest {
         assertEquals(1, outgoingMessages.size());
         assertTrue(outgoingMessages.get(0) instanceof LogonEvent);
 
-        verify(ctx, atLeastOnce()).attr(AbstractSessionHandler.FIX_SESSION_KEY);
+        verify(channel, atLeastOnce()).attr(AbstractSessionHandler.FIX_SESSION_KEY);
         verify(ctx).write(messageCaptor.capture());
         verify(ctx).flush();
-        verifyNoMoreInteractions(ctx);
+        verifyNoMoreInteractions(channel);
 
         FixMessageBuilderImpl logonAck = messageCaptor.getValue();
         verify(fixApplication).beforeSendMessage(same(ctx), same(logonAck));
@@ -101,9 +112,9 @@ public class ServerSessionHandlerTest {
 
         handler.decode(ctx, logonMsg, outgoingMessages);
 
-        verify(ctx).attr(AbstractSessionHandler.FIX_SESSION_KEY);
+        verify(channel).attr(AbstractSessionHandler.FIX_SESSION_KEY);
         verify(ctx).close();
-        verifyNoMoreInteractions(ctx);
+        verifyNoMoreInteractions(channel);
     }
 
     @Test
@@ -116,10 +127,10 @@ public class ServerSessionHandlerTest {
         assertEquals(1, outgoingMessages.size());
         assertTrue(outgoingMessages.get(0) instanceof LogonEvent);
 
-        verify(ctx, atLeastOnce()).attr(AbstractSessionHandler.FIX_SESSION_KEY);
+        verify(channel, atLeastOnce()).attr(AbstractSessionHandler.FIX_SESSION_KEY);
         verify(ctx, times(2)).write(messageCaptor.capture());
         verify(ctx).flush();
-        verifyNoMoreInteractions(ctx);
+        verifyNoMoreInteractions(channel);
 
         final List<FixMessageBuilderImpl> sentMessages = messageCaptor.getAllValues();
         FixMessageAsserts.assertLogonAck(sentMessages.get(0));
@@ -137,16 +148,11 @@ public class ServerSessionHandlerTest {
 
         assertEquals(0, outgoingMessages.size());
 
-        verify(ctx, atLeastOnce()).attr(AbstractSessionHandler.FIX_SESSION_KEY);
+        verify(channel, atLeastOnce()).attr(AbstractSessionHandler.FIX_SESSION_KEY);
         verify(ctx).writeAndFlush(messageCaptor.capture());
         verify(channelFeature).addListener(ChannelFutureListener.CLOSE);
-        verifyNoMoreInteractions(ctx);
+        verifyNoMoreInteractions(channel);
 
         FixMessageAsserts.assertLogout(messageCaptor.getValue());
-    }
-
-    @Test
-    public void testLogout() {
-
     }
 }

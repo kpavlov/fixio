@@ -89,7 +89,7 @@ public class FixSession {
         return nextOutgoingMessageSeqNum.get();
     }
 
-    public boolean checkIncomingSeqNum(final int num) {
+    public boolean checkAndIncrementIncomingSeqNum(final int num) {
         return INCOMING_SEQ_NUM_UPDATER.compareAndSet(this, num, num + 1);
     }
 

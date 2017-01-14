@@ -42,12 +42,17 @@ import java.util.Random;
 
 import static org.apache.commons.lang3.RandomStringUtils.randomAscii;
 import static org.junit.Assert.assertEquals;
-import static org.mockito.Mockito.*;
+import static org.mockito.Mockito.any;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.never;
+import static org.mockito.Mockito.times;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
 
 @RunWith(MockitoJUnitRunner.class)
 public class AbstractSessionHandlerTest {
 
-    public static final Random RANDOM = new Random();
+    private static final Random RANDOM = new Random();
     private static final Logger LOGGER = LoggerFactory.getLogger(AbstractSessionHandlerTest.class);
     private AbstractSessionHandler sessionHandler;
     @Mock
@@ -59,7 +64,7 @@ public class AbstractSessionHandlerTest {
     @Mock
     private FixApplication fixApplication;
     @Mock
-    private Attribute<FixSession> sessonAttr;
+    private Attribute<FixSession> sessionAttr;
     @Captor
     private ArgumentCaptor<FixMessage> rejectCaptor;
     @Mock
@@ -67,6 +72,7 @@ public class AbstractSessionHandlerTest {
 
     @Before
     public void setUp() {
+        when(ctx.channel()).thenReturn(channel);
         sessionHandler = new AbstractSessionHandler(fixApplication, FixClock.systemUTC(), sessionRepository) {
             @Override
             protected void encode(ChannelHandlerContext ctx, FixMessageBuilder msg, List<Object> out) throws Exception {
@@ -104,21 +110,21 @@ public class AbstractSessionHandlerTest {
 
     @Test
     public void testChannelInactiveSessionExists() throws Exception {
-        when(ctx.attr(AbstractSessionHandler.FIX_SESSION_KEY)).thenReturn(sessonAttr);
-        when(sessonAttr.getAndRemove()).thenReturn(fixSession);
+        when(channel.attr(AbstractSessionHandler.FIX_SESSION_KEY)).thenReturn(sessionAttr);
+        when(sessionAttr.getAndSet(null)).thenReturn(fixSession);
         SessionId sessionId = mock(SessionId.class);
         when(fixSession.getId()).thenReturn(sessionId);
 
         sessionHandler.channelInactive(ctx);
 
         verify(ctx).fireChannelRead(any(LogoutEvent.class));
-        verify(sessonAttr).getAndRemove();
+        verify(sessionAttr).getAndSet(null);
         verify(sessionRepository).removeSession(sessionId);
     }
 
     @Test
     public void testChannelInactiveNoKeyAttr() throws Exception {
-        when(ctx.attr(AbstractSessionHandler.FIX_SESSION_KEY)).thenReturn(null);
+        when(channel.attr(AbstractSessionHandler.FIX_SESSION_KEY)).thenReturn(null);
 
         sessionHandler.channelInactive(ctx);
 
@@ -127,8 +133,8 @@ public class AbstractSessionHandlerTest {
 
     @Test
     public void testChannelInactiveSessionNotExists() throws Exception {
-        when(ctx.attr(AbstractSessionHandler.FIX_SESSION_KEY)).thenReturn(sessonAttr);
-        when(sessonAttr.getAndRemove()).thenReturn(null);
+        when(channel.attr(AbstractSessionHandler.FIX_SESSION_KEY)).thenReturn(sessionAttr);
+        when(sessionAttr.getAndSet(null)).thenReturn(null);
 
         sessionHandler.channelInactive(ctx);
 
