@@ -33,4 +33,12 @@ public interface FixSessionSettingsProvider {
     int getHeartbeatInterval();
 
     String getProperty(String key, String defaultValue);
+
+    default boolean getBooleanProperty(String key) {
+        return Boolean.parseBoolean(getProperty(key, null));
+    }
+
+    final class Params {
+        public static final String SSL = "ssl";
+    }
 }

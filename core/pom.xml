@@ -29,10 +29,6 @@
     <name>fix.io core</name>
     <description>FIX Protocol Support for Netty 4</description>
 
-    <properties>
-        <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-    </properties>
-
     <dependencies>
         <!-- production dependencies -->
         <dependency>

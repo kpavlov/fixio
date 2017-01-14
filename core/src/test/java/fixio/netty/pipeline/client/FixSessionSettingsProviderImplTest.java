@@ -23,9 +23,9 @@ import java.util.Random;
 import static org.apache.commons.lang3.RandomStringUtils.randomAscii;
 import static org.junit.Assert.assertEquals;
 
-public class SimpleFixSessionSettingsProviderTest {
+public class FixSessionSettingsProviderImplTest {
 
-    private static SimpleFixSessionSettingsProvider settingsProvider;
+    private static FixSessionSettingsProviderImpl settingsProvider;
 
     private static String beginString;
     private static String senderCompID;
@@ -46,14 +46,15 @@ public class SimpleFixSessionSettingsProviderTest {
         heartbeatInterval = new Random().nextInt(100) + 1;
 
 
-        settingsProvider = new SimpleFixSessionSettingsProvider();
-        settingsProvider.setBeginString(beginString);
-        settingsProvider.setSenderCompID(senderCompID);
-        settingsProvider.setSenderSubID(senderSubID);
-        settingsProvider.setTargetCompID(targetCompID);
-        settingsProvider.setTargetSubID(targetSubID);
-        settingsProvider.setResetMsgSeqNum(resetMsgSeqNum);
-        settingsProvider.setHeartbeatInterval(heartbeatInterval);
+        settingsProvider = FixSessionSettingsProviderImpl.newBuilder()
+                .beginString(beginString)
+                .senderCompID(senderCompID)
+                .senderSubID(senderSubID)
+                .targetCompID(targetCompID)
+                .targetSubID(targetSubID)
+                .resetMsgSeqNum(resetMsgSeqNum)
+                .heartbeatInterval(heartbeatInterval)
+                .build();
     }
 
     @Test

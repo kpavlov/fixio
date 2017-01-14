@@ -16,7 +16,11 @@
 package fixio;
 
 import fixio.events.LogonEvent;
-import fixio.fixprotocol.*;
+import fixio.fixprotocol.DataType;
+import fixio.fixprotocol.FixMessage;
+import fixio.fixprotocol.FixMessageBuilder;
+import fixio.fixprotocol.FixMessageBuilderImpl;
+import fixio.fixprotocol.MessageTypes;
 import fixio.handlers.FixApplicationAdapter;
 import fixio.netty.pipeline.InMemorySessionRepository;
 import fixio.netty.pipeline.client.PropertyAuthenticationProvider;
@@ -24,18 +28,26 @@ import fixio.netty.pipeline.client.PropertyFixSessionSettingsProviderImpl;
 import fixio.netty.pipeline.server.AcceptAllAuthenticator;
 import io.netty.channel.ChannelFuture;
 import io.netty.channel.ChannelHandlerContext;
-import org.junit.*;
+import org.junit.After;
+import org.junit.AfterClass;
+import org.junit.Before;
+import org.junit.BeforeClass;
+import org.junit.Test;
 
 import java.util.ArrayList;
 import java.util.List;
 
-import static fixio.fixprotocol.FieldType.*;
+import static fixio.fixprotocol.FieldType.UserRequestID;
+import static fixio.fixprotocol.FieldType.UserRequestType;
+import static fixio.fixprotocol.FieldType.UserStatus;
+import static fixio.fixprotocol.FieldType.UserStatusText;
+import static fixio.fixprotocol.FieldType.Username;
 import static org.junit.Assert.assertEquals;
 
 public class FixConversationIT {
 
-    public static final int TEST_TIMEOUT = 5000;
-    public static final int PORT = 10453;
+    private static final int TEST_TIMEOUT = 5000;
+    private static final int PORT = 10453;
     private static final List<FixMessage> conversation = new ArrayList<>();
     private static FixServer server;
     private FixClient client;

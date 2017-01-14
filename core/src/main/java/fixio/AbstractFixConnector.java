@@ -24,12 +24,13 @@ import fixio.netty.pipeline.SessionRepository;
  *
  * @author Konstantin Pavlov
  */
+@SuppressWarnings("WeakerAccess")
 public abstract class AbstractFixConnector {
 
     private final FixApplication fixApplication;
     private final SessionRepository sessionRepository;
 
-    public AbstractFixConnector(FixApplication fixApplication, SessionRepository sessionRepository) {
+    protected AbstractFixConnector(FixApplication fixApplication, SessionRepository sessionRepository) {
         this.fixApplication = fixApplication;
         this.sessionRepository = sessionRepository;
     }

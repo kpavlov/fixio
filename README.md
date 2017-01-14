@@ -52,7 +52,7 @@ You'll also need a slf4j API implementation at runtime, so please add appropriat
 <dependency>
     <groupId>org.slf4j</groupId>
     <artifactId>slf4j-simple</artifactId>
-    <version>1.7.10</version>
+    <version>1.7.22</version>
     <scope>runtime</scope>
     <optional>true</optional>
 </dependency>
@@ -66,7 +66,7 @@ and [server][server-example] applications in module ["examples"][examples-module
 I recommend running server with Concurrent Mark Sweep Collector enabled: `-XX:+UseConcMarkSweepGC`
 and increased Survivor spaces (`-XX:SurvivorRatio=4`).
 
-## Writing Simple FIX Client
+### Writing Simple FIX Client
 
 To create a simple FIX client you need to:
 
@@ -95,6 +95,12 @@ closeFeature.sync();
 // Shutdown FIX client
 client.disconnect();
 ~~~~~~~~~
+
+### SSL Support for Client
+
+You may set a property `ssl=true` in `client.properties` file.
+ 
+Or configure `FixSessionSettingsProvider` by hand. See `FixSessionSettingsProvider.Params.SSL`.
 
 You may find more information in [User Guide](https://github.com/kpavlov/fixio/wiki/User-Guide) and
 [Wiki pages](https://github.com/kpavlov/fixio/wiki).

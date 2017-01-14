@@ -85,12 +85,13 @@ public class ClientSessionHandlerTest {
 
         heartbeartInterval = RANDOM.nextInt(100) + 10;
 
-        SimpleFixSessionSettingsProvider settingsProvider = new SimpleFixSessionSettingsProvider();
-        settingsProvider.setResetMsgSeqNum(true);
-        settingsProvider.setHeartbeatInterval(heartbeartInterval);
-        settingsProvider.setBeginString(randomAscii(5));
-        settingsProvider.setSenderCompID(randomAscii(5));
-        settingsProvider.setTargetCompID(randomAscii(5));
+        FixSessionSettingsProvider settingsProvider = FixSessionSettingsProviderImpl.newBuilder()
+                .resetMsgSeqNum(true)
+                .heartbeatInterval(heartbeartInterval)
+                .beginString(randomAscii(5))
+                .senderCompID(randomAscii(5))
+                .targetCompID(randomAscii(5))
+                .build();
 
         when(authenticationProvider.getPasswordAuthentication()).thenReturn(
                 new PasswordAuthentication(userName, password.toCharArray())

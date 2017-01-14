@@ -31,8 +31,12 @@
         <url>https://github.com/kpavlov/fixio</url>
         <connection>scm:git:git://github.com/kpavlov/fixio.git</connection>
         <developerConnection>scm:git:ssh://git@github.com/kpavlov/fixio.git</developerConnection>
-        <tag>master</tag>
+        <tag>HEAD</tag>
     </scm>
+
+    <prerequisites>
+        <maven>3.3.9</maven>
+    </prerequisites>
 
     <properties>
         <java.version>1.8</java.version>

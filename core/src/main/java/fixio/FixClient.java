@@ -80,10 +80,12 @@ public class FixClient extends AbstractFixConnector {
     /**
      * Connect and start FIX session to specified host and port.
      */
+    @SuppressWarnings("WeakerAccess")
     public ChannelFuture connect(String host, int port) throws InterruptedException {
         return connect(new InetSocketAddress(host, port));
     }
 
+    @SuppressWarnings("WeakerAccess")
     public ChannelFuture connect(SocketAddress serverAddress) throws InterruptedException {
         final Channel channel = connectAsync(serverAddress).sync().await().channel();
         assert (channel != null) : "Channel must be set";
@@ -91,6 +93,7 @@ public class FixClient extends AbstractFixConnector {
         return channel.closeFuture();
     }
 
+    @SuppressWarnings("WeakerAccess")
     public ChannelFuture connectAsync(SocketAddress serverAddress) {
         LOGGER.info("FixClient is starting");
         final Bootstrap b = new Bootstrap();
@@ -116,6 +119,7 @@ public class FixClient extends AbstractFixConnector {
         return connectFuture.addListener(future -> channel = connectFuture.channel());
     }
 
+    @SuppressWarnings("WeakerAccess")
     public ChannelFuture disconnectAsync() {
         LOGGER.info("Closing connection to {}", channel.remoteAddress());
         return channel.close().addListener(future -> {
