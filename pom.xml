@@ -19,8 +19,8 @@
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <modelVersion>4.0.0</modelVersion>
 
-    <groupId>kpavlov.fixio</groupId>
-    <artifactId>fixio</artifactId>
+    <groupId>com.github.kpavlov.fixio</groupId>
+    <artifactId>fixio-parent</artifactId>
     <packaging>pom</packaging>
     <version>1.1-SNAPSHOT</version>
 
@@ -39,6 +39,8 @@
     </prerequisites>
 
     <properties>
+        <autoVersionSubmodules>true</autoVersionSubmodules>
+        <fastutil.version>7.0.13</fastutil.version>
         <java.version>1.8</java.version>
         <joda.version>2.9.7</joda.version>
         <maven.compiler.debug>true</maven.compiler.debug>
@@ -49,7 +51,6 @@
         <netty.version>4.1.7.Final</netty.version>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <slf4j.version>1.7.22</slf4j.version>
-        <fastutil.version>7.0.13</fastutil.version>
     </properties>
 
     <modules>
