@@ -97,13 +97,13 @@ final class FieldListBuilderHelper {
         map.put(fieldType.tag(), FieldFactory.fromFixedPointValue(fieldType.type(), fieldType.tag(), value));
     }
 
-    public void add(Int2ObjectArrayMap<FixMessageFragment> map, int tagNum, FixedPointNumber value) {
+    public static void add(Int2ObjectArrayMap<FixMessageFragment> map, int tagNum, FixedPointNumber value) {
         assert (tagNum > 0) : "TagNum must be positive. Got " + tagNum;
         assert (value != null) : "Value must be specified.";
         map.put(tagNum, FieldFactory.fromFixedPointValue(tagNum, value));
     }
 
-    public void add(Int2ObjectArrayMap<FixMessageFragment> map, DataType type, int tagNum, FixedPointNumber value) {
+    public static void add(Int2ObjectArrayMap<FixMessageFragment> map, DataType type, int tagNum, FixedPointNumber value) {
         assert (tagNum > 0) : "TagNum must be positive. Got " + tagNum;
         assert (value != null) : "Value must be specified.";
         map.put(tagNum, FieldFactory.fromFixedPointValue(type, tagNum, value));
