@@ -34,7 +34,7 @@ public class FixAcceptorChannelInitializer<C extends Channel> extends FixChannel
                                          FixApplication fixApplication,
                                          FixAuthenticator authenticator,
                                          SessionRepository sessionRepository) {
-        super(workerGroup, fixApplication);
+        super(workerGroup, fixApplication, false);
         this.authenticator = authenticator;
         this.sessionRepository = sessionRepository;
     }

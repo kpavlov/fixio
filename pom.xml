@@ -54,8 +54,6 @@
 
     <modules>
         <module>core</module>
-        <module>examples</module>
-        <module>benchmark</module>
     </modules>
 
     <licenses>

@@ -34,7 +34,7 @@ public class FixInitiatorChannelInitializer<C extends Channel> extends FixChanne
                                           AuthenticationProvider authenticationProvider,
                                           MessageSequenceProvider messageSequenceProvider,
                                           FixApplication fixApplication) {
-        super(workerGroup, fixApplication);
+        super(workerGroup, fixApplication, Boolean.parseBoolean(settingsProvider.getProperty("ssl", "false")));
         this.authenticationProvider = authenticationProvider;
         this.messageSequenceProvider = (messageSequenceProvider == null) ? StatelessMessageSequenceProvider.getInstance() : messageSequenceProvider;
         this.settingsProvider = settingsProvider;

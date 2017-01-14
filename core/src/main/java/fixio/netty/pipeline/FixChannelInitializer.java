@@ -30,6 +30,8 @@ import io.netty.handler.codec.DelimiterBasedFrameDecoder;
 import io.netty.handler.codec.MessageToMessageCodec;
 import io.netty.handler.logging.LogLevel;
 import io.netty.handler.logging.LoggingHandler;
+import io.netty.handler.ssl.SslContext;
+import io.netty.handler.ssl.SslContextBuilder;
 
 /**
  * FixChannelInitializer
@@ -45,14 +47,21 @@ public abstract class FixChannelInitializer<C extends Channel> extends ChannelIn
 
     private final TestRequestHandler testRequestHandler = new TestRequestHandler();
 
-    protected FixChannelInitializer(EventLoopGroup workerGroup, FixApplication fixApplication) {
+    private final boolean enableSsl;
+
+    protected FixChannelInitializer(EventLoopGroup workerGroup, FixApplication fixApplication, boolean enableSsl) {
         this.workerGroup = workerGroup;
         this.fixApplication = fixApplication;
+        this.enableSsl = enableSsl;
     }
 
     @Override
     public void initChannel(C ch) throws Exception {
         final ChannelPipeline pipeline = ch.pipeline();
+        if (enableSsl) {
+            SslContext ssl = SslContextBuilder.forClient().build();
+            pipeline.addLast("ssl", ssl.newHandler(ch.alloc()));
+        }
         pipeline.addLast("tagDecoder", new DelimiterBasedFrameDecoder(1024, Unpooled.wrappedBuffer(new byte[]{1})));
         pipeline.addLast("fixMessageDecoder", new FixMessageDecoder());
         pipeline.addLast("fixMessageEncoder", ENCODER);
