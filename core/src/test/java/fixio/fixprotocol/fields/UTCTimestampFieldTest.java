@@ -15,15 +15,15 @@
  */
 package fixio.fixprotocol.fields;
 
-import org.joda.time.DateTime;
-import org.joda.time.DateTimeFieldType;
-import org.joda.time.LocalDate;
-import org.joda.time.LocalTime;
 import org.junit.Test;
 
+import java.time.LocalDate;
+import java.time.LocalTime;
+import java.time.ZonedDateTime;
 import java.util.Random;
+import java.util.concurrent.TimeUnit;
 
-import static org.joda.time.DateTimeZone.UTC;
+import static fixio.netty.pipeline.FixClock.systemUTC;
 import static org.junit.Assert.assertArrayEquals;
 import static org.junit.Assert.assertEquals;
 
@@ -36,17 +36,15 @@ public class UTCTimestampFieldTest {
 
     private final long testDateTime = ZonedDateTime.of(testDate, LocalTime.of(8, 3, 31), systemUTC().zone()).toInstant().toEpochMilli();
     private final long testDateTimeWithMillis = ZonedDateTime.of(testDate, LocalTime.of(8, 3, 31, (int) TimeUnit.MILLISECONDS.toNanos(537)), systemUTC().zone()).toInstant().toEpochMilli();
-    private final DateTime testDate = new LocalDate(1998, 6, 4).toDateTime(new LocalTime(8, 3, 31, 0), UTC);
 
     @Test
     public void testParseNoMillis() throws Exception {
         assertEquals(testDateTime, UTCTimestampField.parse(TIMESTAMP_NO_MILLIS.getBytes()));
-        assertEquals(testDate.getMillis(), UTCTimestampField.parse(TIMESTAMP_NO_MILLIS.getBytes()));
     }
 
     @Test
     public void testParseWithMillis() throws Exception {
-        assertEquals(testDate.withField(DateTimeFieldType.millisOfSecond(), 537).getMillis(), UTCTimestampField.parse((TIMESTAMP_WITH_MILLIS.getBytes())));
+        assertEquals(testDateTimeWithMillis, UTCTimestampField.parse((TIMESTAMP_WITH_MILLIS.getBytes())));
     }
 
     @Test
@@ -54,7 +52,7 @@ public class UTCTimestampFieldTest {
         int tag = new Random().nextInt();
         byte[] bytes = TIMESTAMP_NO_MILLIS.getBytes();
         UTCTimestampField field = new UTCTimestampField(tag, bytes, 0, bytes.length);
-        assertEquals(testDate.getMillis(), field.getValue().longValue());
+        assertEquals(testDateTime, field.getValue().longValue());
     }
 
     @Test
@@ -62,7 +60,7 @@ public class UTCTimestampFieldTest {
         int tag = new Random().nextInt();
         byte[] bytes = TIMESTAMP_WITH_MILLIS.getBytes();
         UTCTimestampField field = new UTCTimestampField(tag, bytes, 0, bytes.length);
-        assertEquals(testDate.withField(DateTimeFieldType.millisOfSecond(), 537).getMillis(), field.getValue().longValue());
+        assertEquals(testDateTimeWithMillis, field.getValue().longValue());
     }
 
     @Test

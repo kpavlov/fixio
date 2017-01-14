@@ -33,8 +33,10 @@ import static fixio.netty.pipeline.FixClock.systemUTC;
 import static java.nio.charset.StandardCharsets.US_ASCII;
 import static org.apache.commons.lang3.RandomStringUtils.randomAlphanumeric;
 import static org.apache.commons.lang3.RandomStringUtils.randomAscii;
-import static org.joda.time.DateTimeZone.UTC;
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertSame;
+import static org.junit.Assert.assertTrue;
 
 @RunWith(JUnitParamsRunner.class)
 public class FieldFactoryTest {
@@ -182,7 +184,7 @@ public class FieldFactoryTest {
         UTCTimestampField field = FieldFactory.valueOf(FieldType.OrigTime.tag(), value.getBytes(US_ASCII));
 
         assertEquals("tagnum", FieldType.OrigTime.tag(), field.getTagNum());
-        assertEquals("value", new LocalDate(1998, 6, 4).toDateTime(new LocalTime(8, 3, 31, 537), UTC).getMillis(), field.getValue().longValue());
+        assertEquals("value", ZonedDateTime.of(LocalDate.of(1998, 6, 4), LocalTime.of(8, 3, 31, (int) TimeUnit.MILLISECONDS.toNanos(537)), systemUTC().zone()).toInstant().toEpochMilli(), field.getValue().longValue());
     }
 
     @Test
@@ -191,7 +193,7 @@ public class FieldFactoryTest {
         UTCTimestampField field = FieldFactory.valueOf(FieldType.OrigTime.tag(), value.getBytes(US_ASCII));
 
         assertEquals("tagnum", FieldType.OrigTime.tag(), field.getTagNum());
-        assertEquals("value", new LocalDate(1998, 6, 4).toDateTime(new LocalTime(8, 3, 31, 0), UTC).getMillis(), field.getValue().longValue());
+        assertEquals("value", ZonedDateTime.of(LocalDate.of(1998, 6, 4), LocalTime.of(8, 3, 31), systemUTC().zone()).toInstant().toEpochMilli(), field.getValue().longValue());
     }
 
     @Test

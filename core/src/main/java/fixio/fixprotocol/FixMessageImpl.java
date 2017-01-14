@@ -16,14 +16,12 @@
 
 package fixio.fixprotocol;
 
-import fixio.fixprotocol.fields.*;
-import it.unimi.dsi.fastutil.ints.Int2ObjectArrayMap;
 import fixio.fixprotocol.fields.AbstractField;
+import fixio.fixprotocol.fields.CharField;
 import fixio.fixprotocol.fields.FieldFactory;
 import fixio.fixprotocol.fields.IntField;
 import fixio.fixprotocol.fields.StringField;
-import it.unimi.dsi.fastutil.ints.Int2ObjectLinkedOpenHashMap;
-import it.unimi.dsi.fastutil.ints.Int2ObjectMap;
+import it.unimi.dsi.fastutil.ints.Int2ObjectArrayMap;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -36,7 +34,6 @@ public class FixMessageImpl implements FixMessage {
     private final FixMessageHeader header = new FixMessageHeader();
     private final FixMessageTrailer trailer = new FixMessageTrailer();
     private final Int2ObjectArrayMap<FixMessageFragment> body = new Int2ObjectArrayMap<>();
-    private final Int2ObjectMap<FixMessageFragment> body = new Int2ObjectLinkedOpenHashMap<>();
 
     public FixMessageImpl add(int tagNum, byte[] value) {
         return add(tagNum, value, 0, value.length);

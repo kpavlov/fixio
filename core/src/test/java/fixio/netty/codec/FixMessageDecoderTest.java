@@ -21,22 +21,18 @@ import fixio.fixprotocol.FixMessageImpl;
 import fixio.fixprotocol.MessageTypes;
 import io.netty.buffer.Unpooled;
 import io.netty.handler.codec.DecoderException;
-import org.joda.time.LocalDate;
-import org.joda.time.LocalTime;
 import org.junit.BeforeClass;
 import org.junit.Test;
 
 import java.nio.charset.StandardCharsets;
-import java.time.LocalDate;
-import java.time.LocalTime;
-import java.time.ZonedDateTime;
 import java.util.ArrayList;
 import java.util.List;
 
-import static fixio.netty.pipeline.FixClock.systemUTC;
 import static org.apache.commons.lang3.RandomStringUtils.randomAlphanumeric;
 import static org.joda.time.DateTimeZone.UTC;
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.fail;
 
 public class FixMessageDecoderTest {
 
@@ -64,8 +60,8 @@ public class FixMessageDecoderTest {
         assertEquals(240, header.getMsgSeqNum());
         assertEquals(129, fixMessage.getChecksum());
 
-         final Long value = fixMessage.getValue(FieldType.SendingTime);
-        assertEquals(new LocalDate(1998, 6, 4).toDateTime(new LocalTime(8, 3, 31, 0), UTC).getMillis(), value.longValue());
+        final Long value = fixMessage.getValue(FieldType.SendingTime);
+        assertEquals(new org.joda.time.LocalDate(1998, 6, 4).toDateTime(new org.joda.time.LocalTime(8, 3, 31, 0), UTC).getMillis(), value.longValue());
     }
 
     @Test

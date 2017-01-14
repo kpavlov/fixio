@@ -23,7 +23,6 @@ import org.joda.time.format.DateTimeFormatter;
 
 import java.text.ParseException;
 
-import static fixio.netty.pipeline.FixClock.systemUTC;
 import static java.nio.charset.StandardCharsets.US_ASCII;
 import static org.joda.time.DateTimeZone.UTC;
 
@@ -31,8 +30,6 @@ public class UTCTimestampField extends AbstractTemporalField {
 
     private static final DateTimeFormatter FORMATTER_WITH_MILLIS = DateTimeFormat.forPattern("yyyyMMdd-HH:mm:ss.SSS").withZone(UTC);
     private static final DateTimeFormatter FORMATTER = DateTimeFormat.forPattern("yyyyMMdd-HH:mm:ss").withZone(UTC);
-
-    private final long value;
 
     protected UTCTimestampField(int tagNum, byte[] bytes, int offset, int length) throws ParseException {
         super(tagNum, parse(bytes, offset, length));
@@ -85,11 +82,6 @@ public class UTCTimestampField extends AbstractTemporalField {
 
     private static void throwParseException(byte[] bytes, int offset, int length, int errorOffset) throws ParseException {
         throw new ParseException("Unparseable date: " + new String(bytes, offset, length, US_ASCII), errorOffset);
-    }
-
-    @Override
-    public Long getValue() {
-        return value;
     }
 
     @Override

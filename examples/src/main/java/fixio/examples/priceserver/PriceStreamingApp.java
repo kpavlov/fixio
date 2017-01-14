@@ -19,7 +19,11 @@ import fixio.events.LogonEvent;
 import fixio.events.LogoutEvent;
 import fixio.examples.common.AbstractQouteStreamingWorker;
 import fixio.examples.common.Quote;
-import fixio.fixprotocol.*;
+import fixio.fixprotocol.FieldType;
+import fixio.fixprotocol.FixMessage;
+import fixio.fixprotocol.FixMessageBuilder;
+import fixio.fixprotocol.FixMessageBuilderImpl;
+import fixio.fixprotocol.MessageTypes;
 import fixio.fixprotocol.fields.FixedPointNumber;
 import fixio.handlers.FixApplicationAdapter;
 import io.netty.channel.ChannelHandlerContext;
@@ -103,25 +107,18 @@ class PriceStreamingApp extends FixApplicationAdapter {
 
     private class StreamingWorker extends AbstractQouteStreamingWorker {
 
+        public StreamingWorker(BlockingQueue<Quote> quoteQueue) {
+            super(quoteQueue);
+        }
+
         @Override
-        public void run() {
-            Quote quote = null;
-            final Thread currentThread = Thread.currentThread();
-            while (!currentThread.isInterrupted()) {
-                try {
-                    quote = quoteQueue.take();
-                } catch (InterruptedException e) {
-                    currentThread.interrupt();
-                    LOGGER.error("Interrupted queue", e);
-                }
+        protected void sendQuotes(List<Quote> buffer) {
+            buffer.forEach(quote -> {
                 for (Map.Entry<String, ChannelHandlerContext> subscriptionEntry : subscriptions.entrySet()) {
                     publish(subscriptionEntry.getValue(), subscriptionEntry.getKey(), quote);
                 }
-            }
+            });
         }
 
-        public void stop() {
-            Thread.currentThread().interrupt();
-        }
     }
 }

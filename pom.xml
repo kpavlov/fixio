@@ -36,7 +36,7 @@
 
     <properties>
         <slf4j.version>1.7.13</slf4j.version>
-        <netty.version>4.1.1.Final</netty.version>
+        <netty.version>4.1.7.Final</netty.version>
         <mockito.version>1.10.19</mockito.version>
         <java.version>1.8</java.version>
         <joda.version>2.7</joda.version>
