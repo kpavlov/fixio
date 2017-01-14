@@ -26,6 +26,7 @@
 
     <name>fix.io</name>
     <description>FIX Protocol Support for Netty</description>
+    <url>https://github.com/kpavlov/fixio</url>
 
     <scm>
         <url>https://github.com/kpavlov/fixio</url>
@@ -61,11 +62,21 @@
 
     <licenses>
         <license>
-            <name>Apache License Version 2.0, January 2004</name>
-            <distribution>repo</distribution>
-            <url>http://www.apache.org/licenses/LICENSE-2.0</url>
+            <name>The Apache License, Version 2.0</name>
+            <url>http://www.apache.org/licenses/LICENSE-2.0.txt</url>
         </license>
     </licenses>
+
+    <developers>
+        <developer>
+            <name>Konstantin Pavlov</name>
+            <email>mail+fixio@konstantinpavlov.net</email>
+            <url>https://konstantinpavlov.net</url>
+            <roles>
+                <role>author</role>
+            </roles>
+        </developer>
+    </developers>
 
     <build>
         <plugins>
