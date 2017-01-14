@@ -39,6 +39,9 @@ import io.netty.handler.logging.LoggingHandler;
 public abstract class FixChannelInitializer<C extends Channel> extends ChannelInitializer<C> {
 
     private static final FixMessageEncoder ENCODER = new FixMessageEncoder();
+
+    protected static final String TAG_DECODER_HANDLER_NAME = "tagDecoder";
+
     private final EventLoopGroup workerGroup;
 
     private final FixApplication fixApplication;
@@ -53,7 +56,7 @@ public abstract class FixChannelInitializer<C extends Channel> extends ChannelIn
     @Override
     public void initChannel(C ch) throws Exception {
         final ChannelPipeline pipeline = ch.pipeline();
-        pipeline.addLast("tagDecoder", new DelimiterBasedFrameDecoder(1024, Unpooled.wrappedBuffer(new byte[]{1})));
+        pipeline.addLast(TAG_DECODER_HANDLER_NAME, new DelimiterBasedFrameDecoder(1024, Unpooled.wrappedBuffer(new byte[]{1})));
         pipeline.addLast("fixMessageDecoder", new FixMessageDecoder());
         pipeline.addLast("fixMessageEncoder", ENCODER);
         pipeline.addLast("logging", new LoggingHandler("fix", LogLevel.DEBUG));

@@ -107,8 +107,12 @@ public class FixMessageDecoder extends MessageToMessageDecoder<ByteBuf> {
                 checksum = 0;
                 break;
             default:
-                appendField(tagNum, bytes, offset, valueLength);
-                checksum += sumBytes;
+                if (tagNum > 0) {
+                    appendField(tagNum, bytes, offset, valueLength);
+                    checksum += sumBytes;
+                } else {
+                    throw new DecoderException("Tag num must be positive but got " + tagNum);
+                }
         }
     }
 

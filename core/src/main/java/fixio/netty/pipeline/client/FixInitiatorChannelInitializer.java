@@ -23,11 +23,21 @@ import fixio.netty.pipeline.FixChannelInitializer;
 import io.netty.channel.Channel;
 import io.netty.channel.EventLoopGroup;
 import io.netty.handler.codec.MessageToMessageCodec;
+import io.netty.handler.ssl.SslContext;
+import io.netty.handler.ssl.SslContextBuilder;
+import org.slf4j.Logger;
+
+import javax.net.ssl.SSLException;
+
+import static org.slf4j.LoggerFactory.getLogger;
 
 public class FixInitiatorChannelInitializer<C extends Channel> extends FixChannelInitializer<C> {
     private final MessageSequenceProvider messageSequenceProvider;
     private final FixSessionSettingsProvider settingsProvider;
     private final AuthenticationProvider authenticationProvider;
+    private final SslContext sslContext;
+
+    private final Logger logger = getLogger(FixInitiatorChannelInitializer.class);
 
     public FixInitiatorChannelInitializer(EventLoopGroup workerGroup,
                                           FixSessionSettingsProvider settingsProvider,
@@ -38,10 +48,28 @@ public class FixInitiatorChannelInitializer<C extends Channel> extends FixChanne
         this.authenticationProvider = authenticationProvider;
         this.messageSequenceProvider = (messageSequenceProvider == null) ? StatelessMessageSequenceProvider.getInstance() : messageSequenceProvider;
         this.settingsProvider = settingsProvider;
+        if (settingsProvider.getBooleanProperty(FixSessionSettingsProvider.Params.SSL)) {
+            try {
+                sslContext = SslContextBuilder.forClient().build();
+                logger.info("SslContext has been configured: {}", sslContext);
+            } catch (SSLException e) {
+                throw new RuntimeException("Can't create SSL context", e);
+            }
+        } else {
+            sslContext = null;
+        }
     }
 
     @Override
     protected MessageToMessageCodec<FixMessage, FixMessageBuilder> createSessionHandler() {
         return new ClientSessionHandler(settingsProvider, authenticationProvider, messageSequenceProvider, getFixApplication());
+    }
+
+    @Override
+    public void initChannel(C ch) throws Exception {
+        super.initChannel(ch);
+        if (sslContext != null) {
+            ch.pipeline().addBefore(TAG_DECODER_HANDLER_NAME, "ssl", sslContext.newHandler(ch.alloc()));
+        }
     }
 }

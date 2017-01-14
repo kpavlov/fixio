@@ -26,7 +26,7 @@ import java.util.Properties;
 public class PropertyFixSessionSettingsProviderImpl implements FixSessionSettingsProvider {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(PropertyFixSessionSettingsProviderImpl.class);
-    private final Properties properties;
+    private final java.util.Properties properties;
 
     public PropertyFixSessionSettingsProviderImpl(Properties properties) {
         this.properties = properties;
@@ -37,7 +37,7 @@ public class PropertyFixSessionSettingsProviderImpl implements FixSessionSetting
         loadProperties(resource);
     }
 
-    public Properties getProperties() {
+    public java.util.Properties getProperties() {
         return properties;
     }
 
