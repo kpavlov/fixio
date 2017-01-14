@@ -33,7 +33,7 @@
     <dependencies>
         <dependency>
             <groupId>${project.groupId}</groupId>
-            <artifactId>core</artifactId>
+            <artifactId>fixio</artifactId>
             <version>${project.version}</version>
         </dependency>
 
