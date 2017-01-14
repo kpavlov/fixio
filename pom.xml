@@ -35,16 +35,17 @@
     </scm>
 
     <properties>
-        <slf4j.version>1.7.13</slf4j.version>
-        <netty.version>4.1.7.Final</netty.version>
-        <mockito.version>1.10.19</mockito.version>
         <java.version>1.8</java.version>
-        <joda.version>2.7</joda.version>
+        <joda.version>2.9.7</joda.version>
+        <maven.compiler.debug>true</maven.compiler.debug>
+        <maven.compiler.optimize>true</maven.compiler.optimize>
         <maven.compiler.source>${java.version}</maven.compiler.source>
         <maven.compiler.target>${java.version}</maven.compiler.target>
-        <maven.compiler.optimize>true</maven.compiler.optimize>
-        <maven.compiler.debug>true</maven.compiler.debug>
+        <mockito.version>2.6.2</mockito.version>
+        <netty.version>4.1.7.Final</netty.version>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+        <slf4j.version>1.7.22</slf4j.version>
+        <fastutil.version>7.0.13</fastutil.version>
     </properties>
 
     <modules>
@@ -98,8 +99,9 @@
         <dependencies>
             <dependency>
                 <groupId>org.mockito</groupId>
-                <artifactId>mockito-all</artifactId>
+                <artifactId>mockito-core</artifactId>
                 <version>${mockito.version}</version>
+                <scope>test</scope>
             </dependency>
         </dependencies>
     </dependencyManagement>
