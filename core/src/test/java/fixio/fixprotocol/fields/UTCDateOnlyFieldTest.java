@@ -15,15 +15,12 @@
  */
 package fixio.fixprotocol.fields;
 
+import org.joda.time.LocalDate;
 import org.junit.Test;
 
-import java.time.LocalDate;
-import java.time.LocalTime;
-import java.time.ZoneId;
-import java.time.ZonedDateTime;
 import java.util.Random;
 
-import static fixio.netty.pipeline.FixClock.systemUTC;
+import static org.joda.time.DateTimeZone.UTC;
 import static org.junit.Assert.assertArrayEquals;
 import static org.junit.Assert.assertEquals;
 
@@ -31,21 +28,18 @@ public class UTCDateOnlyFieldTest {
 
     private static final String DATE_STR = "19980604";
 
-    private final LocalDate testDate = LocalDate.of(1998, 6, 4);
+    private final LocalDate testDate = new LocalDate(1998, 6, 4);
 
     @Test
     public void testParse() throws Exception {
-        final ZoneId zone = systemUTC().zone();
-        final long expected = ZonedDateTime.of(testDate, LocalTime.MIDNIGHT, zone).toInstant().toEpochMilli();
-        assertEquals(expected, UTCDateOnlyField.parse((DATE_STR.getBytes())));
+        assertEquals(testDate.toDateTimeAtStartOfDay(UTC).getMillis(), UTCDateOnlyField.parse((DATE_STR.getBytes())));
     }
 
     @Test
     public void testCreate() throws Exception {
         int tag = new Random().nextInt();
         UTCDateOnlyField field = new UTCDateOnlyField(tag, DATE_STR.getBytes());
-        final ZoneId zone = systemUTC().zone();
-        assertEquals(ZonedDateTime.of(testDate, LocalTime.MIDNIGHT, zone).toInstant().toEpochMilli(), field.getValue().longValue());
+        assertEquals(testDate.toDateTimeAtStartOfDay(UTC).getMillis(), field.getValue().longValue());
     }
 
     @Test

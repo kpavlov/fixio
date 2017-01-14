@@ -16,7 +16,11 @@
 
 package fixio.netty.codec;
 
-import fixio.fixprotocol.*;
+import fixio.fixprotocol.DataType;
+import fixio.fixprotocol.FieldType;
+import fixio.fixprotocol.FixMessageImpl;
+import fixio.fixprotocol.Group;
+import fixio.fixprotocol.GroupField;
 import fixio.fixprotocol.fields.AbstractField;
 import fixio.fixprotocol.fields.FieldFactory;
 import io.netty.buffer.ByteBuf;

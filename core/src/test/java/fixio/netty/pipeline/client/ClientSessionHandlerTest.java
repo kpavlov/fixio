@@ -16,7 +16,11 @@
 package fixio.netty.pipeline.client;
 
 import fixio.events.LogonEvent;
-import fixio.fixprotocol.*;
+import fixio.fixprotocol.FieldType;
+import fixio.fixprotocol.FixMessage;
+import fixio.fixprotocol.FixMessageBuilderImpl;
+import fixio.fixprotocol.FixMessageHeader;
+import fixio.fixprotocol.MessageTypes;
 import fixio.fixprotocol.session.FixSession;
 import fixio.handlers.FixApplication;
 import fixio.netty.AttributeMock;
@@ -31,7 +35,6 @@ import org.junit.runner.RunWith;
 import org.mockito.ArgumentCaptor;
 import org.mockito.Captor;
 import org.mockito.Mock;
-import org.mockito.runners.MockitoJUnitRunner;
 
 import java.net.PasswordAuthentication;
 import java.util.ArrayList;
@@ -41,11 +44,16 @@ import java.util.Random;
 import static org.apache.commons.lang3.RandomStringUtils.randomAscii;
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.CoreMatchers.nullValue;
-import static org.junit.Assert.*;
-import static org.mockito.Mockito.*;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertThat;
+import static org.junit.Assert.assertTrue;
+import static org.mockito.Mockito.same;
+import static org.mockito.Mockito.spy;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
 
 
-@RunWith(MockitoJUnitRunner.class)
+@RunWith(org.mockito.junit.MockitoJUnitRunner.class)
 public class ClientSessionHandlerTest {
 
     private static final Random RANDOM = new Random();
@@ -63,7 +71,6 @@ public class ClientSessionHandlerTest {
     private AuthenticationProvider authenticationProvider;
     @Captor
     private ArgumentCaptor<FixMessageBuilderImpl> messageCaptor;
-    private int inMsgSeqNum;
     private int outMsgSeqNum;
     private Integer heartbeartInterval;
     private Attribute<FixSession> sessionAttribute;
@@ -72,7 +79,6 @@ public class ClientSessionHandlerTest {
 
     @Before
     public void setUp() {
-        inMsgSeqNum = RANDOM.nextInt();
         outMsgSeqNum = RANDOM.nextInt();
         userName = randomAscii(10);
         password = randomAscii(9);
@@ -92,11 +98,10 @@ public class ClientSessionHandlerTest {
 
         handler = spy(new ClientSessionHandler(settingsProvider, authenticationProvider, sequenceProvider, fixApplication));
 
-        when(sequenceProvider.getMsgInSeqNum()).thenReturn(inMsgSeqNum);
         when(sequenceProvider.getMsgOutSeqNum()).thenReturn(outMsgSeqNum);
 
         sessionAttribute = new AttributeMock<>();
-        when(ctx.attr(AbstractSessionHandler.FIX_SESSION_KEY)).thenReturn(sessionAttribute);
+        when(channel.attr(AbstractSessionHandler.FIX_SESSION_KEY)).thenReturn(sessionAttribute);
         when(ctx.channel()).thenReturn(channel);
     }
 

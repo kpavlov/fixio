@@ -19,7 +19,11 @@ import fixio.events.LogonEvent;
 import fixio.events.LogoutEvent;
 import fixio.examples.common.AbstractQouteStreamingWorker;
 import fixio.examples.common.Quote;
-import fixio.fixprotocol.*;
+import fixio.fixprotocol.FieldType;
+import fixio.fixprotocol.FixMessage;
+import fixio.fixprotocol.FixMessageBuilder;
+import fixio.fixprotocol.FixMessageBuilderImpl;
+import fixio.fixprotocol.MessageTypes;
 import fixio.fixprotocol.fields.FixedPointNumber;
 import fixio.handlers.FixApplicationAdapter;
 import io.netty.channel.ChannelHandlerContext;
@@ -103,7 +107,6 @@ class PriceStreamingApp extends FixApplicationAdapter {
 
     private class StreamingWorker extends AbstractQouteStreamingWorker {
 
-
         public StreamingWorker(BlockingQueue<Quote> quoteQueue) {
             super(quoteQueue);
         }
@@ -116,5 +119,6 @@ class PriceStreamingApp extends FixApplicationAdapter {
                 }
             });
         }
+
     }
 }

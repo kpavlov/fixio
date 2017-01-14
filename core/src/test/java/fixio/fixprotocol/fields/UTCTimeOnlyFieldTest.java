@@ -15,15 +15,15 @@
  */
 package fixio.fixprotocol.fields;
 
+import org.joda.time.DateTime;
+import org.joda.time.DateTimeFieldType;
+import org.joda.time.LocalDate;
+import org.joda.time.LocalTime;
 import org.junit.Test;
 
-import java.time.LocalDate;
-import java.time.LocalTime;
-import java.time.ZonedDateTime;
 import java.util.Random;
-import java.util.concurrent.TimeUnit;
 
-import static fixio.netty.pipeline.FixClock.systemUTC;
+import static org.joda.time.DateTimeZone.UTC;
 import static org.junit.Assert.assertArrayEquals;
 import static org.junit.Assert.assertEquals;
 
@@ -37,21 +37,16 @@ public class UTCTimeOnlyFieldTest {
     private static final long MILLIS_PER_MINUTE = 60 * MILLIS_PER_SECOND;
     private static final long MILLIS_PER_HOUR = 60 * MILLIS_PER_MINUTE;
 
-    private final LocalDate testDate = LocalDate.of(1970, 1, 1);
-    private final LocalTime testTime = LocalTime.of(8, 3, 31);
-    private final LocalTime testTimeWihMillis = testTime.plusNanos(TimeUnit.MILLISECONDS.toNanos(MILLIS));
-
-    private final long testDateTime = ZonedDateTime.of(testDate, testTime, systemUTC().zone()).toInstant().toEpochMilli();
-    private final long testDateTimeWithMillis = ZonedDateTime.of(testDate, testTimeWihMillis, systemUTC().zone()).toInstant().toEpochMilli();
+    private final DateTime testDate = new LocalDate(1970, 1, 1).toDateTime(new LocalTime(8, 3, 31, 0), UTC);
 
     @Test
     public void testParseNoMillis() throws Exception {
-        assertEquals(testDateTime, UTCTimeOnlyField.parse(TIMESTAMP_NO_MILLIS.getBytes()));
+        assertEquals(testDate.getMillis(), UTCTimeOnlyField.parse(TIMESTAMP_NO_MILLIS.getBytes()));
     }
 
     @Test
     public void testParseWithMillis() throws Exception {
-        assertEquals(testDateTimeWithMillis, UTCTimeOnlyField.parse((TIMESTAMP_WITH_MILLIS.getBytes())));
+        assertEquals(testDate.withField(DateTimeFieldType.millisOfSecond(), 537).getMillis(), UTCTimeOnlyField.parse((TIMESTAMP_WITH_MILLIS.getBytes())));
     }
 
     @Test
@@ -64,14 +59,14 @@ public class UTCTimeOnlyFieldTest {
     public void testCreateNoMillis() throws Exception {
         int tag = new Random().nextInt();
         UTCTimeOnlyField field = new UTCTimeOnlyField(tag, TIMESTAMP_NO_MILLIS.getBytes());
-        assertEquals(testDateTime, field.getValue().longValue());
+        assertEquals(testDate.getMillis(), field.getValue().longValue());
     }
 
     @Test
     public void testCreateWithMillis() throws Exception {
         int tag = new Random().nextInt();
         UTCTimeOnlyField field = new UTCTimeOnlyField(tag, TIMESTAMP_WITH_MILLIS.getBytes());
-        assertEquals(testDateTimeWithMillis, field.getValue().longValue());
+        assertEquals(testDate.withField(DateTimeFieldType.millisOfSecond(), 537).getMillis(), field.getValue().longValue());
     }
 
     @Test
@@ -87,6 +82,7 @@ public class UTCTimeOnlyFieldTest {
         int tag = new Random().nextInt();
         byte[] bytes = TIMESTAMP_NO_MILLIS.getBytes();
         UTCTimeOnlyField field = new UTCTimeOnlyField(tag, bytes);
+
         assertArrayEquals(bytes, field.getBytes());
     }
 }

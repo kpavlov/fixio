@@ -15,38 +15,45 @@
  */
 package fixio.fixprotocol.fields;
 
+import org.joda.time.DateTime;
+import org.joda.time.LocalDate;
+import org.joda.time.format.DateTimeFormat;
+import org.joda.time.format.DateTimeFormatter;
+
 import java.nio.charset.StandardCharsets;
 import java.text.ParseException;
-import java.time.*;
-import java.time.format.DateTimeFormatter;
 
-import static fixio.netty.pipeline.FixClock.systemUTC;
 import static java.nio.charset.StandardCharsets.US_ASCII;
+import static org.joda.time.DateTimeZone.UTC;
 
-public class UTCTimeOnlyField extends AbstractTemporalField {
+public class UTCTimeOnlyField extends AbstractField<Long> {
 
     private static final long MILLIS_PER_SECOND = 1000;
     private static final long MILLIS_PER_MINUTE = 60 * MILLIS_PER_SECOND;
     private static final long MILLIS_PER_HOUR = 60 * MILLIS_PER_MINUTE;
 
-    private static final DateTimeFormatter FORMATTER_WITH_MILLIS = DateTimeFormatter.ofPattern("HH:mm:ss.SSS").withZone(systemUTC().zone());
-    private static final DateTimeFormatter FORMATTER = DateTimeFormatter.ofPattern("HH:mm:ss").withZone(systemUTC().zone());
+    private static final DateTimeFormatter FORMATTER_WITH_MILLIS = DateTimeFormat.forPattern("HH:mm:ss.SSS").withZone(UTC);
+    private static final DateTimeFormatter FORMATTER = DateTimeFormat.forPattern("HH:mm:ss").withZone(UTC);
+
+    private final long value;
 
     protected UTCTimeOnlyField(int tagNum, byte[] bytes) throws ParseException {
-        super(tagNum, parse(bytes));
+        super(tagNum);
+        this.value = parse(bytes);
     }
 
     protected UTCTimeOnlyField(int tagNum, String timestampString) throws ParseException {
-        super(tagNum, parse(timestampString));
+        super(tagNum);
+        this.value = parse(timestampString);
     }
 
     protected UTCTimeOnlyField(int tagNum, long value) {
-        super(tagNum, value);
+        super(tagNum);
+        this.value = value;
     }
 
     static long parse(String timestampString) throws ParseException {
-        final ZoneId zone = systemUTC().zone();
-        return ZonedDateTime.of(LocalDate.now(zone), LocalTime.parse(timestampString, FORMATTER), zone).toInstant().toEpochMilli();
+        return new LocalDate(UTC).toDateTime(FORMATTER.parseLocalTime(timestampString), UTC).getMillis();
     }
 
     static long parse(byte[] bytes) throws ParseException {
@@ -83,8 +90,13 @@ public class UTCTimeOnlyField extends AbstractTemporalField {
     }
 
     @Override
+    public Long getValue() {
+        return value;
+    }
+
+    @Override
     public byte[] getBytes() {
-        return (value % 1000 != 0 ? FORMATTER_WITH_MILLIS.format(Instant.ofEpochMilli(value)) : FORMATTER.format(Instant.ofEpochMilli(value))).getBytes(US_ASCII);
+        return new DateTime(value).toString(value % 1000 != 0 ? FORMATTER_WITH_MILLIS : FORMATTER).getBytes(US_ASCII);
     }
 
 }

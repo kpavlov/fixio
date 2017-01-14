@@ -17,7 +17,12 @@
 package fixio.netty.pipeline.client;
 
 import fixio.events.LogonEvent;
-import fixio.fixprotocol.*;
+import fixio.fixprotocol.FieldType;
+import fixio.fixprotocol.FixMessage;
+import fixio.fixprotocol.FixMessageBuilder;
+import fixio.fixprotocol.FixMessageBuilderImpl;
+import fixio.fixprotocol.FixMessageHeader;
+import fixio.fixprotocol.MessageTypes;
 import fixio.fixprotocol.session.FixSession;
 import fixio.handlers.FixApplication;
 import fixio.netty.pipeline.AbstractSessionHandler;
@@ -37,7 +42,7 @@ public class ClientSessionHandler extends AbstractSessionHandler {
     private final MessageSequenceProvider messageSequenceProvider;
     private final AuthenticationProvider authenticationProvider;
 
-    public ClientSessionHandler(FixSessionSettingsProvider settingsProvider,
+    protected ClientSessionHandler(FixSessionSettingsProvider settingsProvider,
                                 AuthenticationProvider authenticationProvider,
                                 MessageSequenceProvider messageSequenceProvider,
                                 FixApplication fixApplication) {
@@ -69,7 +74,7 @@ public class ClientSessionHandler extends AbstractSessionHandler {
         if (MessageTypes.LOGON.equals(header.getMessageType())) {
             if (session != null) {
                 int incomingMsgSeqNum = header.getMsgSeqNum();
-                if (!session.checkIncomingSeqNum(incomingMsgSeqNum)) {
+                if (!session.checkAndIncrementIncomingSeqNum(incomingMsgSeqNum)) {
                     int expectedMsgSeqNum = session.getNextIncomingMessageSeqNum();
                     if (incomingMsgSeqNum > expectedMsgSeqNum) {
                         FixMessageBuilder resendRequest = new FixMessageBuilderImpl(MessageTypes.RESEND_REQUEST);

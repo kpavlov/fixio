@@ -35,10 +35,10 @@ public class InMemorySessionRepository implements SessionRepository {
     }
 
     @Override
-    public FixSession createSession(FixMessageHeader header) {
+    public FixSession getOrCreateSession(FixMessageHeader header) {
         SessionId id = createSessionId(header);
 
-        FixSession session = FixSession.newBuilder()
+        FixSession newSession = FixSession.newBuilder()
                 .beginString(header.getBeginString())
                 .senderCompId(header.getSenderCompID())
                 .senderSubId(header.getSenderSubID())
@@ -46,11 +46,12 @@ public class InMemorySessionRepository implements SessionRepository {
                 .targetSubId(header.getTargetSubID())
                 .build();
 
-        session.setNextIncomingMessageSeqNum(1);
-        session.setNextOutgoingMessageSeqNum(1);
+        newSession.setNextIncomingMessageSeqNum(1);
+        newSession.setNextOutgoingMessageSeqNum(1);
 
-        sessions.put(id, session);
-        return session;
+        final FixSession existingSession = sessions.putIfAbsent(id, newSession);
+        return existingSession == null ? newSession : existingSession;
+
     }
 
     /**

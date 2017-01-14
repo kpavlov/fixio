@@ -25,15 +25,14 @@ import org.junit.BeforeClass;
 import org.junit.Test;
 
 import java.nio.charset.StandardCharsets;
-import java.time.LocalDate;
-import java.time.LocalTime;
-import java.time.ZonedDateTime;
 import java.util.ArrayList;
 import java.util.List;
 
-import static fixio.netty.pipeline.FixClock.systemUTC;
 import static org.apache.commons.lang3.RandomStringUtils.randomAlphanumeric;
-import static org.junit.Assert.*;
+import static org.joda.time.DateTimeZone.UTC;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.fail;
 
 public class FixMessageDecoderTest {
 
@@ -62,7 +61,7 @@ public class FixMessageDecoderTest {
         assertEquals(129, fixMessage.getChecksum());
 
         final Long value = fixMessage.getValue(FieldType.SendingTime);
-        assertEquals(ZonedDateTime.of(LocalDate.of(1998, 6, 4), LocalTime.of(8, 3, 31), systemUTC().zone()).toInstant().toEpochMilli(), value.longValue());
+        assertEquals(new org.joda.time.LocalDate(1998, 6, 4).toDateTime(new org.joda.time.LocalTime(8, 3, 31, 0), UTC).getMillis(), value.longValue());
     }
 
     @Test

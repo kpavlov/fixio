@@ -15,21 +15,21 @@
  */
 package fixio.fixprotocol.fields;
 
-import java.text.ParseException;
-import java.time.Instant;
-import java.time.LocalDate;
-import java.time.LocalTime;
-import java.time.ZonedDateTime;
-import java.time.format.DateTimeFormatter;
-import java.util.concurrent.TimeUnit;
+import org.joda.time.DateTime;
+import org.joda.time.LocalDate;
+import org.joda.time.LocalTime;
+import org.joda.time.format.DateTimeFormat;
+import org.joda.time.format.DateTimeFormatter;
 
-import static fixio.netty.pipeline.FixClock.systemUTC;
+import java.text.ParseException;
+
 import static java.nio.charset.StandardCharsets.US_ASCII;
+import static org.joda.time.DateTimeZone.UTC;
 
 public class UTCTimestampField extends AbstractTemporalField {
 
-    private static final DateTimeFormatter FORMATTER_WITH_MILLIS = DateTimeFormatter.ofPattern("yyyyMMdd-HH:mm:ss.SSS").withZone(systemUTC().zone());
-    private static final DateTimeFormatter FORMATTER = DateTimeFormatter.ofPattern("yyyyMMdd-HH:mm:ss").withZone(systemUTC().zone());
+    private static final DateTimeFormatter FORMATTER_WITH_MILLIS = DateTimeFormat.forPattern("yyyyMMdd-HH:mm:ss.SSS").withZone(UTC);
+    private static final DateTimeFormatter FORMATTER = DateTimeFormat.forPattern("yyyyMMdd-HH:mm:ss").withZone(UTC);
 
     protected UTCTimestampField(int tagNum, byte[] bytes, int offset, int length) throws ParseException {
         super(tagNum, parse(bytes, offset, length));
@@ -69,14 +69,11 @@ public class UTCTimestampField extends AbstractTemporalField {
             }
             millisecond = (bytes[offset + 18] - '0') * 100 + (bytes[offset + 19] - '0') * 10 + (bytes[offset + 20] - '0');
         }
-        return ZonedDateTime.of(
-                LocalDate.of(year, month, date),
-                LocalTime.of(hour, minute, second, (int) TimeUnit.MILLISECONDS.toNanos(millisecond)), systemUTC().zone()
-        ).toInstant().toEpochMilli();
+        return new LocalDate(year, month, date).toDateTime(new LocalTime(hour, minute, second, millisecond), UTC).getMillis();
     }
 
     static long parse(String timestampString) throws ParseException {
-        return ZonedDateTime.parse(timestampString, FORMATTER_WITH_MILLIS).toInstant().toEpochMilli();
+        return FORMATTER_WITH_MILLIS.parseDateTime(timestampString).getMillis();
     }
 
     static long parse(byte[] bytes) throws ParseException {
@@ -89,6 +86,6 @@ public class UTCTimestampField extends AbstractTemporalField {
 
     @Override
     public byte[] getBytes() {
-        return (value % 1000 != 0 ? FORMATTER_WITH_MILLIS.format(Instant.ofEpochMilli(value)) : FORMATTER.format(Instant.ofEpochMilli(value))).getBytes(US_ASCII);
+        return new DateTime(value).toString(value % 1000 != 0 ? FORMATTER_WITH_MILLIS : FORMATTER).getBytes(US_ASCII);
     }
 }
