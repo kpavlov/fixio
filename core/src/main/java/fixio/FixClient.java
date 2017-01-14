@@ -19,10 +19,7 @@ package fixio;
 import fixio.fixprotocol.FixMessageBuilder;
 import fixio.handlers.FixApplication;
 import fixio.netty.pipeline.SessionRepository;
-import fixio.netty.pipeline.client.FixInitiatorChannelInitializer;
-import fixio.netty.pipeline.client.FixSessionSettingsProvider;
-import fixio.netty.pipeline.client.MessageSequenceProvider;
-import fixio.netty.pipeline.client.PropertyFixSessionSettingsProviderImpl;
+import fixio.netty.pipeline.client.*;
 import io.netty.bootstrap.Bootstrap;
 import io.netty.buffer.PooledByteBufAllocator;
 import io.netty.channel.Channel;
@@ -46,6 +43,7 @@ public class FixClient extends AbstractFixConnector {
     private EventLoopGroup workerEventLoopGroup;
     private FixSessionSettingsProvider sessionSettingsProvider;
     private MessageSequenceProvider messageSequenceProvider;
+    private AuthenticationProvider authenticationProvider;
 
     public FixClient(FixApplication fixApplication,
                      SessionRepository sessionRepository) {
@@ -71,6 +69,10 @@ public class FixClient extends AbstractFixConnector {
         this.messageSequenceProvider = messageSequenceProvider;
     }
 
+    public void setAuthenticationProvider(AuthenticationProvider authenticationProvider) {
+        this.authenticationProvider = authenticationProvider;
+    }
+
     /**
      * Connect and start FIX session to specified host and port.
      */
@@ -79,9 +81,17 @@ public class FixClient extends AbstractFixConnector {
     }
 
     public ChannelFuture connect(SocketAddress serverAddress) throws InterruptedException {
-        Bootstrap b = new Bootstrap();
+        final Channel channel = connectAsync(serverAddress).sync().await().channel();
+        assert (channel != null) : "Channel must be set";
+        LOGGER.info("FixClient is started and connected to {}", channel.remoteAddress());
+        return channel.closeFuture();
+    }
+
+    public ChannelFuture connectAsync(SocketAddress serverAddress) {
+        LOGGER.info("FixClient is starting");
+        final Bootstrap b = new Bootstrap();
         bossEventLoopGroup = new NioEventLoopGroup();
-        workerEventLoopGroup = new NioEventLoopGroup(8);
+        workerEventLoopGroup = new NioEventLoopGroup(Runtime.getRuntime().availableProcessors());
         b.group(bossEventLoopGroup)
                 .channel(NioSocketChannel.class)
                 .remoteAddress(serverAddress)
@@ -92,28 +102,35 @@ public class FixClient extends AbstractFixConnector {
                 .handler(new FixInitiatorChannelInitializer<SocketChannel>(
                         workerEventLoopGroup,
                         sessionSettingsProvider,
+                        authenticationProvider,
                         messageSequenceProvider,
                         getFixApplication()
                 ))
                 .validate();
 
-        channel = b.connect().sync().channel();
-        LOGGER.info("FixClient is started and connected to {}", channel.remoteAddress());
-        return channel.closeFuture();
+        final ChannelFuture connectFuture = b.connect();
+        return connectFuture.addListener(future -> channel = connectFuture.channel());
+    }
+
+    public ChannelFuture disconnectAsync() {
+        LOGGER.info("Closing connection to {}", channel.remoteAddress());
+        return channel.close().addListener(future -> {
+            if (workerEventLoopGroup != null)
+                workerEventLoopGroup.shutdownGracefully();
+            if (bossEventLoopGroup != null)
+                bossEventLoopGroup.shutdownGracefully();
+            bossEventLoopGroup = null;
+            workerEventLoopGroup = null;
+            LOGGER.info("Connection to {} was closed.", channel.remoteAddress());
+        });
     }
 
     public void disconnect() throws InterruptedException {
-        LOGGER.info("Closing connection to {}", channel.remoteAddress());
-        channel.close().sync();
-        if (workerEventLoopGroup != null)
-            workerEventLoopGroup.shutdownGracefully();
-        if (bossEventLoopGroup != null)
-            bossEventLoopGroup.shutdownGracefully();
-        bossEventLoopGroup = null;
-        workerEventLoopGroup = null;
+        disconnectAsync().await();
     }
 
-    public void send(FixMessageBuilder fixMessageBuilder) throws InterruptedException {
+    public void send(FixMessageBuilder fixMessageBuilder) {
         channel.writeAndFlush(fixMessageBuilder);
     }
+
 }

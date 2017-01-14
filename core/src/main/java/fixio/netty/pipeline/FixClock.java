@@ -16,6 +16,7 @@
 package fixio.netty.pipeline;
 
 import java.time.Clock;
+import java.time.ZoneId;
 
 /**
  * Fix clock that uses Java 8 system UTC clock by default,
@@ -27,13 +28,23 @@ public class FixClock {
     private static final FixClock INSTANCE = new FixClock(Clock.systemUTC());
 
     private final Clock clock;
+    private final ZoneId zoneId;
 
     private FixClock(Clock clock) {
         this.clock = clock;
+        zoneId = clock.getZone();
     }
 
     public static FixClock systemUTC() {
         return INSTANCE;
+    }
+
+    public Clock clock() {
+        return clock;
+    }
+
+    public ZoneId zone() {
+        return zoneId;
     }
 
     public long millis() {

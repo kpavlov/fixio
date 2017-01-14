@@ -28,6 +28,7 @@ public interface FixMessage {
     String FIX_4_2 = "FIX.4.2";
     String FIX_4_3 = "FIX.4.3";
     String FIX_4_4 = "FIX.4.4";
+    String FIX_5_0 = "FIXT.1.1";
 
     FixMessageHeader getHeader();
 
@@ -39,10 +40,13 @@ public interface FixMessage {
 
     String getString(int tagNum);
 
-    <T> T getValue(FieldType field);
-
     String getString(FieldType field);
 
-    String getMessageType();
+    <T> T getValue(FieldType field);
 
+    Character getChar(int tagNum);
+
+    Character getChar(FieldType fieldType);
+
+    String getMessageType();
 }

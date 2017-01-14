@@ -15,9 +15,11 @@
  */
 package fixio.fixprotocol;
 
+import fixio.fixprotocol.fields.CharField;
 import fixio.fixprotocol.fields.FixedPointNumber;
 import fixio.fixprotocol.fields.IntField;
 import fixio.fixprotocol.fields.StringField;
+import it.unimi.dsi.fastutil.ints.Int2ObjectArrayMap;
 import it.unimi.dsi.fastutil.ints.Int2ObjectLinkedOpenHashMap;
 import it.unimi.dsi.fastutil.ints.Int2ObjectMap;
 
@@ -29,7 +31,7 @@ public class FixMessageBuilderImpl implements FixMessage, FixMessageBuilder {
     private static final int DEFAULT_BODY_FIELD_COUNT = 16;
     private final FixMessageHeader header;
     private final FixMessageTrailer trailer;
-    private final Int2ObjectMap<FixMessageFragment> body;
+    private final Int2ObjectArrayMap<FixMessageFragment> body;
 
     /**
      * Creates FixMessageBuilderImpl with expected body field count.
@@ -37,20 +39,20 @@ public class FixMessageBuilderImpl implements FixMessage, FixMessageBuilder {
      * Providing expected capacity eliminates unnecessary growing of internal ArrayList storing body fields.
      */
     public FixMessageBuilderImpl(int expectedBodyFieldCount) {
-        header = new FixMessageHeader();
-        trailer = new FixMessageTrailer();
-        body = new Int2ObjectLinkedOpenHashMap<>(expectedBodyFieldCount);
+        this.header = new FixMessageHeader();
+        this.trailer = new FixMessageTrailer();
+        this.body = new Int2ObjectArrayMap<>(expectedBodyFieldCount);
     }
 
     /**
      * Creates FixMessageBuilderImpl with specified FixMessageHeader and  FixMessageTrailer.
      */
-    public FixMessageBuilderImpl(FixMessageHeader header, FixMessageTrailer trailer) {
+    public FixMessageBuilderImpl(FixMessageHeader header, final FixMessageTrailer trailer) {
         assert (header != null) : "FixMessageHeader is expected";
         assert (trailer != null) : "FixMessageTrailer is expected";
         this.header = header;
         this.trailer = trailer;
-        body = new Int2ObjectLinkedOpenHashMap<>(DEFAULT_BODY_FIELD_COUNT);
+        this.body = new Int2ObjectArrayMap<>(DEFAULT_BODY_FIELD_COUNT);
     }
 
     /**
@@ -131,6 +133,12 @@ public class FixMessageBuilderImpl implements FixMessage, FixMessageBuilder {
     }
 
     @Override
+    public FixMessageBuilder add(FieldType field, char value) {
+        FieldListBuilderHelper.add(body, field, value);
+        return this;
+    }
+
+    @Override
     public FixMessageBuilder add(DataType type, int tagNum, String value) {
         FieldListBuilderHelper.add(body, type, tagNum, value);
         return this;
@@ -188,7 +196,7 @@ public class FixMessageBuilderImpl implements FixMessage, FixMessageBuilder {
     @Override
     public void copyBody(List<? extends FixMessageFragment> body) {
         this.body.clear();
-        for (FixMessageFragment fragment : body){
+        for (FixMessageFragment fragment : body) {
             this.body.put(fragment.getTagNum(), fragment);
         }
     }
@@ -217,6 +225,24 @@ public class FixMessageBuilderImpl implements FixMessage, FixMessageBuilder {
     @Override
     public String getString(FieldType field) {
         return getString(field.tag());
+    }
+
+    @Override
+    public Character getChar(FieldType fieldType) {
+        return getChar(fieldType.tag());
+    }
+
+    @Override
+    public Character getChar(int tagNum) {
+        FixMessageFragment field = getFragment(tagNum);
+        if (field == null) {
+            return null;
+        }
+        if (field instanceof CharField) {
+            return ((CharField) field).getValue();
+        } else {
+            throw new IllegalArgumentException("Tag " + tagNum + " is not a Field.");
+        }
     }
 
     @Override

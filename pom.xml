@@ -27,20 +27,30 @@
     <name>fix.io</name>
     <description>FIX Protocol Support for Netty</description>
 
+    <scm>
+        <url>https://github.com/kpavlov/fixio</url>
+        <connection>scm:git:git://github.com/kpavlov/fixio.git</connection>
+        <developerConnection>scm:git:ssh://git@github.com/kpavlov/fixio.git</developerConnection>
+        <tag>master</tag>
+    </scm>
+
     <properties>
-        <slf4j.version>1.7.10</slf4j.version>
-        <netty.version>4.0.25.Final</netty.version>
-        <joda.version>2.7</joda.version>
+        <slf4j.version>1.7.13</slf4j.version>
+        <netty.version>4.1.1.Final</netty.version>
+        <mockito.version>1.10.19</mockito.version>
         <java.version>1.8</java.version>
+        <joda.version>2.7</joda.version>
         <maven.compiler.source>${java.version}</maven.compiler.source>
         <maven.compiler.target>${java.version}</maven.compiler.target>
         <maven.compiler.optimize>true</maven.compiler.optimize>
         <maven.compiler.debug>true</maven.compiler.debug>
+        <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
     </properties>
 
     <modules>
         <module>core</module>
         <module>examples</module>
+        <module>benchmark</module>
     </modules>
 
     <licenses>
@@ -56,7 +66,7 @@
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-source-plugin</artifactId>
-                <version>2.2.1</version>
+                <version>2.4</version>
                 <executions>
                     <execution>
                         <id>attach-sources</id>
@@ -67,6 +77,31 @@
                 </executions>
             </plugin>
         </plugins>
+
+        <pluginManagement>
+            <plugins>
+                <plugin>
+                    <groupId>org.apache.maven.plugins</groupId>
+                    <artifactId>maven-surefire-plugin</artifactId>
+                    <version>2.18.1</version>
+                </plugin>
+                <plugin>
+                    <groupId>org.apache.maven.plugins</groupId>
+                    <artifactId>maven-failsafe-plugin</artifactId>
+                    <version>2.18.1</version>
+                </plugin>
+            </plugins>
+        </pluginManagement>
     </build>
+
+    <dependencyManagement>
+        <dependencies>
+            <dependency>
+                <groupId>org.mockito</groupId>
+                <artifactId>mockito-all</artifactId>
+                <version>${mockito.version}</version>
+            </dependency>
+        </dependencies>
+    </dependencyManagement>
 
 </project>

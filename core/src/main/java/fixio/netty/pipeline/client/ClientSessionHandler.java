@@ -27,6 +27,7 @@ import io.netty.channel.ChannelHandlerContext;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.net.PasswordAuthentication;
 import java.util.List;
 
 public class ClientSessionHandler extends AbstractSessionHandler {
@@ -34,20 +35,30 @@ public class ClientSessionHandler extends AbstractSessionHandler {
     private final static Logger LOGGER = LoggerFactory.getLogger(ClientSessionHandler.class);
     private final FixSessionSettingsProvider sessionSettingsProvider;
     private final MessageSequenceProvider messageSequenceProvider;
+    private final AuthenticationProvider authenticationProvider;
 
     public ClientSessionHandler(FixSessionSettingsProvider settingsProvider,
+                                AuthenticationProvider authenticationProvider,
                                 MessageSequenceProvider messageSequenceProvider,
                                 FixApplication fixApplication) {
         super(fixApplication, FixClock.systemUTC(), new InMemorySessionRepository());
+        this.authenticationProvider = authenticationProvider;
         assert (settingsProvider != null) : "FixSessionSettingsProvider is expected.";
         this.sessionSettingsProvider = settingsProvider;
         this.messageSequenceProvider = messageSequenceProvider;
     }
 
-    private static FixMessageBuilderImpl createLogonRequest(FixSessionSettingsProvider sessionSettingsProvider) {
+    private FixMessageBuilderImpl createLogonRequest(FixSessionSettingsProvider sessionSettingsProvider) {
         FixMessageBuilderImpl messageBuilder = new FixMessageBuilderImpl(MessageTypes.LOGON);
         messageBuilder.add(FieldType.HeartBtInt, sessionSettingsProvider.getHeartbeatInterval());
         messageBuilder.add(FieldType.EncryptMethod, 0);
+        if (authenticationProvider != null) {
+            final PasswordAuthentication authentication = authenticationProvider.getPasswordAuthentication();
+            if (authentication != null) {
+                messageBuilder.add(FieldType.Username, authentication.getUserName());
+                messageBuilder.add(FieldType.Password, String.valueOf(authentication.getPassword()));
+            }
+        }
         return messageBuilder;
     }
 

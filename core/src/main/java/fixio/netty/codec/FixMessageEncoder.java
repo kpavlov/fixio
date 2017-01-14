@@ -29,7 +29,11 @@ import org.joda.time.format.DateTimeFormatter;
 
 import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;
+import java.time.Instant;
+import java.time.format.DateTimeFormatter;
 import java.util.List;
+
+import static fixio.netty.pipeline.FixClock.systemUTC;
 
 @ChannelHandler.Sharable
 public class FixMessageEncoder extends MessageToByteEncoder<FixMessageBuilder> {

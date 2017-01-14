@@ -16,6 +16,8 @@
 
 package fixio.fixprotocol;
 
+import fixio.fixprotocol.fields.*;
+import it.unimi.dsi.fastutil.ints.Int2ObjectArrayMap;
 import fixio.fixprotocol.fields.AbstractField;
 import fixio.fixprotocol.fields.FieldFactory;
 import fixio.fixprotocol.fields.IntField;
@@ -33,6 +35,7 @@ public class FixMessageImpl implements FixMessage {
 
     private final FixMessageHeader header = new FixMessageHeader();
     private final FixMessageTrailer trailer = new FixMessageTrailer();
+    private final Int2ObjectArrayMap<FixMessageFragment> body = new Int2ObjectArrayMap<>();
     private final Int2ObjectMap<FixMessageFragment> body = new Int2ObjectLinkedOpenHashMap<>();
 
     public FixMessageImpl add(int tagNum, byte[] value) {
@@ -111,6 +114,24 @@ public class FixMessageImpl implements FixMessage {
     @Override
     public String getString(FieldType field) {
         return getString(field.tag());
+    }
+
+    @Override
+    public Character getChar(FieldType fieldType) {
+        return getChar(fieldType.tag());
+    }
+
+    @Override
+    public Character getChar(int tagNum) {
+        FixMessageFragment field = getFirst(tagNum);
+        if (field == null) {
+            return null;
+        }
+        if (field instanceof CharField) {
+            return ((CharField) field).getValue();
+        } else {
+            throw new IllegalArgumentException("Tag " + tagNum + " is not a Field.");
+        }
     }
 
     @Override

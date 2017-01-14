@@ -24,7 +24,10 @@ import java.util.List;
  */
 public interface FixMessageBuilder extends FieldListBuilder<FixMessageBuilder> {
     FixMessageHeader getHeader();
+
     void copyHeader(FixMessageHeader header);
+
     List<? extends FixMessageFragment> getBody();
+
     void copyBody(List<? extends FixMessageFragment> body);
 }

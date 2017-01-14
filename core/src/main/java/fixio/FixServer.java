@@ -55,12 +55,12 @@ public class FixServer extends AbstractFixConnector {
 
     public void start() throws InterruptedException {
         bossGroup = new NioEventLoopGroup();
-        workerGroup = new NioEventLoopGroup(8);
+        workerGroup = new NioEventLoopGroup(Runtime.getRuntime().availableProcessors());
         final ServerBootstrap bootstrap = new ServerBootstrap();
         final FixAcceptorChannelInitializer<SocketChannel> channelInitializer = new FixAcceptorChannelInitializer<>(
                 workerGroup,
                 getFixApplication(),
-                authenticator ,
+                authenticator,
                 getSessionRepository()
         );
 

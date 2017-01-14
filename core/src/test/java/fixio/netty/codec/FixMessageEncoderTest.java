@@ -39,13 +39,13 @@ import static org.mockito.Mockito.when;
 public class FixMessageEncoderTest {
 
     private static FixMessageEncoder encoder;
+    private final long timestamp = 123456789;
     @Mock
     private ChannelHandlerContext ctx;
     @Mock
     private ByteBufAllocator byteBufAllocator;
     private FixMessageBuilder messageBuilder;
     private ByteBuf out;
-    private long timestamp = 123456789;
 
     @BeforeClass
     public static void beforeClass() {

@@ -26,6 +26,8 @@ interface FieldListBuilder<T> {
 
     T add(FieldType field, String value);
 
+    T add(FieldType field, char value);
+
     T add(int tagNum, String value);
 
     T add(DataType type, int tagNum, String value);

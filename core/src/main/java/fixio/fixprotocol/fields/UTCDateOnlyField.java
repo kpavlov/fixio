@@ -22,6 +22,7 @@ import org.joda.time.format.DateTimeFormatter;
 
 import java.text.ParseException;
 
+import static fixio.netty.pipeline.FixClock.systemUTC;
 import static java.nio.charset.StandardCharsets.US_ASCII;
 import static org.joda.time.DateTimeZone.UTC;
 
@@ -35,29 +36,26 @@ import static org.joda.time.DateTimeZone.UTC;
  * <p/>
  * Example(s): <code>MDEntryDate="20030910"</code>
  */
-public class UTCDateOnlyField extends AbstractField<Long> {
+public class UTCDateOnlyField extends AbstractTemporalField {
 
     private static final DateTimeFormatter FORMATTER = DateTimeFormat.forPattern("yyyyMMdd").withZone(UTC);
 
     private final long value;
 
     protected UTCDateOnlyField(int tagNum, byte[] bytes) throws ParseException {
-        super(tagNum);
-        this.value = parse(bytes);
+        super(tagNum, parse(bytes));
     }
 
     protected UTCDateOnlyField(int tagNum, String timestampString) throws ParseException {
-        super(tagNum);
-        this.value = parse(timestampString);
+        super(tagNum, parse(timestampString));
     }
 
     protected UTCDateOnlyField(int tagNum, long value) {
-        super(tagNum);
-        this.value = value;
+        super(tagNum, value);
     }
 
     static long parse(String timestampString) throws ParseException {
-        return FORMATTER.parseLocalDate(timestampString).toDateTimeAtCurrentTime(UTC).getMillis();
+        return FORMAT_THREAD_LOCAL.get().parse(timestampString).getTime();
     }
 
     static long parse(byte[] bytes) throws ParseException {
@@ -83,5 +81,4 @@ public class UTCDateOnlyField extends AbstractField<Long> {
     public byte[] getBytes() {
         return new DateTime(value).toString(FORMATTER).getBytes(US_ASCII);
     }
-
 }

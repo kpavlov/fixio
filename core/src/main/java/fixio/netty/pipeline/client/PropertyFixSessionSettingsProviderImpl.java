@@ -28,12 +28,20 @@ public class PropertyFixSessionSettingsProviderImpl implements FixSessionSetting
     private static final Logger LOGGER = LoggerFactory.getLogger(PropertyFixSessionSettingsProviderImpl.class);
     private final Properties properties;
 
-    public PropertyFixSessionSettingsProviderImpl(String resource) {
-        properties = new Properties();
-        load(resource);
+    public PropertyFixSessionSettingsProviderImpl(Properties properties) {
+        this.properties = properties;
     }
 
-    private void load(String resource) {
+    public PropertyFixSessionSettingsProviderImpl(String resource) {
+        this(new Properties());
+        loadProperties(resource);
+    }
+
+    public Properties getProperties() {
+        return properties;
+    }
+
+    private void loadProperties(String resource) {
         try {
             final InputStream inputStream = getClass().getResourceAsStream(resource);
             if (inputStream == null) {
@@ -81,5 +89,10 @@ public class PropertyFixSessionSettingsProviderImpl implements FixSessionSetting
     @Override
     public String getBeginString() {
         return properties.getProperty("BeginString");
+    }
+
+    @Override
+    public String getProperty(String key, String defaultValue) {
+        return properties.getProperty(key, defaultValue);
     }
 }

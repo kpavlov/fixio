@@ -17,19 +17,26 @@ package fixio.fixprotocol.fields;
 
 import fixio.fixprotocol.DataType;
 import fixio.fixprotocol.FieldType;
-import org.joda.time.LocalDate;
-import org.joda.time.LocalTime;
+import junitparams.JUnitParamsRunner;
+import junitparams.Parameters;
 import org.junit.Test;
+import org.junit.runner.RunWith;
 
 import java.math.BigDecimal;
+import java.time.LocalDate;
+import java.time.LocalTime;
+import java.time.ZonedDateTime;
 import java.util.Random;
+import java.util.concurrent.TimeUnit;
 
+import static fixio.netty.pipeline.FixClock.systemUTC;
 import static java.nio.charset.StandardCharsets.US_ASCII;
 import static org.apache.commons.lang3.RandomStringUtils.randomAlphanumeric;
 import static org.apache.commons.lang3.RandomStringUtils.randomAscii;
 import static org.joda.time.DateTimeZone.UTC;
 import static org.junit.Assert.*;
 
+@RunWith(JUnitParamsRunner.class)
 public class FieldFactoryTest {
 
     @Test(expected = IllegalArgumentException.class)
@@ -163,6 +170,12 @@ public class FieldFactoryTest {
         assertFalse("value", field.booleanValue());
     }
 
+    @Test(expected = IllegalArgumentException.class)
+    @Parameters({"XXX", "", "-"})
+    public void testFailValueOfIncorrectBoolean(String value) throws Exception {
+        FieldFactory.valueOf(FieldType.PossDupFlag.tag(), value.getBytes(US_ASCII));
+    }
+
     @Test
     public void testValueOfUtcTimestampWithMillis() throws Exception {
         String value = "19980604-08:03:31.537";
@@ -182,8 +195,28 @@ public class FieldFactoryTest {
     }
 
     @Test
-    public void testFromStringValueBooleanTrue() throws Exception {
-        String value = "Y";
+    @Parameters({"200303", "20030320", "200303w2"})
+    public void testFromStringValueMonthYear(final String value) throws Exception {
+        final int tag = FieldType.MaturityMonthYear.tag();
+        StringField field = FieldFactory.fromStringValue(DataType.MONTHYEAR, tag, value);
+
+        assertEquals("tagnum", tag, field.getTagNum());
+        assertEquals("value", value, field.getValue());
+    }
+
+    @Test
+    @Parameters({"2003-09-10"})
+    public void testFromStringValueLocalMktDate(final String value) throws Exception {
+        final int tag = FieldType.TradeOriginationDate.tag();
+        StringField field = FieldFactory.fromStringValue(DataType.LOCALMKTDATE, tag, value);
+
+        assertEquals("tagnum", tag, field.getTagNum());
+        assertEquals("value", value, field.getValue());
+    }
+
+    @Test
+    @Parameters({"Y", "true", "TRUE"})
+    public void testFromStringValueBooleanTrue(final String value) throws Exception {
         final int tag = FieldType.PossDupFlag.tag();
         BooleanField field = FieldFactory.fromStringValue(DataType.BOOLEAN, tag, value);
 
@@ -193,8 +226,8 @@ public class FieldFactoryTest {
     }
 
     @Test
-    public void testValueStringValueBooleanFalse() throws Exception {
-        String value = "N";
+    @Parameters({"N", "false", "FALSE"})
+    public void testValueStringValueBooleanFalse(final String value) throws Exception {
         final int tag = FieldType.PossDupFlag.tag();
         BooleanField field = FieldFactory.fromStringValue(DataType.BOOLEAN, tag, value);
 

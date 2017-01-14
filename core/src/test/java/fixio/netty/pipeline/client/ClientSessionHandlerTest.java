@@ -33,14 +33,15 @@ import org.mockito.Captor;
 import org.mockito.Mock;
 import org.mockito.runners.MockitoJUnitRunner;
 
+import java.net.PasswordAuthentication;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
 
 import static org.apache.commons.lang3.RandomStringUtils.randomAscii;
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertTrue;
-import static org.mockito.Matchers.same;
+import static org.hamcrest.CoreMatchers.is;
+import static org.hamcrest.CoreMatchers.nullValue;
+import static org.junit.Assert.*;
 import static org.mockito.Mockito.*;
 
 
@@ -58,17 +59,23 @@ public class ClientSessionHandlerTest {
     private Channel channel;
     @Mock
     private FixApplication fixApplication;
+    @Mock
+    private AuthenticationProvider authenticationProvider;
     @Captor
     private ArgumentCaptor<FixMessageBuilderImpl> messageCaptor;
     private int inMsgSeqNum;
     private int outMsgSeqNum;
     private Integer heartbeartInterval;
     private Attribute<FixSession> sessionAttribute;
+    private String userName;
+    private String password;
 
     @Before
     public void setUp() {
         inMsgSeqNum = RANDOM.nextInt();
         outMsgSeqNum = RANDOM.nextInt();
+        userName = randomAscii(10);
+        password = randomAscii(9);
 
         heartbeartInterval = RANDOM.nextInt(100) + 10;
 
@@ -79,7 +86,11 @@ public class ClientSessionHandlerTest {
         settingsProvider.setSenderCompID(randomAscii(5));
         settingsProvider.setTargetCompID(randomAscii(5));
 
-        handler = spy(new ClientSessionHandler(settingsProvider, sequenceProvider, fixApplication));
+        when(authenticationProvider.getPasswordAuthentication()).thenReturn(
+                new PasswordAuthentication(userName, password.toCharArray())
+        );
+
+        handler = spy(new ClientSessionHandler(settingsProvider, authenticationProvider, sequenceProvider, fixApplication));
 
         when(sequenceProvider.getMsgInSeqNum()).thenReturn(inMsgSeqNum);
         when(sequenceProvider.getMsgOutSeqNum()).thenReturn(outMsgSeqNum);
@@ -90,7 +101,8 @@ public class ClientSessionHandlerTest {
     }
 
     @Test
-    public void testChannelActive() throws Exception {
+    public void testChannelActiveNoAuthentication() throws Exception {
+        when(authenticationProvider.getPasswordAuthentication()).thenReturn(null);
 
         handler.channelActive(ctx);
 
@@ -105,8 +117,32 @@ public class ClientSessionHandlerTest {
         assertEquals(outMsgSeqNum, header.getMsgSeqNum());
         assertTrue(header.getSendingTime() > 0);
 
-        assertEquals("HeartBtInt", heartbeartInterval, messageBuilder.getInt(FieldType.HeartBtInt));
-        assertEquals("EncryptMethod", (Integer) 0, messageBuilder.getInt(FieldType.EncryptMethod));
+        assertThat("HeartBtInt", messageBuilder.getInt(FieldType.HeartBtInt), is(heartbeartInterval));
+        assertThat("EncryptMethod", messageBuilder.getInt(FieldType.EncryptMethod), is(0));
+        assertThat("Username", messageBuilder.getString(FieldType.Username), nullValue());
+        assertThat("Password", messageBuilder.getString(FieldType.Password), nullValue());
+    }
+
+    @Test
+    public void testChannelActiveWithAuthentication() throws Exception {
+
+        handler.channelActive(ctx);
+
+        verify(ctx).writeAndFlush(messageCaptor.capture());
+
+        FixMessageBuilderImpl messageBuilder = messageCaptor.getValue();
+        FixMessageHeader header = messageBuilder.getHeader();
+
+        verify(fixApplication).beforeSendMessage(same(ctx), same(messageBuilder));
+
+        assertEquals("LOGON expected", MessageTypes.LOGON, header.getMessageType());
+        assertEquals(outMsgSeqNum, header.getMsgSeqNum());
+        assertTrue(header.getSendingTime() > 0);
+
+        assertThat("HeartBtInt", messageBuilder.getInt(FieldType.HeartBtInt), is(heartbeartInterval));
+        assertThat("EncryptMethod", messageBuilder.getInt(FieldType.EncryptMethod), is(0));
+        assertThat("Username", messageBuilder.getString(FieldType.Username), is(userName));
+        assertThat("Password", messageBuilder.getString(FieldType.Password), is(password));
     }
 
     @Test

@@ -29,8 +29,10 @@ import static org.junit.Assert.assertEquals;
 
 public class UTCTimeOnlyFieldTest {
 
+    public static final int MILLIS = 537;
     private static final String TIMESTAMP_WITH_MILLIS = "08:03:31.537";
     private static final String TIMESTAMP_NO_MILLIS = "08:03:31";
+
     private static final long MILLIS_PER_SECOND = 1000L;
     private static final long MILLIS_PER_MINUTE = 60 * MILLIS_PER_SECOND;
     private static final long MILLIS_PER_HOUR = 60 * MILLIS_PER_MINUTE;
@@ -72,7 +74,6 @@ public class UTCTimeOnlyFieldTest {
         int tag = new Random().nextInt();
         byte[] bytes = TIMESTAMP_WITH_MILLIS.getBytes();
         UTCTimeOnlyField field = new UTCTimeOnlyField(tag, bytes);
-
         assertArrayEquals(bytes, field.getBytes());
     }
 

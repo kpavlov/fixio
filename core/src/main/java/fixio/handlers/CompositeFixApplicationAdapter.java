@@ -57,14 +57,14 @@ public class CompositeFixApplicationAdapter extends FixApplicationAdapter {
             boolean isHandled = false;
             for (FixMessageHandler handler : handlers) {
                 try {
-                    if (handler.handle(ctx, msg)){
+                    if (handler.handle(ctx, msg)) {
                         isHandled = true;
                     }
-                } catch (Exception ex){
+                } catch (Exception ex) {
                     LOGGER.error("on {} ", handler.getClass(), ex);
                 }
             }
-            if (!isHandled){
+            if (!isHandled) {
                 LOGGER.warn("no handler for this message. {} ", msg);
             }
         }

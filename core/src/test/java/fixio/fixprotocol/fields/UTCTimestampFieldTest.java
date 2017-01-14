@@ -32,10 +32,15 @@ public class UTCTimestampFieldTest {
     private static final String TIMESTAMP_WITH_MILLIS = "19980604-08:03:31.537";
     private static final String TIMESTAMP_NO_MILLIS = "19980604-08:03:31";
 
+    private final LocalDate testDate = LocalDate.of(1998, 6, 4);
+
+    private final long testDateTime = ZonedDateTime.of(testDate, LocalTime.of(8, 3, 31), systemUTC().zone()).toInstant().toEpochMilli();
+    private final long testDateTimeWithMillis = ZonedDateTime.of(testDate, LocalTime.of(8, 3, 31, (int) TimeUnit.MILLISECONDS.toNanos(537)), systemUTC().zone()).toInstant().toEpochMilli();
     private final DateTime testDate = new LocalDate(1998, 6, 4).toDateTime(new LocalTime(8, 3, 31, 0), UTC);
 
     @Test
     public void testParseNoMillis() throws Exception {
+        assertEquals(testDateTime, UTCTimestampField.parse(TIMESTAMP_NO_MILLIS.getBytes()));
         assertEquals(testDate.getMillis(), UTCTimestampField.parse(TIMESTAMP_NO_MILLIS.getBytes()));
     }
 
@@ -65,7 +70,6 @@ public class UTCTimestampFieldTest {
         int tag = new Random().nextInt();
         byte[] bytes = TIMESTAMP_WITH_MILLIS.getBytes();
         UTCTimestampField field = new UTCTimestampField(tag, bytes, 0, bytes.length);
-
         assertArrayEquals(bytes, field.getBytes());
     }
 
@@ -74,7 +78,6 @@ public class UTCTimestampFieldTest {
         int tag = new Random().nextInt();
         byte[] bytes = TIMESTAMP_NO_MILLIS.getBytes();
         UTCTimestampField field = new UTCTimestampField(tag, bytes, 0, bytes.length);
-
         assertArrayEquals(bytes, field.getBytes());
     }
 }

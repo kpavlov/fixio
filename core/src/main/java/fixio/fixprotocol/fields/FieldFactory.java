@@ -20,8 +20,6 @@ import fixio.fixprotocol.FieldType;
 
 import java.text.ParseException;
 
-import static java.nio.charset.StandardCharsets.US_ASCII;
-
 public class FieldFactory {
 
     public static <F extends AbstractField> F valueOf(int tagNum, byte[] value) {
@@ -33,22 +31,32 @@ public class FieldFactory {
         if (tagNum <= 0) {
             throw new IllegalArgumentException("Invalid tagNum=" + tagNum);
         }
+        if (length <= 0) {
+            throw new IllegalArgumentException("Value length must be positive but was " + length);
+        }
         FieldType fieldType = FieldType.forTag(tagNum);
         try {
-            switch (fieldType.type()) {
+            final DataType dataType = fieldType.type();
+            switch (dataType) {
                 case STRING:
-                    return (F) new StringField(tagNum, new String(value, offset, length, US_ASCII));
+                    return (F) new StringField(tagNum, value, offset, length);
                 case BOOLEAN:
-                    if (value[offset] == 'Y') {
-                        return (F) new BooleanField(tagNum, true);
-                    } else if (value[offset] == 'N')  {
-                        return (F) new BooleanField(tagNum, false);
+                    switch (value[offset]) {
+                        case 'Y':
+                            return (F) new BooleanField(tagNum, true);
+                        case 'N':
+                            return (F) new BooleanField(tagNum, false);
+                        default:
+                            throw new ParseException("Invalid Boolean value. 'Y'/'N' is expected.", offset);
                     }
                 case CHAR:
                     return (F) new CharField(tagNum, (char) value[offset]);
                 case FLOAT:
                 case PRICE:
+                case PRICEOFFSET:
                 case QTY:
+                case AMT:
+                case PERCENTAGE:
                     return (F) new FloatField(tagNum, value, offset, length);
                 case INT:
                 case LENGTH:
@@ -58,7 +66,7 @@ public class FieldFactory {
                 case UTCTIMESTAMP:
                     return (F) new UTCTimestampField(tagNum, value, offset, length);
                 default:
-                    return (F) new StringField(tagNum, new String(value, offset, length, US_ASCII));
+                    return (F) new StringField(tagNum, value, offset, length);
 //                    throw new UnsupportedOperationException("Unsupported field type: " + fieldType
 //                            + '(' + fieldType.type() + ')');
             }
@@ -71,7 +79,9 @@ public class FieldFactory {
     public static <F extends AbstractField<?>> F fromIntValue(DataType type, int tagNum, int value) {
         switch (type) {
             case STRING:
-                return (F) new StringField(tagNum, String.valueOf(value));
+                return (F) new StringField(tagNum, Integer.toString(value));
+            case CHAR:
+                return (F) new CharField(tagNum, Character.forDigit(value, Character.MAX_RADIX));
             case FLOAT:
             case PRICE:
             case QTY:
@@ -114,7 +124,7 @@ public class FieldFactory {
     public static <F extends AbstractField<?>> F fromLongValue(DataType type, int tagNum, long value) {
         switch (type) {
             case STRING:
-                return (F) new StringField(tagNum, String.valueOf(value));
+                return (F) new StringField(tagNum, Long.toString(value));
             case FLOAT:
             case PRICE:
             case PRICEOFFSET:
@@ -150,37 +160,51 @@ public class FieldFactory {
 
     @SuppressWarnings("unchecked")
     public static <F extends AbstractField<?>> F fromStringValue(DataType type, int tagNum, String value) {
-        switch (type) {
-            case BOOLEAN:
-                if ("Y".equals(value)){
-                    return (F) new BooleanField(tagNum, true);
-                } else if("N".equals(value)){
-                    return (F) new BooleanField(tagNum, false);
-                }
-                return (F) new BooleanField(tagNum, Boolean.parseBoolean(value));
-            case CHAR:
-            case STRING:
-                return (F) new StringField(tagNum, value);
-            case FLOAT:
-            case PRICE:
-            case PRICEOFFSET:
-            case PERCENTAGE:
-            case AMT:
-            case QTY:
-                return (F) new FloatField(tagNum, new FixedPointNumber(value));
-            case INT:
-            case LENGTH:
-            case SEQNUM:
-            case NUMINGROUP:
-                return (F) new IntField(tagNum, Integer.parseInt(value));
-            default:
-                return (F) new StringField(tagNum, value);
-//                throw new IllegalArgumentException("Value " + value + " is not applicable for field : " + tagNum
-//                        + '(' + type + ')');
+        try {
+            switch (type) {
+                case BOOLEAN:
+                    if ("Y".equals(value)) {
+                        return (F) new BooleanField(tagNum, true);
+                    } else if ("N".equals(value)) {
+                        return (F) new BooleanField(tagNum, false);
+                    }
+                    return (F) new BooleanField(tagNum, Boolean.parseBoolean(value.toLowerCase()));
+                case LOCALMKTDATE:
+                case MONTHYEAR:
+                case CHAR:
+                case STRING:
+                case CURRENCY:
+                case COUNTRY:
+                case EXCHANGE:
+                case LANGUAGE:
+                    return (F) new StringField(tagNum, value);
+                case FLOAT:
+                case PRICE:
+                case PRICEOFFSET:
+                case PERCENTAGE:
+                case AMT:
+                case QTY:
+                    return (F) new FloatField(tagNum, new FixedPointNumber(value));
+                case INT:
+                case LENGTH:
+                case SEQNUM:
+                case NUMINGROUP:
+                    return (F) new IntField(tagNum, Integer.parseInt(value));
+                case UTCTIMESTAMP:
+                    return (F) new UTCTimestampField(tagNum, value);
+                case UTCTIMEONLY:
+                    return (F) new UTCTimeOnlyField(tagNum, value);
+                case UTCDATEONLY:
+                    return (F) new UTCDateOnlyField(tagNum, value);
+                default:
+                    return (F) new StringField(tagNum, value);
+            }
+        } catch (ParseException e) {
+            throw new IllegalArgumentException("Invalid value for field " + type + ": " + e.getMessage(), e);
         }
     }
 
-    public static <T, F extends AbstractField<?>> F fromFixedPointValue(int tagNum, FixedPointNumber value) {
+    public static <F extends AbstractField<?>> F fromFixedPointValue(int tagNum, FixedPointNumber value) {
         FieldType fieldType = FieldType.forTag(tagNum);
         return fromFixedPointValue(fieldType, value);
     }

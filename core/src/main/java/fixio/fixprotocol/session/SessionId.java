@@ -58,7 +58,11 @@ public class SessionId {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
         SessionId other = (SessionId) o;
-        return this.hashCode() == other.hashCode() && senderCompID.equals(other.senderCompID) && !(senderSubID != null ? !senderSubID.equals(other.senderSubID) : other.senderSubID != null) && targetCompID.equals(other.targetCompID) && !(targetSubID != null ? !targetSubID.equals(other.targetSubID) : other.targetSubID != null);
+        return this.hashCode() == other.hashCode() &&
+                senderCompID.equals(other.senderCompID) &&
+                !(senderSubID != null ? !senderSubID.equals(other.senderSubID) : other.senderSubID != null) &&
+                targetCompID.equals(other.targetCompID) &&
+                !(targetSubID != null ? !targetSubID.equals(other.targetSubID) : other.targetSubID != null);
 
     }
 

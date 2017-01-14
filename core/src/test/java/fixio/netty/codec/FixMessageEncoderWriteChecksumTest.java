@@ -28,9 +28,9 @@ import static org.junit.Assert.assertArrayEquals;
 @RunWith(Parameterized.class)
 public class FixMessageEncoderWriteChecksumTest {
 
-    private ByteBuf byteBuf;
-    private int value;
-    private byte[] expectedBytes;
+    private final ByteBuf byteBuf;
+    private final int value;
+    private final byte[] expectedBytes;
 
     public FixMessageEncoderWriteChecksumTest(int value, byte[] expectedBytes) {
         this.byteBuf = Unpooled.buffer(7);

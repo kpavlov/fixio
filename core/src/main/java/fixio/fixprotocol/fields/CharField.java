@@ -19,7 +19,7 @@ public class CharField extends AbstractField<Character> {
 
     private final char value;
 
-    protected CharField(int tagNum, char value) {
+    public CharField(int tagNum, char value) {
         super(tagNum);
         this.value = value;
     }

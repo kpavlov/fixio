@@ -23,10 +23,11 @@ import org.joda.time.format.DateTimeFormatter;
 
 import java.text.ParseException;
 
+import static fixio.netty.pipeline.FixClock.systemUTC;
 import static java.nio.charset.StandardCharsets.US_ASCII;
 import static org.joda.time.DateTimeZone.UTC;
 
-public class UTCTimestampField extends AbstractField<Long> {
+public class UTCTimestampField extends AbstractTemporalField {
 
     private static final DateTimeFormatter FORMATTER_WITH_MILLIS = DateTimeFormat.forPattern("yyyyMMdd-HH:mm:ss.SSS").withZone(UTC);
     private static final DateTimeFormatter FORMATTER = DateTimeFormat.forPattern("yyyyMMdd-HH:mm:ss").withZone(UTC);
@@ -34,18 +35,15 @@ public class UTCTimestampField extends AbstractField<Long> {
     private final long value;
 
     protected UTCTimestampField(int tagNum, byte[] bytes, int offset, int length) throws ParseException {
-        super(tagNum);
-        this.value = parse(bytes, offset, length);
+        super(tagNum, parse(bytes, offset, length));
     }
 
     protected UTCTimestampField(int tagNum, String timestampString) throws ParseException {
-        super(tagNum);
-        this.value = parse(timestampString);
+        super(tagNum, parse(timestampString));
     }
 
     protected UTCTimestampField(int tagNum, long value) {
-        super(tagNum);
-        this.value = value;
+        super(tagNum, value);
     }
 
     static long parse(byte[] bytes, int offset, int length) throws ParseException {
@@ -98,5 +96,4 @@ public class UTCTimestampField extends AbstractField<Long> {
     public byte[] getBytes() {
         return new DateTime(value).toString(value % 1000 != 0 ? FORMATTER_WITH_MILLIS : FORMATTER).getBytes(US_ASCII);
     }
-
 }

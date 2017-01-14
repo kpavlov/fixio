@@ -16,8 +16,8 @@
 package fixio.examples.priceserver;
 
 import fixio.FixServer;
-import fixio.examples.generator.Quote;
-import fixio.examples.generator.QuoteGeneratorTask;
+import fixio.examples.common.Quote;
+import fixio.examples.common.QuoteGeneratorTask;
 import fixio.netty.pipeline.InMemorySessionRepository;
 import fixio.netty.pipeline.server.AcceptAllAuthenticator;
 

@@ -15,23 +15,35 @@
  */
 package fixio.fixprotocol.fields;
 
-import java.nio.charset.StandardCharsets;
+import fixio.Utils;
 
 public class StringField extends AbstractField<String> {
 
-    private final String value;
+    private final byte[] value;
 
     public StringField(int tagNum, String value) {
+        super(tagNum);
+        this.value = Utils.stringToBytesASCII(value);
+    }
+
+    public StringField(int tagNum, byte[] value) {
         super(tagNum);
         this.value = value;
     }
 
+    public StringField(int tagNum, byte[] source, int offset, int length) {
+        super(tagNum);
+        this.value = new byte[length];
+        System.arraycopy(source, offset, this.value, 0, length);
+    }
+
+    @Override
     public String getValue() {
-        return value;
+        return Utils.bytesToStringASCII(value);
     }
 
     @Override
     public byte[] getBytes() {
-        return value.getBytes(StandardCharsets.US_ASCII);
+        return value;
     }
 }

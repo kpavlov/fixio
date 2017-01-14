@@ -24,7 +24,8 @@ The API has a number of [limitations](#Limitations), so it may be not suitable f
 1. Logon message encryption is not supported. EncryptMethod(98)=0
 2. XmlData is not supported
 3. Message encodings other than US-ASCII are not supported.
-4. ...
+4. Message resending and resend requests are not supported.
+5. ...
 
 ## Performance
 
@@ -41,7 +42,7 @@ Currently fixio can beat QuickFix performance in simple scenario. See [performan
 <dependency>
     <groupId>kpavlov.fixio</groupId>
     <artifactId>core</artifactId>
-    <version>1.0-SNAPSHOT</version>
+    <version>1.1-SNAPSHOT</version>
 </dependency>
 ~~~~~~~~~
 
@@ -51,7 +52,7 @@ You'll also need a slf4j API implementation at runtime, so please add appropriat
 <dependency>
     <groupId>org.slf4j</groupId>
     <artifactId>slf4j-simple</artifactId>
-    <version>1.7.5</version>
+    <version>1.7.10</version>
     <scope>runtime</scope>
     <optional>true</optional>
 </dependency>
