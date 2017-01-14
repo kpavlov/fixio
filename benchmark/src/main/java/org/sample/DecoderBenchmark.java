@@ -35,25 +35,29 @@ import fixio.netty.codec.FixMessageDecoder;
 import io.netty.buffer.ByteBuf;
 import io.netty.buffer.Unpooled;
 import io.netty.channel.ChannelHandlerContext;
-import org.openjdk.jmh.annotations.*;
+import org.openjdk.jmh.annotations.Benchmark;
+import org.openjdk.jmh.annotations.Level;
+import org.openjdk.jmh.annotations.Scope;
+import org.openjdk.jmh.annotations.Setup;
+import org.openjdk.jmh.annotations.State;
 import org.openjdk.jmh.runner.Runner;
 import org.openjdk.jmh.runner.RunnerException;
 import org.openjdk.jmh.runner.options.Options;
 import org.openjdk.jmh.runner.options.OptionsBuilder;
 
-import java.nio.charset.StandardCharsets;
-
+import static java.nio.charset.StandardCharsets.US_ASCII;
 import static org.mockito.Mockito.mock;
 
 public class DecoderBenchmark {
 
-    public static final String MESSAGE = "8=FIX.4.29=39635=BZ34=148949=CME50=G52=20141210-04:12:58.68956=17ACPON57=DUMMY369=36701180=0K41181=42811350=428011=ACP141818477867860=20141210-04:12:58.686533=3797=Y893=Y1028=Y1300=991369=9971:21373=31374=91375=1453=2448=000447=D452=7448=US,IL447=D452=54534=341=ACP141818477617384=60535=99499752041=ACP141818477621484=60535=99499752141=ACP141818477625384=180535=99499752210=228";
+    private static final String MESSAGE = "8=FIX.4.29=39635=BZ34=148949=CME50=G52=20141210-04:12:58.68956=17ACPON57=DUMMY369=36701180=0K41181=42811350=428011=ACP141818477867860=20141210-04:12:58.686533=3797=Y893=Y1028=Y1300=991369=9971:21373=31374=91375=1453=2448=000447=D452=7448=US,IL447=D452=54534=341=ACP141818477617384=60535=99499752041=ACP141818477621484=60535=99499752141=ACP141818477625384=180535=99499752210=228";
     private static ChannelHandlerContext ctx = mock(ChannelHandlerContext.class);
 
     @State(Scope.Thread)
     public static class ThreadState {
-        ByteBuf byteBuf = Unpooled.wrappedBuffer(MESSAGE.getBytes(StandardCharsets.US_ASCII));
-        FixMessageDecoder decoder;
+        private final ByteBuf byteBuf = Unpooled.wrappedBuffer(MESSAGE.getBytes(US_ASCII));
+
+        private FixMessageDecoder decoder;
 
         @Setup(Level.Invocation)
         public void setup() {
@@ -72,8 +76,6 @@ public class DecoderBenchmark {
 
         Options opt = new OptionsBuilder()
                 .include(DecoderBenchmark.class.getSimpleName())
-//                .warmupIterations(500)
-//                .measurementIterations(50)
                 .threads(4)
                 .forks(1)
                 .build();

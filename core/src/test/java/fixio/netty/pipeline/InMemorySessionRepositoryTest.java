@@ -52,7 +52,7 @@ public class InMemorySessionRepositoryTest {
     @Test
     public void testNormalLifecycle() throws Exception {
 
-        FixSession session = sessionRepository.createSession(header);
+        FixSession session = sessionRepository.getOrCreateSession(header);
 
         assertNotNull(session);
 

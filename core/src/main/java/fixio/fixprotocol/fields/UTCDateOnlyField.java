@@ -15,12 +15,14 @@
  */
 package fixio.fixprotocol.fields;
 
-import java.text.ParseException;
-import java.time.*;
-import java.time.format.DateTimeFormatter;
+import org.joda.time.DateTime;
+import org.joda.time.format.DateTimeFormat;
+import org.joda.time.format.DateTimeFormatter;
 
-import static fixio.netty.pipeline.FixClock.systemUTC;
+import java.text.ParseException;
+
 import static java.nio.charset.StandardCharsets.US_ASCII;
+import static org.joda.time.DateTimeZone.UTC;
 
 /**
  * Field representing Date represented in UTC (Universal Time Coordinated, also known as "GMT") in YYYYMMDD format.
@@ -34,7 +36,7 @@ import static java.nio.charset.StandardCharsets.US_ASCII;
  */
 public class UTCDateOnlyField extends AbstractTemporalField {
 
-    private static final DateTimeFormatter FORMATTER = DateTimeFormatter.ofPattern("yyyyMMdd").withZone(systemUTC().zone());
+    private static final DateTimeFormatter FORMATTER = DateTimeFormat.forPattern("yyyyMMdd").withZone(UTC);
 
     protected UTCDateOnlyField(int tagNum, byte[] bytes) throws ParseException {
         super(tagNum, parse(bytes));
@@ -49,8 +51,7 @@ public class UTCDateOnlyField extends AbstractTemporalField {
     }
 
     static long parse(String timestampString) throws ParseException {
-        final ZoneId zone = systemUTC().zone();
-        return ZonedDateTime.of(LocalDate.now(zone), LocalTime.parse(timestampString, FORMATTER), zone).toInstant().toEpochMilli();
+        return FORMATTER.parseMillis(timestampString);
     }
 
     static long parse(byte[] bytes) throws ParseException {
@@ -60,8 +61,7 @@ public class UTCDateOnlyField extends AbstractTemporalField {
         int year = (bytes[0] - '0') * 1000 + (bytes[1] - '0') * 100 + (bytes[2] - '0') * 10 + (bytes[3] - '0');
         int month = (bytes[4] - '0') * 10 + (bytes[5] - '0');
         int date = (bytes[6] - '0') * 10 + (bytes[7] - '0');
-        final ZoneId zone = systemUTC().zone();
-        return ZonedDateTime.of(LocalDate.of(year, month, date), LocalTime.MIDNIGHT, zone).toInstant().toEpochMilli();
+        return new DateTime(year, month, date, 0, 0, 0, 0, UTC).getMillis();
     }
 
     private static void throwParseException(byte[] bytes, int errorOffset) throws ParseException {
@@ -70,6 +70,6 @@ public class UTCDateOnlyField extends AbstractTemporalField {
 
     @Override
     public byte[] getBytes() {
-        return FORMATTER.format(Instant.ofEpochMilli(value)).getBytes(US_ASCII);
+        return new DateTime(value).toString(FORMATTER).getBytes(US_ASCII);
     }
 }

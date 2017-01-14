@@ -16,28 +16,30 @@
 
 package fixio.netty.codec;
 
-import fixio.fixprotocol.*;
+import fixio.fixprotocol.FixMessageBuilder;
+import fixio.fixprotocol.FixMessageFragment;
+import fixio.fixprotocol.FixMessageHeader;
+import fixio.fixprotocol.Group;
+import fixio.fixprotocol.GroupField;
 import fixio.fixprotocol.fields.AbstractField;
 import io.netty.buffer.ByteBuf;
 import io.netty.buffer.ByteBufAllocator;
 import io.netty.channel.ChannelHandler;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.handler.codec.MessageToByteEncoder;
+import org.joda.time.DateTime;
+import org.joda.time.format.DateTimeFormat;
 
 import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;
-import java.time.Instant;
-import java.time.format.DateTimeFormatter;
 import java.util.List;
-
-import static fixio.netty.pipeline.FixClock.systemUTC;
 
 @ChannelHandler.Sharable
 public class FixMessageEncoder extends MessageToByteEncoder<FixMessageBuilder> {
 
     private static final Charset CHARSET = StandardCharsets.US_ASCII;
     private static final String UTC_TIMESTAMP_WITH_MILLIS_PATTERN = "yyyyMMdd-HH:mm:ss.SSS";
-    private static final DateTimeFormatter SDF = DateTimeFormatter.ofPattern(UTC_TIMESTAMP_WITH_MILLIS_PATTERN).withZone(systemUTC().zone());
+    private static final org.joda.time.format.DateTimeFormatter SDF = DateTimeFormat.forPattern(UTC_TIMESTAMP_WITH_MILLIS_PATTERN).withZoneUTC();
 
     private static void validateRequiredFields(FixMessageHeader header) {
         if (header.getBeginString() == null) {
@@ -101,7 +103,8 @@ public class FixMessageEncoder extends MessageToByteEncoder<FixMessageBuilder> {
         writeField(34, Integer.toString(header.getMsgSeqNum()), out);
 
         // SendingTime
-        writeField(52, SDF.format(Instant.ofEpochMilli(header.getSendingTime())), out);
+        String timeStr = new DateTime(header.getSendingTime()).toString(SDF);
+        writeField(52, timeStr, out);
 
         // customize tag
         List<FixMessageFragment> customFields = header.getCustomFields();

@@ -17,7 +17,12 @@
 package fixio.netty.pipeline.server;
 
 import fixio.events.LogonEvent;
-import fixio.fixprotocol.*;
+import fixio.fixprotocol.FieldType;
+import fixio.fixprotocol.FixMessage;
+import fixio.fixprotocol.FixMessageBuilder;
+import fixio.fixprotocol.FixMessageBuilderImpl;
+import fixio.fixprotocol.FixMessageHeader;
+import fixio.fixprotocol.MessageTypes;
 import fixio.fixprotocol.session.FixSession;
 import fixio.handlers.FixApplication;
 import fixio.netty.pipeline.AbstractSessionHandler;
@@ -79,7 +84,7 @@ public class ServerSessionHandler extends AbstractSessionHandler {
                     int expectedMsgSeqNum = -1;
 
                     boolean seqTooHigh = false;
-                    if (!fixSession.checkIncomingSeqNum(msgSeqNum)) {
+                    if (!fixSession.checkAndIncrementIncomingSeqNum(msgSeqNum)) {
                         expectedMsgSeqNum = fixSession.getNextIncomingMessageSeqNum();
                         if (msgSeqNum < expectedMsgSeqNum) {
                             sendLogoutAndClose(ctx, fixSession, "Sequence Number Too Low. Expected = " + expectedMsgSeqNum);
@@ -117,7 +122,7 @@ public class ServerSessionHandler extends AbstractSessionHandler {
     }
 
     private FixSession initSession(ChannelHandlerContext ctx, FixMessageHeader header) {
-        FixSession session = getSessionRepository().createSession(header);
+        FixSession session = getSessionRepository().getOrCreateSession(header);
 
         session.setNextOutgoingMessageSeqNum(1);
 

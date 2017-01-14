@@ -16,7 +16,11 @@
 
 package fixio.fixprotocol;
 
-import fixio.fixprotocol.fields.*;
+import fixio.fixprotocol.fields.AbstractField;
+import fixio.fixprotocol.fields.CharField;
+import fixio.fixprotocol.fields.FieldFactory;
+import fixio.fixprotocol.fields.IntField;
+import fixio.fixprotocol.fields.StringField;
 import it.unimi.dsi.fastutil.ints.Int2ObjectArrayMap;
 
 import java.util.ArrayList;

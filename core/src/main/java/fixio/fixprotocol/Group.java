@@ -120,6 +120,7 @@ public class Group implements FieldListBuilder<Group> {
         return this;
     }
 
+    @SuppressWarnings("unchecked")
     public <T> T getValue(int tagNum) {
         FixMessageFragment field = contents.get(tagNum);
         if (field != null)
@@ -127,6 +128,7 @@ public class Group implements FieldListBuilder<Group> {
         return null;
     }
 
+    @SuppressWarnings("unchecked")
     public <T> T getValue(FieldType fieldType) {
         FixMessageFragment field = contents.get(fieldType.tag());
         if (field != null)

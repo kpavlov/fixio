@@ -22,7 +22,7 @@ public class Party {
     String locationID;
     Role role;
 
-    public static enum Role {
+    public enum Role {
 
         SENDER(49, 50, 142),
         TARGET(56, 57, 143),
@@ -33,7 +33,7 @@ public class Party {
         private final int subIdField;
         private final int locationIdField;
 
-        private Role(int compIdField, int subIdField, int locationIdField) {
+        Role(int compIdField, int subIdField, int locationIdField) {
             this.compIdField = compIdField;
             this.subIdField = subIdField;
             this.locationIdField = locationIdField;

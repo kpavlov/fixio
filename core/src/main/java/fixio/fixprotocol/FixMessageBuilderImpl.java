@@ -212,11 +212,13 @@ public class FixMessageBuilderImpl implements FixMessage, FixMessageBuilder {
         }
     }
 
+    @SuppressWarnings("unchecked")
     @Override
     public <T> T getValue(FieldType fieldType) {
         FixMessageFragment field = getFragment(fieldType.tag());
-        if (field != null)
+        if (field != null) {
             return (T) field.getValue();
+        }
         return null;
     }
 

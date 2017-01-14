@@ -26,7 +26,7 @@ public interface FixMessageHandler {
      *
      * @return true if message should be handled by following {@link FixMessageHandler} in a chain.
      */
-    public boolean handle(ChannelHandlerContext ctx, FixMessage msg);
+    boolean handle(ChannelHandlerContext ctx, FixMessage msg);
 
-    public void beforeSendMessage(ChannelHandlerContext ctx, FixMessageBuilder messageBuilder);
+    void beforeSendMessage(ChannelHandlerContext ctx, FixMessageBuilder messageBuilder);
 }
