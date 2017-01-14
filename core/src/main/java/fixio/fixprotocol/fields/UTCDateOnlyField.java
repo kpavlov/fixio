@@ -16,7 +16,6 @@
 package fixio.fixprotocol.fields;
 
 import org.joda.time.DateTime;
-import org.joda.time.DateTimeZone;
 import org.joda.time.format.DateTimeFormat;
 import org.joda.time.format.DateTimeFormatter;
 
@@ -62,7 +61,7 @@ public class UTCDateOnlyField extends AbstractTemporalField {
         int year = (bytes[0] - '0') * 1000 + (bytes[1] - '0') * 100 + (bytes[2] - '0') * 10 + (bytes[3] - '0');
         int month = (bytes[4] - '0') * 10 + (bytes[5] - '0');
         int date = (bytes[6] - '0') * 10 + (bytes[7] - '0');
-        return new DateTime(year, month, date, 0,0,0, 0, DateTimeZone.UTC).getMillis();
+        return new DateTime(year, month, date, 0, 0, 0, 0, UTC).getMillis();
     }
 
     private static void throwParseException(byte[] bytes, int errorOffset) throws ParseException {
