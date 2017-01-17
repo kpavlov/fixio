@@ -28,7 +28,7 @@
 
     <scm>
         <connection>scm:git:git://github.com/kpavlov/fixio.git</connection>
-        <developerConnection>scm:git:ssh://github.com:kpavlov/fixio.git</developerConnection>
+        <developerConnection>scm:git:ssh://github.com/kpavlov/fixio.git</developerConnection>
         <url>http://github.com/kpavlov/fixio/tree/master</url>
       <tag>v1.1</tag>
   </scm>
