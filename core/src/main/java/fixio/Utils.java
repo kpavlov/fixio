@@ -7,7 +7,9 @@ public class Utils {
 
 
     /**
-     * @link http://www.javacodegeeks.com/2010/11/java-best-practices-char-to-byte-and.html
+     * @param str string to convert
+     * @return a byte array
+     * @see <a href="http://www.javacodegeeks.com/2010/11/java-best-practices-char-to-byte-and.html">Java Best Practices char to byte</a>
      */
     public static byte[] stringToBytesASCII(String str) {
         char[] buffer = str.toCharArray();
@@ -20,7 +22,9 @@ public class Utils {
     }
 
     /**
-     * @link http://www.javacodegeeks.com/2010/11/java-best-practices-char-to-byte-and.html
+     * @param bytes a byte array tp convert
+     * @return converted String
+     * @see <a href="http://www.javacodegeeks.com/2010/11/java-best-practices-char-to-byte-and.html">Java Best Practices char to byte</a>
      */
     public static String bytesToStringASCII(byte[] bytes) {
         final int length = bytes.length;
