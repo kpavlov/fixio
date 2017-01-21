@@ -100,7 +100,8 @@ public abstract class AbstractSessionHandler extends MessageToMessageCodec<FixMe
     /**
      * Retrieves {@link FixSession} from context.
      *
-     * @return null if session not established.
+     * @return FixSession or null, if session not established.
+     * @param ctx context
      */
     protected FixSession getSession(ChannelHandlerContext ctx) {
         Attribute<FixSession> fixSessionAttribute = ctx.channel().attr(FIX_SESSION_KEY);

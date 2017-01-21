@@ -17,8 +17,9 @@ package fixio.netty.pipeline.client;
 
 /**
  * Simple java bean FixSessionSettingsProvider implementation.
- * <p/>
+ * <p>
  * <strong>Thread-safety:</strong> This implementation is immutable and thread-safe.
+ * </p>
  */
 public class FixSessionSettingsProviderImpl implements FixSessionSettingsProvider {
 
