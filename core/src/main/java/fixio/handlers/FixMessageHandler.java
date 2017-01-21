@@ -24,6 +24,8 @@ public interface FixMessageHandler {
     /**
      * Performs some processing on incoming {@link FixMessage}.
      *
+     * @param ctx current ChannelHandlerContext
+     * @param msg a FixMessage to handle
      * @return true if message should be handled by following {@link FixMessageHandler} in a chain.
      */
     boolean handle(ChannelHandlerContext ctx, FixMessage msg);

@@ -28,21 +28,34 @@ public interface FixApplication extends ChannelHandler {
 
     /**
      * Invoked after FIX session was successfully established.
+     *
+     * @param ctx current {@link ChannelHandlerContext}
+     * @param msg {@link LogonEvent} message to handle
      */
     void onLogon(ChannelHandlerContext ctx, LogonEvent msg);
 
     /**
      * Invoked after FIX session was closed.
+     *
+     * @param ctx current {@link ChannelHandlerContext}
+     * @param msg {@link LogonEvent} message to handle
      */
     void onLogout(ChannelHandlerContext ctx, LogoutEvent msg);
 
     /**
      * Invoked when message arrived
+     *
+     * @param ctx current {@link ChannelHandlerContext}
+     * @param msg a {@link FixMessage} to handle
+     * @param out a {@link List} where decoded messages should be added
+     *
      */
     void onMessage(ChannelHandlerContext ctx, FixMessage msg, List<Object> out) throws Exception;
 
     /**
      * Invoked before {@link FixMessageBuilder} is sent.
+     *
+     * @param ctx current {@link ChannelHandlerContext}
      */
     void beforeSendMessage(ChannelHandlerContext ctx, FixMessageBuilder messageBuilder) throws Exception;
 }
