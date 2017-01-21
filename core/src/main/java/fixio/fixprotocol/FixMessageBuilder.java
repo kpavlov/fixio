@@ -19,8 +19,9 @@ import java.util.List;
 
 /**
  * Represents outgoing FIX Protocol message.
- * <p/>
+ * <p>
  * Messages of this type are passed into {@link fixio.netty.codec.FixMessageEncoder}.
+ * </p>
  */
 public interface FixMessageBuilder extends FieldListBuilder<FixMessageBuilder> {
     FixMessageHeader getHeader();

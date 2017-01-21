@@ -19,8 +19,9 @@ import fixio.fixprotocol.fields.FixedPointNumber;
 
 /**
  * Represent a ordered list of fields.
- * <p/>
+ * <p>
  * Provides methods to add new fields.
+ * </p>
  */
 interface FieldListBuilder<T> {
 
