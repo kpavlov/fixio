@@ -19,6 +19,7 @@ import fixio.events.LogonEvent;
 import fixio.events.LogoutEvent;
 import fixio.fixprotocol.FixMessage;
 import fixio.fixprotocol.FixMessageBuilder;
+import fixio.validator.BusinessRejectException;
 import io.netty.channel.ChannelHandler;
 import io.netty.channel.ChannelHandlerContext;
 
@@ -48,14 +49,17 @@ public interface FixApplication extends ChannelHandler {
      * @param ctx current {@link ChannelHandlerContext}
      * @param msg a {@link FixMessage} to handle
      * @param out a {@link List} where decoded messages should be added
-     *
+     * @throws BusinessRejectException when message can't be accepted
+     * @throws InterruptedException    if interrupted while processing a message
      */
-    void onMessage(ChannelHandlerContext ctx, FixMessage msg, List<Object> out) throws Exception;
+    void onMessage(ChannelHandlerContext ctx, FixMessage msg, List<Object> out)
+            throws BusinessRejectException, InterruptedException;
 
     /**
      * Invoked before {@link FixMessageBuilder} is sent.
      *
-     * @param ctx current {@link ChannelHandlerContext}
+     * @param ctx            current {@link ChannelHandlerContext}
+     * @param messageBuilder a message builder
      */
-    void beforeSendMessage(ChannelHandlerContext ctx, FixMessageBuilder messageBuilder) throws Exception;
+    void beforeSendMessage(ChannelHandlerContext ctx, FixMessageBuilder messageBuilder);
 }

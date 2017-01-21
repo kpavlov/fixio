@@ -16,7 +16,12 @@
 package fixio.examples.priceclient;
 
 import fixio.events.LogonEvent;
-import fixio.fixprotocol.*;
+import fixio.fixprotocol.FieldType;
+import fixio.fixprotocol.FixMessage;
+import fixio.fixprotocol.FixMessageBuilder;
+import fixio.fixprotocol.FixMessageBuilderImpl;
+import fixio.fixprotocol.Group;
+import fixio.fixprotocol.MessageTypes;
 import fixio.handlers.FixApplicationAdapter;
 import io.netty.channel.ChannelFutureListener;
 import io.netty.channel.ChannelHandlerContext;
@@ -41,7 +46,7 @@ class PriceReadingApp extends FixApplicationAdapter {
     }
 
     @Override
-    public void onMessage(ChannelHandlerContext ctx, FixMessage msg, List<Object> out) throws Exception {
+    public void onMessage(ChannelHandlerContext ctx, FixMessage msg, List<Object> out) {
         assert (msg != null) : "Message can't be null";
         switch (msg.getMessageType()) {
             case MessageTypes.QUOTE:

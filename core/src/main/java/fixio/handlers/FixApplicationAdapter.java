@@ -19,6 +19,7 @@ import fixio.events.LogonEvent;
 import fixio.events.LogoutEvent;
 import fixio.fixprotocol.FixMessage;
 import fixio.fixprotocol.FixMessageBuilder;
+import fixio.validator.BusinessRejectException;
 import io.netty.channel.ChannelHandler;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.handler.codec.MessageToMessageDecoder;
@@ -57,16 +58,21 @@ public class FixApplicationAdapter extends MessageToMessageDecoder<Object> imple
     }
 
     @Override
-    public void onMessage(ChannelHandlerContext ctx, FixMessage msg, List<Object> out) throws Exception {
+    public void onMessage(ChannelHandlerContext ctx, FixMessage msg, List<Object> out) throws BusinessRejectException, InterruptedException {
     }
 
     @Override
-    public void beforeSendMessage(ChannelHandlerContext ctx, FixMessageBuilder msg) throws Exception {
+    public void beforeSendMessage(ChannelHandlerContext ctx, FixMessageBuilder msg) {
     }
 
     @Override
-    public void exceptionCaught(ChannelHandlerContext ctx, Throwable cause) throws Exception {
+    public void exceptionCaught(ChannelHandlerContext ctx, Throwable cause)  {
         LOGGER.error("Uncaught application exception.", cause);
-        ctx.close().sync();
+        try {
+            ctx.close().sync();
+        } catch (InterruptedException e) {
+            Thread.currentThread().interrupt();
+            throw new RuntimeException("Interrupted while closing channel", e);
+        }
     }
 }

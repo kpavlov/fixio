@@ -25,7 +25,7 @@
     <artifactId>examples</artifactId>
 
     <properties>
-        <quickfix.version>1.5.3</quickfix.version>
+        <quickfix.version>1.6.3</quickfix.version>
     </properties>
 
     <dependencies>
@@ -44,33 +44,23 @@
         </dependency>
 
         <dependency>
-            <groupId>quickfixj</groupId>
+            <groupId>org.quickfixj</groupId>
             <artifactId>quickfixj-all</artifactId>
             <version>${quickfix.version}</version>
         </dependency>
         <dependency>
-            <groupId>quickfixj</groupId>
-            <artifactId>quickfixj-msg-fix44</artifactId>
+            <groupId>org.quickfixj</groupId>
+            <artifactId>quickfixj-messages-fix44</artifactId>
             <version>${quickfix.version}</version>
         </dependency>
 
-        <dependency>
-            <groupId>org.apache.mina</groupId>
-            <artifactId>mina-core</artifactId>
-            <version>1.1.0</version>
-            <scope>runtime</scope>
-        </dependency>
+        <!--<dependency>-->
+            <!--<groupId>org.apache.mina</groupId>-->
+            <!--<artifactId>mina-core</artifactId>-->
+            <!--<version>1.1.0</version>-->
+            <!--<scope>runtime</scope>-->
+        <!--</dependency>-->
 
     </dependencies>
-
-    <repositories>
-        <repository>
-            <id>MarketceteraRepo</id>
-            <url>http://repo.marketcetera.org/maven</url>
-            <releases>
-                <enabled>true</enabled>
-            </releases>
-        </repository>
-    </repositories>
 
 </project>
