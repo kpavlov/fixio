@@ -26,12 +26,15 @@ import static org.joda.time.DateTimeZone.UTC;
 
 /**
  * Field representing Date represented in UTC (Universal Time Coordinated, also known as "GMT") in YYYYMMDD format.
- * <p/>
+ * <p>
  * This special-purpose field is paired with UTCTimeOnly to form a proper UTCTimestamp for bandwidth-sensitive messages.
- * <p/>
+ * </p>
+ * <p>
  * Valid values:
- * YYYY = 0000-9999, MM = 01-12, DD = 01-31.
- * <p/>
+ * YYYY = 0000-9999,
+ * MM = 01-12,
+ * DD = 01-31.
+ * </p>
  * Example(s): <code>MDEntryDate="20030910"</code>
  */
 public class UTCDateOnlyField extends AbstractTemporalField {
