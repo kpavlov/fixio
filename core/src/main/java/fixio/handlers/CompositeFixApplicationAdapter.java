@@ -17,6 +17,7 @@ package fixio.handlers;
 
 import fixio.fixprotocol.FixMessage;
 import fixio.fixprotocol.FixMessageBuilder;
+import fixio.validator.BusinessRejectException;
 import fixio.validator.FixMessageValidator;
 import io.netty.channel.ChannelHandler;
 import io.netty.channel.ChannelHandlerContext;
@@ -41,16 +42,14 @@ public class CompositeFixApplicationAdapter extends FixApplicationAdapter {
     }
 
     @Override
-    public void onMessage(ChannelHandlerContext ctx, FixMessage msg, List<Object> out) throws Exception {
+    public void onMessage(ChannelHandlerContext ctx, FixMessage msg, List<Object> out) throws BusinessRejectException {
         assert (msg != null) : "Message can't be null";
         LOGGER.info("Received : {}", msg);
 
         //Validate
-        if (validators != null) {
             for (FixMessageValidator validator : validators) {
                 validator.validate(ctx, msg);
             }
-        }
 
         //Business handler
         if (handlers != null) {
@@ -71,7 +70,7 @@ public class CompositeFixApplicationAdapter extends FixApplicationAdapter {
     }
 
     @Override
-    public void beforeSendMessage(ChannelHandlerContext ctx, FixMessageBuilder msg) throws Exception {
+    public void beforeSendMessage(ChannelHandlerContext ctx, FixMessageBuilder msg) {
         for (FixMessageHandler handler : handlers) {
             handler.beforeSendMessage(ctx, msg);
         }
