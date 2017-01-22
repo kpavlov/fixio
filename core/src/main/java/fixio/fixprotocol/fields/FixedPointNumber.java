@@ -17,10 +17,12 @@ package fixio.fixprotocol.fields;
 
 /**
  * High performance thread-safe Fixed-Point Number implementation.
- * <p/>
+ * <p>
  * This class should be used as a replacement for {@link java.math.BigDecimal} when dealing with monetary data in FIX protocol API.
- * <p/>
+ * </p>
+ * <p>
  * This implementation is <strong>thread-safe.</strong>
+ * </p>
  */
 public class FixedPointNumber extends Number {
 
@@ -28,6 +30,7 @@ public class FixedPointNumber extends Number {
      * Negative or positive scaled value decimal value: <code>scaledValue := value * (10^scale)</code>
      */
     private final long scaledValue;
+
     /**
      * If zero or positive, the scale is the number of digits to the right of the decimal point.
      */

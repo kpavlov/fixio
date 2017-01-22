@@ -19,6 +19,7 @@ import fixio.events.LogonEvent;
 import fixio.events.LogoutEvent;
 import fixio.fixprotocol.FixMessage;
 import fixio.fixprotocol.FixMessageBuilder;
+import fixio.validator.BusinessRejectException;
 import io.netty.channel.ChannelHandler;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.handler.codec.MessageToMessageDecoder;
@@ -48,25 +49,40 @@ public class FixApplicationAdapter extends MessageToMessageDecoder<Object> imple
         }
     }
 
+    /**
+     * @implNote This implementation does nothing.
+     */
     @Override
     public void onLogon(ChannelHandlerContext ctx, LogonEvent msg) {
     }
 
+    /**
+     * @implSpec This implementation does nothing.
+     */
     @Override
     public void onLogout(ChannelHandlerContext ctx, LogoutEvent msg) {
     }
 
+    /**
+     * @implSpec This implementation does nothing.
+     */
     @Override
-    public void onMessage(ChannelHandlerContext ctx, FixMessage msg, List<Object> out) throws Exception {
+    public void onMessage(ChannelHandlerContext ctx, FixMessage msg, List<Object> out) throws BusinessRejectException, InterruptedException {
     }
 
+    /**
+     * @implSpec This implementation does nothing.
+     */
     @Override
-    public void beforeSendMessage(ChannelHandlerContext ctx, FixMessageBuilder msg) throws Exception {
+    public void beforeSendMessage(ChannelHandlerContext ctx, FixMessageBuilder msg) {
     }
 
+    /**
+     * @implSpec This implementation initiates closing the {@link ChannelHandlerContext} (connection)
+     */
     @Override
-    public void exceptionCaught(ChannelHandlerContext ctx, Throwable cause) throws Exception {
+    public void exceptionCaught(ChannelHandlerContext ctx, Throwable cause) {
         LOGGER.error("Uncaught application exception.", cause);
-        ctx.close().sync();
+        ctx.close();
     }
 }

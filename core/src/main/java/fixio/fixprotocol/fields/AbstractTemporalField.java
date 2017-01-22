@@ -1,6 +1,6 @@
 package fixio.fixprotocol.fields;
 
-public abstract class AbstractTemporalField extends AbstractField<Long> {
+public abstract class AbstractTemporalField extends AbstractField {
 
     protected final long value;
 
@@ -13,7 +13,7 @@ public abstract class AbstractTemporalField extends AbstractField<Long> {
      * Returns timestamp value in milliseconds.
      * Use with caution, since it causes value autoboxing.
      *
-     * @return timestamp value in milliseconds.
+     * @return value in milliseconds as {@link java.lang.Long}. Prefer {@link #timestampMillis()} to avoid autoboxing.
      * @see #timestampMillis()
      */
     @Override
@@ -23,6 +23,8 @@ public abstract class AbstractTemporalField extends AbstractField<Long> {
 
     /**
      * Useful when you need to get a milliseconds without autoboxing
+     *
+     * @return value in milliseconds
      */
     public final long timestampMillis() {
         return value;

@@ -79,6 +79,11 @@ public class FixClient extends AbstractFixConnector {
 
     /**
      * Connect and start FIX session to specified host and port.
+     *
+     * @param host hostname
+     * @param port a TCP port
+     * @return ChannelFuture Channel close future which will resolve when the connection is closed.
+     * @throws InterruptedException when connection interrupted
      */
     @SuppressWarnings("WeakerAccess")
     public ChannelFuture connect(String host, int port) throws InterruptedException {

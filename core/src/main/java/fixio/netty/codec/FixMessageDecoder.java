@@ -33,19 +33,19 @@ import java.util.List;
 
 /**
  * Decodes series of {@link ByteBuf}s into FixMessages.
- * <p/>
  * <p>
  * Use following code to configure {@link io.netty.channel.ChannelPipeline}:
+ * </p>
  * <pre><code>
  * ChannelPipeline pipeline = ch.pipeline();
  * pipeline.addLast("tagDecoder", new DelimiterBasedFrameDecoder(1024, Unpooled.wrappedBuffer(new byte[]{1})));
  * pipeline.addLast("fixMessageDecoder", new FixMessageDecoder());
  * pipeline.addLast("fixMessageEncoder", new FixMessageEncoder());
  * </code></pre>
- * <p/>
- * FixMessageDecoder should be preceded in pipeline with {@link io.netty.handler.codec.DelimiterBasedFrameDecoder}, which is responsible for detecting FIX Protocol tags.
+ * <p>
+ * FixMessageDecoder should be preceded in pipeline with {@link io.netty.handler.codec.DelimiterBasedFrameDecoder},
+ * which is responsible for detecting FIX Protocol tags.
  * </p>
- * <p/>
  * <p>
  * <strong>This class is not thread safe!</strong>
  * It should be a separate instance per {@link io.netty.channel.Channel}.

@@ -64,7 +64,7 @@ class PriceStreamingApp extends FixApplicationAdapter {
     }
 
     @Override
-    public void exceptionCaught(ChannelHandlerContext ctx, Throwable cause) throws Exception {
+    public void exceptionCaught(ChannelHandlerContext ctx, Throwable cause) {
         stopStreaming(ctx);
         super.exceptionCaught(ctx, cause);
     }
@@ -77,7 +77,7 @@ class PriceStreamingApp extends FixApplicationAdapter {
     }
 
     @Override
-    public void onMessage(ChannelHandlerContext ctx, FixMessage msg, List<Object> out) throws Exception {
+    public void onMessage(ChannelHandlerContext ctx, FixMessage msg, List<Object> out) {
         String reqId;
         final String messageType = msg.getMessageType();
         switch (messageType) {

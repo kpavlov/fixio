@@ -19,7 +19,7 @@ package fixio.fixprotocol.fields;
 import fixio.fixprotocol.FieldType;
 import fixio.fixprotocol.FixMessageFragment;
 
-public abstract class AbstractField<T> implements FixMessageFragment {
+public abstract class AbstractField<T> implements FixMessageFragment<T> {
 
     private final int tagNum;
 

@@ -5,9 +5,12 @@ public class Utils {
     private Utils() {
     }
 
-
     /**
-     * @link http://www.javacodegeeks.com/2010/11/java-best-practices-char-to-byte-and.html
+     * Converts a String to ASCII byte array, provided that string contains only ASCII characters.
+     *
+     * @param str string to convert
+     * @return a byte array
+     * @see <a href="http://www.javacodegeeks.com/2010/11/java-best-practices-char-to-byte-and.html">Java Best Practices char to byte</a>
      */
     public static byte[] stringToBytesASCII(String str) {
         char[] buffer = str.toCharArray();
@@ -20,7 +23,11 @@ public class Utils {
     }
 
     /**
-     * @link http://www.javacodegeeks.com/2010/11/java-best-practices-char-to-byte-and.html
+     * Converts ASCII byte array to String, provided that string contains only ASCII characters.
+     *
+     * @param bytes a byte array tp convert
+     * @return converted String
+     * @see <a href="http://www.javacodegeeks.com/2010/11/java-best-practices-char-to-byte-and.html">Java Best Practices char to byte</a>
      */
     public static String bytesToStringASCII(byte[] bytes) {
         final int length = bytes.length;

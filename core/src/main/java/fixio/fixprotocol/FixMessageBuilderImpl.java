@@ -33,8 +33,11 @@ public class FixMessageBuilderImpl implements FixMessage, FixMessageBuilder {
 
     /**
      * Creates FixMessageBuilderImpl with expected body field count.
-     * <p/>
+     * <p>
      * Providing expected capacity eliminates unnecessary growing of internal ArrayList storing body fields.
+     * </p>
+     *
+     * @param expectedBodyFieldCount estimated maximum number of field in message body
      */
     public FixMessageBuilderImpl(int expectedBodyFieldCount) {
         this.header = new FixMessageHeader();
@@ -44,6 +47,9 @@ public class FixMessageBuilderImpl implements FixMessage, FixMessageBuilder {
 
     /**
      * Creates FixMessageBuilderImpl with specified FixMessageHeader and  FixMessageTrailer.
+     *
+     * @param header  message header
+     * @param trailer message trailer
      */
     public FixMessageBuilderImpl(FixMessageHeader header, final FixMessageTrailer trailer) {
         assert (header != null) : "FixMessageHeader is expected";
@@ -66,6 +72,7 @@ public class FixMessageBuilderImpl implements FixMessage, FixMessageBuilder {
      * Creates FixMessageBuilderImpl with specified message type (tag 35)
      * and default expected body field count.
      *
+     * @param messageType Value of message type (tag 35)
      * @see #DEFAULT_BODY_FIELD_COUNT
      */
     public FixMessageBuilderImpl(String messageType) {
@@ -76,6 +83,9 @@ public class FixMessageBuilderImpl implements FixMessage, FixMessageBuilder {
     /**
      * Creates FixMessageBuilderImpl with specified message type (tag 35)
      * and expected body field count.
+     *
+     * @param messageType            Value of message type (tag 35)
+     * @param expectedBodyFieldCount estimated maximum number of field in message body
      */
     public FixMessageBuilderImpl(String messageType, int expectedBodyFieldCount) {
         this(expectedBodyFieldCount);

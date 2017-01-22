@@ -113,7 +113,7 @@ public class FixConversationIT {
     private static class ServerLogicHandler extends FixApplicationAdapter {
 
         @Override
-        public void onMessage(ChannelHandlerContext ctx, FixMessage msg, List<Object> out) throws Exception {
+        public void onMessage(ChannelHandlerContext ctx, FixMessage msg, List<Object> out) {
             if (MessageTypes.USER_REQUEST.equals(msg.getMessageType())) {
                 conversation.add(msg);
                 ctx.writeAndFlush(createUserStatusReport());
@@ -124,7 +124,7 @@ public class FixConversationIT {
     private class ClientApp extends FixApplicationAdapter {
 
         @Override
-        public void onMessage(ChannelHandlerContext ctx, FixMessage msg, List<Object> out) throws Exception {
+        public void onMessage(ChannelHandlerContext ctx, FixMessage msg, List<Object> out) throws InterruptedException {
             if ("BF".equals(msg.getMessageType())) {
                 conversation.add(msg);
                 client.disconnect();
