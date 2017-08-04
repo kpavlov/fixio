@@ -26,19 +26,25 @@ public class FixSessionSettingsProviderImpl implements FixSessionSettingsProvide
     private final String beginString;
     private final String senderCompID;
     private final String senderSubID;
+    private final String senderLocationID;
     private final String targetCompID;
     private final String targetSubID;
+    private final String targetLocationID;
     private final boolean resetMsgSeqNum;
     private final int heartbeatIntervalSec;
+    private final String timeStampPrecision;
 
     private FixSessionSettingsProviderImpl(Builder builder) {
         beginString = builder.beginString;
         senderCompID = builder.senderCompID;
         senderSubID = builder.senderSubID;
+        senderLocationID = builder.senderLocationID;
         targetCompID = builder.targetCompID;
         targetSubID = builder.targetSubID;
+        targetLocationID = builder.targetLocationID;
         resetMsgSeqNum = builder.resetMsgSeqNum;
         heartbeatIntervalSec = builder.heartbeatInterval;
+        timeStampPrecision = builder.timeStampPrecision;
     }
 
     public static Builder newBuilder() {
@@ -67,6 +73,11 @@ public class FixSessionSettingsProviderImpl implements FixSessionSettingsProvide
     }
 
     @Override
+    public String getSenderLocationID() {
+        return senderLocationID;
+    }
+
+    @Override
     public String getTargetCompID() {
         return targetCompID;
     }
@@ -74,6 +85,11 @@ public class FixSessionSettingsProviderImpl implements FixSessionSettingsProvide
     @Override
     public String getTargetSubID() {
         return targetSubID;
+    }
+
+    @Override
+    public String getTargetLocationID() {
+        return targetLocationID;
     }
 
     @Override
@@ -92,6 +108,11 @@ public class FixSessionSettingsProviderImpl implements FixSessionSettingsProvide
     }
 
     @Override
+    public String getTimeStampPrecision() {
+        return timeStampPrecision;
+    }
+
+    @Override
     public String getProperty(String key, String defaultValue) {
         throw new UnsupportedOperationException("Get custom property operation not supported");
     }
@@ -100,10 +121,13 @@ public class FixSessionSettingsProviderImpl implements FixSessionSettingsProvide
         private String beginString;
         private String senderCompID;
         private String senderSubID;
+        private String senderLocationID;
         private String targetCompID;
         private String targetSubID;
+        private String targetLocationID;
         private boolean resetMsgSeqNum;
         private int heartbeatInterval = 60;
+        private String timeStampPrecision = "";
 
         private Builder() {
         }
@@ -123,6 +147,11 @@ public class FixSessionSettingsProviderImpl implements FixSessionSettingsProvide
             return this;
         }
 
+        public Builder senderLocationID(String val) {
+            senderLocationID = val;
+            return this;
+        }
+
         public Builder targetCompID(String val) {
             targetCompID = val;
             return this;
@@ -133,6 +162,11 @@ public class FixSessionSettingsProviderImpl implements FixSessionSettingsProvide
             return this;
         }
 
+        public Builder targetLocationID(String val) {
+            targetLocationID = val;
+            return this;
+        }
+
         public Builder resetMsgSeqNum(boolean val) {
             resetMsgSeqNum = val;
             return this;
@@ -140,6 +174,11 @@ public class FixSessionSettingsProviderImpl implements FixSessionSettingsProvide
 
         public Builder heartbeatInterval(int val) {
             heartbeatInterval = val;
+            return this;
+        }
+
+        public Builder timeStampPrecision(String val) {
+            timeStampPrecision = val;
             return this;
         }
 
