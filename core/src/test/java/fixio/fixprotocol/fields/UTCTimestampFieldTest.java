@@ -34,17 +34,17 @@ public class UTCTimestampFieldTest {
 
     private final LocalDate testDate = LocalDate.of(1998, 6, 4);
 
-    private final long testDateTime = ZonedDateTime.of(testDate, LocalTime.of(8, 3, 31), systemUTC().zone()).toInstant().toEpochMilli();
-    private final long testDateTimeWithMillis = ZonedDateTime.of(testDate, LocalTime.of(8, 3, 31, (int) TimeUnit.MILLISECONDS.toNanos(537)), systemUTC().zone()).toInstant().toEpochMilli();
+    private final ZonedDateTime testDateTime = ZonedDateTime.of(testDate, LocalTime.of(8, 3, 31), systemUTC().zone());
+    private final ZonedDateTime testDateTimeWithMillis = ZonedDateTime.of(testDate, LocalTime.of(8, 3, 31, (int) TimeUnit.MILLISECONDS.toNanos(537)), systemUTC().zone());
 
     @Test
     public void testParseNoMillis() throws Exception {
-        assertEquals(testDateTime, UTCTimestampField.parse(TIMESTAMP_NO_MILLIS.getBytes()));
+        assertEquals(testDateTime.toInstant().toEpochMilli(), UTCTimestampField.parse(TIMESTAMP_NO_MILLIS.getBytes()).toInstant().toEpochMilli());
     }
 
     @Test
     public void testParseWithMillis() throws Exception {
-        assertEquals(testDateTimeWithMillis, UTCTimestampField.parse((TIMESTAMP_WITH_MILLIS.getBytes())));
+        assertEquals(testDateTimeWithMillis.toInstant().toEpochMilli(), UTCTimestampField.parse((TIMESTAMP_WITH_MILLIS.getBytes())).toInstant().toEpochMilli());
     }
 
     @Test
@@ -52,7 +52,7 @@ public class UTCTimestampFieldTest {
         int tag = new Random().nextInt();
         byte[] bytes = TIMESTAMP_NO_MILLIS.getBytes();
         UTCTimestampField field = new UTCTimestampField(tag, bytes, 0, bytes.length);
-        assertEquals(testDateTime, field.getValue().longValue());
+        assertEquals(testDateTime.toInstant().toEpochMilli(), field.getValue().toInstant().toEpochMilli());
     }
 
     @Test
@@ -60,7 +60,7 @@ public class UTCTimestampFieldTest {
         int tag = new Random().nextInt();
         byte[] bytes = TIMESTAMP_WITH_MILLIS.getBytes();
         UTCTimestampField field = new UTCTimestampField(tag, bytes, 0, bytes.length);
-        assertEquals(testDateTimeWithMillis, field.getValue().longValue());
+        assertEquals(testDateTimeWithMillis.toInstant().toEpochMilli(), field.getValue().toInstant().toEpochMilli());
     }
 
     @Test
