@@ -41,7 +41,6 @@
         <autoVersionSubmodules>true</autoVersionSubmodules>
         <fastutil.version>7.0.13</fastutil.version>
         <java.version>1.8</java.version>
-        <joda.version>2.9.7</joda.version>
         <maven.compiler.debug>true</maven.compiler.debug>
         <maven.compiler.optimize>true</maven.compiler.optimize>
         <maven.compiler.source>${java.version}</maven.compiler.source>
