@@ -121,7 +121,7 @@ public class ClientSessionHandlerTest {
 
         assertEquals("LOGON expected", MessageTypes.LOGON, header.getMessageType());
         assertEquals(outMsgSeqNum, header.getMsgSeqNum());
-        assertTrue(header.getSendingTime() > 0);
+        assertTrue(header.getSendingTime().toInstant().toEpochMilli() > 0);
 
         assertThat("HeartBtInt", messageBuilder.getInt(FieldType.HeartBtInt), is(heartbeartInterval));
         assertThat("EncryptMethod", messageBuilder.getInt(FieldType.EncryptMethod), is(0));
@@ -143,7 +143,7 @@ public class ClientSessionHandlerTest {
 
         assertEquals("LOGON expected", MessageTypes.LOGON, header.getMessageType());
         assertEquals(outMsgSeqNum, header.getMsgSeqNum());
-        assertTrue(header.getSendingTime() > 0);
+        assertTrue(header.getSendingTime().toInstant().toEpochMilli() > 0);
 
         assertThat("HeartBtInt", messageBuilder.getInt(FieldType.HeartBtInt), is(heartbeartInterval));
         assertThat("EncryptMethod", messageBuilder.getInt(FieldType.EncryptMethod), is(0));
