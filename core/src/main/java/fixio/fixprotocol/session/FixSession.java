@@ -16,11 +16,15 @@
 
 package fixio.fixprotocol.session;
 
+import fixio.fixprotocol.FixConst;
 import fixio.fixprotocol.FixMessageBuilder;
 import fixio.fixprotocol.FixMessageHeader;
 
+import java.time.format.DateTimeFormatter;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.concurrent.atomic.AtomicIntegerFieldUpdater;
+
+import static fixio.fixprotocol.FixConst.TimeStampPrecision.*;
 
 public class FixSession {
 
@@ -30,23 +34,26 @@ public class FixSession {
     private final String beginString;
     private final String senderCompID;
     private final String senderSubID;
+    private final String senderLocationID;
     private final String targetCompID;
+    private final String targetLocationID;
     private final String targetSubID;
     private final SessionId sessionId;
     private volatile int nextIncomingMessageSeqNum;
+    private DateTimeFormatter dateTimeFormatter = FixConst.DATE_TIME_FORMATTER_MILLIS;
 
     private FixSession(String beginString,
-                       String senderCompID,
-                       String senderSubID,
-                       String targetCompID,
-                       String targetSubID) {
+                       String senderCompID, String senderSubID, String senderLocationID,
+                       String targetCompID, String targetSubID, String targetLocationID){
         this.beginString = beginString;
         this.senderCompID = senderCompID;
         this.senderSubID = senderSubID;
+        this.senderLocationID = senderLocationID;
         this.targetCompID = targetCompID;
         this.targetSubID = targetSubID;
-
-        sessionId = new SessionId(senderCompID, targetCompID, senderSubID, targetSubID);
+        this.targetLocationID = targetLocationID;
+        //
+        this.sessionId = new SessionId(senderCompID, targetCompID, senderSubID, targetSubID);
     }
 
     public static Builder newBuilder() {
@@ -61,12 +68,20 @@ public class FixSession {
         return senderSubID;
     }
 
+    public String getSenderLocationID() {
+        return senderLocationID;
+    }
+
     public String getTargetCompID() {
         return targetCompID;
     }
 
     public String getTargetSubID() {
         return targetSubID;
+    }
+
+    public String getTargetLocationID() {
+        return targetLocationID;
     }
 
     public int getNextOutgoingMessageSeqNum() {
@@ -93,6 +108,14 @@ public class FixSession {
         return INCOMING_SEQ_NUM_UPDATER.compareAndSet(this, num, num + 1);
     }
 
+    public DateTimeFormatter getDateTimeFormatter() {
+        return dateTimeFormatter;
+    }
+
+    public void setDateTimeFormatter(DateTimeFormatter dateTimeFormatter) {
+        this.dateTimeFormatter = dateTimeFormatter;
+    }
+
     public void prepareOutgoing(FixMessageBuilder fixMessage) {
         FixMessageHeader header = fixMessage.getHeader();
 
@@ -102,19 +125,30 @@ public class FixSession {
         if (header.getMsgSeqNum() == 0) {
             header.setMsgSeqNum(nextOutgoingMessageSeqNum.getAndIncrement());
         }
+        //
         if (header.getSenderCompID() == null || "".equals(header.getSenderCompID())) {
             header.setSenderCompID(senderCompID);
         }
         if (header.getSenderSubID() == null || "".equals(header.getSenderSubID())) {
             header.setSenderSubID(senderSubID);
         }
+        if (header.getSenderLocationID() == null || "".equals(header.getSenderLocationID())) {
+            header.setSenderLocationID(senderLocationID);
+        }
+        //
         if (header.getTargetCompID() == null || "".equals(header.getTargetCompID())) {
             header.setTargetCompID(targetCompID);
         }
         if (header.getTargetSubID() == null || "".equals(header.getTargetSubID())) {
             header.setTargetSubID(targetSubID);
         }
-
+        if (header.getTargetLocationID() == null || "".equals(header.getTargetLocationID())) {
+            header.setTargetLocationID(targetLocationID);
+        }
+        //
+        if (header.getDateTimeFormatter() == null) {
+            header.setDateTimeFormatter(dateTimeFormatter);
+        }
         header.setMessageType(header.getMessageType());
     }
 
@@ -127,8 +161,11 @@ public class FixSession {
         private String beginString;
         private String senderCompId;
         private String senderSubId;
+        private String senderLocationID;
         private String targetCompId;
         private String targetSubId;
+        private String targetLocationID;
+        private DateTimeFormatter dateTimeFormatter = FixConst.DATE_TIME_FORMATTER_MILLIS;
 
         private Builder() {
         }
@@ -148,6 +185,11 @@ public class FixSession {
             return this;
         }
 
+        public Builder senderLocationID(String senderLocationID) {
+            this.senderLocationID = senderLocationID;
+            return this;
+        }
+
         public Builder targetCompId(String targetCompId) {
             this.targetCompId = targetCompId;
             return this;
@@ -158,14 +200,36 @@ public class FixSession {
             return this;
         }
 
+        public Builder targetLocationID(String targetLocationID) {
+            this.targetLocationID = targetLocationID;
+            return this;
+        }
+
+        public Builder timeStampPrecision(String timeStampPrecision) {
+            if(SECONDS.toString().equals(timeStampPrecision)){
+                this.dateTimeFormatter = FixConst.DATE_TIME_FORMATTER_SECONDS;
+            }else if(MILLIS.toString().equals(timeStampPrecision)){
+                this.dateTimeFormatter = FixConst.DATE_TIME_FORMATTER_MILLIS;
+            }else if(MICROS.toString().equals(timeStampPrecision)){
+                this.dateTimeFormatter = FixConst.DATE_TIME_FORMATTER_MICROS;
+            }else if(NANOS.toString().equals(timeStampPrecision)){
+                this.dateTimeFormatter = FixConst.DATE_TIME_FORMATTER_NANOS;
+            }
+            return this;
+        }
+
         public FixSession build() {
-            return new FixSession(
+            FixSession session = new FixSession(
                     beginString,
                     senderCompId,
                     senderSubId,
+                    senderLocationID,
                     targetCompId,
-                    targetSubId
+                    targetSubId,
+                    targetLocationID
             );
+            session.setDateTimeFormatter(dateTimeFormatter);
+            return session;
         }
 
     }
