@@ -28,6 +28,9 @@ import org.junit.runner.RunWith;
 import org.mockito.Mock;
 import org.mockito.runners.MockitoJUnitRunner;
 
+import java.time.Instant;
+import java.time.ZoneId;
+import java.time.ZonedDateTime;
 import java.util.Arrays;
 
 import static java.nio.charset.StandardCharsets.US_ASCII;
@@ -39,7 +42,7 @@ import static org.mockito.Mockito.when;
 public class FixMessageEncoderTest {
 
     private static FixMessageEncoder encoder;
-    private final long timestamp = 123456789;
+    private final ZonedDateTime timestamp = ZonedDateTime.ofInstant(Instant.ofEpochMilli(123456789), ZoneId.of("UTC"));
     @Mock
     private ChannelHandlerContext ctx;
     @Mock
