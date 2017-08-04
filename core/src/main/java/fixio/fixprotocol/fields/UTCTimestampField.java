@@ -15,77 +15,93 @@
  */
 package fixio.fixprotocol.fields;
 
-import org.joda.time.DateTime;
-import org.joda.time.LocalDate;
-import org.joda.time.LocalTime;
-import org.joda.time.format.DateTimeFormat;
-import org.joda.time.format.DateTimeFormatter;
+import fixio.fixprotocol.FixConst;
 
 import java.text.ParseException;
+import java.time.ZonedDateTime;
 
 import static java.nio.charset.StandardCharsets.US_ASCII;
-import static org.joda.time.DateTimeZone.UTC;
 
-public class UTCTimestampField extends AbstractTemporalField {
 
-    private static final DateTimeFormatter FORMATTER_WITH_MILLIS = DateTimeFormat.forPattern("yyyyMMdd-HH:mm:ss.SSS").withZone(UTC);
-    private static final DateTimeFormatter FORMATTER = DateTimeFormat.forPattern("yyyyMMdd-HH:mm:ss").withZone(UTC);
+public class UTCTimestampField extends AbstractField<ZonedDateTime> implements FixConst {
+
+    private final ZonedDateTime value;
+    private final int valueLen;
+
 
     protected UTCTimestampField(int tagNum, byte[] bytes, int offset, int length) throws ParseException {
-        super(tagNum, parse(bytes, offset, length));
+        super(tagNum);
+        this.value = parse(bytes,offset,length);
+        this.valueLen = length;
     }
 
     protected UTCTimestampField(int tagNum, String timestampString) throws ParseException {
-        super(tagNum, parse(timestampString));
+        super(tagNum);
+        this.value = parse(timestampString);
+        this.valueLen = timestampString.length();
     }
 
-    protected UTCTimestampField(int tagNum, long value) {
-        super(tagNum, value);
+    protected UTCTimestampField(int tagNum, ZonedDateTime value) {
+        super(tagNum);
+        this.value = value;
+        this.valueLen = DATE_TIME_PATTERN_MILLIS.length();
     }
 
-    static long parse(byte[] bytes, int offset, int length) throws ParseException {
-        if (length != 21 && length != 17) {
-            throwParseException(bytes, offset, length, offset);
-        }
-        if (bytes[offset + 8] != '-') {
-            throwParseException(bytes, offset, length, offset + 8);
-        }
-        if (bytes[offset + 11] != ':') {
-            throwParseException(bytes, offset, length, offset + 11);
-        }
-        if (bytes[offset + 14] != ':') {
-            throwParseException(bytes, offset, length, offset + 14);
-        }
-        int year = (bytes[offset] - '0') * 1000 + (bytes[offset + 1] - '0') * 100 + (bytes[offset + 2] - '0') * 10 + (bytes[offset + 3] - '0');
-        int month = (bytes[offset + 4] - '0') * 10 + (bytes[offset + 5] - '0');
-        int date = (bytes[offset + 6] - '0') * 10 + (bytes[offset + 7] - '0');
-        int hour = (bytes[offset + 9] - '0') * 10 + (bytes[offset + 10] - '0');
-        int minute = (bytes[offset + 12] - '0') * 10 + (bytes[offset + 13] - '0');
-        int second = (bytes[offset + 15] - '0') * 10 + (bytes[offset + 16] - '0');
-        int millisecond = 0;
-        if (length > 17) {
-            if (bytes[offset + 17] != '.') {
-                throwParseException(bytes, offset, length, offset + 17);
-            }
-            millisecond = (bytes[offset + 18] - '0') * 100 + (bytes[offset + 19] - '0') * 10 + (bytes[offset + 20] - '0');
-        }
-        return new LocalDate(year, month, date).toDateTime(new LocalTime(hour, minute, second, millisecond), UTC).getMillis();
-    }
-
-    static long parse(String timestampString) throws ParseException {
-        return FORMATTER_WITH_MILLIS.parseDateTime(timestampString).getMillis();
-    }
-
-    static long parse(byte[] bytes) throws ParseException {
-        return parse(bytes, 0, bytes.length);
-    }
-
-    private static void throwParseException(byte[] bytes, int offset, int length, int errorOffset) throws ParseException {
-        throw new ParseException("Unparseable date: " + new String(bytes, offset, length, US_ASCII), errorOffset);
+    @Override
+    public ZonedDateTime getValue() {
+        return value;
     }
 
     @Override
     public byte[] getBytes() {
-        return new DateTime(value).toString(value % 1000 != 0 ? FORMATTER_WITH_MILLIS : FORMATTER).getBytes(US_ASCII);
+        // most likely scenario
+        switch (valueLen){
+            case 17: return DATE_TIME_FORMATTER_SECONDS.format(value).getBytes(US_ASCII);
+            case 21: return DATE_TIME_FORMATTER_MILLIS.format(value).getBytes(US_ASCII);
+            case 24: return DATE_TIME_FORMATTER_MICROS.format(value).getBytes(US_ASCII);
+            case 27: return DATE_TIME_FORMATTER_NANOS.format(value).getBytes(US_ASCII);
+        }
+        // try to guess
+        if(valueLen>27){
+            return DATE_TIME_FORMATTER_NANOS.format(value).getBytes(US_ASCII);
+        }else if(valueLen>24){
+            return DATE_TIME_FORMATTER_MICROS.format(value).getBytes(US_ASCII);
+        }else if(valueLen>21){
+            return DATE_TIME_FORMATTER_MILLIS.format(value).getBytes(US_ASCII);
+        }else{
+            return DATE_TIME_FORMATTER_SECONDS.format(value).getBytes(US_ASCII);
+        }
+    }
+
+    static ZonedDateTime parse(byte[] bytes) throws ParseException {
+        return parse(new String(bytes,US_ASCII));
+    }
+
+    static ZonedDateTime parse(byte[] bytes, int offset, int length) throws ParseException {
+        return parse(new String(bytes,offset,length,US_ASCII));
+    }
+
+    static ZonedDateTime parse(String timestampString) throws ParseException {
+        if(timestampString!=null){
+            int len = timestampString.length();
+            // most likely scenario
+            switch (len){
+                case 17: return ZonedDateTime.parse(timestampString,DATE_TIME_FORMATTER_SECONDS);
+                case 21: return ZonedDateTime.parse(timestampString,DATE_TIME_FORMATTER_MILLIS);
+                case 24: return ZonedDateTime.parse(timestampString,DATE_TIME_FORMATTER_MICROS);
+                case 27: return ZonedDateTime.parse(timestampString,DATE_TIME_FORMATTER_NANOS);
+            }
+            // try to guess
+            if(len>27){
+                return ZonedDateTime.parse(timestampString.substring(0,27),DATE_TIME_FORMATTER_NANOS);
+            }else if(len>24){
+                return ZonedDateTime.parse(timestampString.substring(0,24),DATE_TIME_FORMATTER_MICROS);
+            }else if(len>21){
+                return ZonedDateTime.parse(timestampString.substring(0,21),DATE_TIME_FORMATTER_MILLIS);
+            }else{
+                return ZonedDateTime.parse(timestampString.substring(0,17),DATE_TIME_FORMATTER_SECONDS);
+            }
+        }
+        throw new ParseException("Unparseable date: '"+timestampString+"'",-1);
     }
 }
