@@ -16,6 +16,8 @@
 
 package fixio.fixprotocol;
 
+import java.time.ZonedDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.List;
 
 public class FixMessageHeader {
@@ -23,12 +25,15 @@ public class FixMessageHeader {
     private String beginString;
     private String messageType;
     private int msgSeqNum;
-    private long sendingTime;
+    private ZonedDateTime sendingTime;
     private String senderCompID;
     private String senderSubID;
+    private String senderLocationID;
     private String targetCompID;
     private String targetSubID;
+    private String targetLocationID;
     private List<FixMessageFragment> customFields;
+    private DateTimeFormatter dateTimeFormatter = null;
 
     public String getBeginString() {
         return beginString;
@@ -54,28 +59,28 @@ public class FixMessageHeader {
         this.senderCompID = senderCompID;
     }
 
-    public String getTargetCompID() {
-        return targetCompID;
-    }
-
-    public void setTargetCompID(String targetCompID) {
-        this.targetCompID = targetCompID;
-    }
-
-    public int getMsgSeqNum() {
-        return msgSeqNum;
-    }
-
-    public void setMsgSeqNum(int msgSeqNum) {
-        this.msgSeqNum = msgSeqNum;
-    }
-
     public String getSenderSubID() {
         return senderSubID;
     }
 
     public void setSenderSubID(String senderSubID) {
         this.senderSubID = senderSubID;
+    }
+
+    public String getSenderLocationID() {
+        return senderLocationID;
+    }
+
+    public void setSenderLocationID(String senderLocationID) {
+        this.senderLocationID = senderLocationID;
+    }
+
+    public String getTargetCompID() {
+        return targetCompID;
+    }
+
+    public void setTargetCompID(String targetCompID) {
+        this.targetCompID = targetCompID;
     }
 
     public String getTargetSubID() {
@@ -86,11 +91,27 @@ public class FixMessageHeader {
         this.targetSubID = targetSubID;
     }
 
-    public long getSendingTime() {
+    public String getTargetLocationID() {
+        return targetLocationID;
+    }
+
+    public void setTargetLocationID(String targetLocationID) {
+        this.targetLocationID = targetLocationID;
+    }
+
+    public int getMsgSeqNum() {
+        return msgSeqNum;
+    }
+
+    public void setMsgSeqNum(int msgSeqNum) {
+        this.msgSeqNum = msgSeqNum;
+    }
+
+    public ZonedDateTime getSendingTime() {
         return sendingTime;
     }
 
-    public void setSendingTime(long sendingTime) {
+    public void setSendingTime(ZonedDateTime sendingTime) {
         this.sendingTime = sendingTime;
     }
 
@@ -100,6 +121,14 @@ public class FixMessageHeader {
 
     public void setCustomFields(List<FixMessageFragment> customFields) {
         this.customFields = customFields;
+    }
+
+    public DateTimeFormatter getDateTimeFormatter() {
+        return dateTimeFormatter;
+    }
+
+    public void setDateTimeFormatter(DateTimeFormatter dateTimeFormatter) {
+        this.dateTimeFormatter = dateTimeFormatter;
     }
 
     @Override
@@ -113,8 +142,14 @@ public class FixMessageHeader {
         if (senderSubID != null) {
             sb.append(", senderSubID='").append(senderSubID).append('\'');
         }
+        if (senderLocationID != null) {
+            sb.append(", senderLocationID='").append(senderLocationID).append('\'');
+        }
         if (targetSubID != null) {
             sb.append(", targetSubID='").append(targetSubID).append('\'');
+        }
+        if (targetLocationID != null) {
+            sb.append(", targetLocationID='").append(targetLocationID).append('\'');
         }
         if (customFields != null) {
             sb.append(customFields);
