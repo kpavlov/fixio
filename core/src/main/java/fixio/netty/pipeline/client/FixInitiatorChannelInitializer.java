@@ -48,7 +48,7 @@ public class FixInitiatorChannelInitializer<C extends Channel> extends FixChanne
         this.authenticationProvider = authenticationProvider;
         this.messageSequenceProvider = (messageSequenceProvider == null) ? StatelessMessageSequenceProvider.getInstance() : messageSequenceProvider;
         this.settingsProvider = settingsProvider;
-        if (settingsProvider.getBooleanProperty(FixSessionSettingsProvider.Params.SSL)) {
+        if (settingsProvider.getBooleanProperty(FixSessionSettingsProvider.Params.SSL,Boolean.FALSE)) {
             try {
                 sslContext = SslContextBuilder.forClient().build();
                 logger.info("SslContext has been configured: {}", sslContext);
