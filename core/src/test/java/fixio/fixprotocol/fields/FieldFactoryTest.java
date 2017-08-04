@@ -184,7 +184,7 @@ public class FieldFactoryTest {
         UTCTimestampField field = FieldFactory.valueOf(FieldType.OrigTime.tag(), value.getBytes(US_ASCII));
 
         assertEquals("tagnum", FieldType.OrigTime.tag(), field.getTagNum());
-        assertEquals("value", ZonedDateTime.of(LocalDate.of(1998, 6, 4), LocalTime.of(8, 3, 31, (int) TimeUnit.MILLISECONDS.toNanos(537)), systemUTC().zone()).toInstant().toEpochMilli(), field.getValue().longValue());
+        assertEquals("value", ZonedDateTime.of(LocalDate.of(1998, 6, 4), LocalTime.of(8, 3, 31, (int) TimeUnit.MILLISECONDS.toNanos(537)), systemUTC().zone()).toInstant().toEpochMilli(), field.getValue().toInstant().toEpochMilli());
     }
 
     @Test
@@ -193,7 +193,7 @@ public class FieldFactoryTest {
         UTCTimestampField field = FieldFactory.valueOf(FieldType.OrigTime.tag(), value.getBytes(US_ASCII));
 
         assertEquals("tagnum", FieldType.OrigTime.tag(), field.getTagNum());
-        assertEquals("value", ZonedDateTime.of(LocalDate.of(1998, 6, 4), LocalTime.of(8, 3, 31), systemUTC().zone()).toInstant().toEpochMilli(), field.getValue().longValue());
+        assertEquals("value", ZonedDateTime.of(LocalDate.of(1998, 6, 4), LocalTime.of(8, 3, 31), systemUTC().zone()).toInstant().toEpochMilli(), field.getValue().toInstant().toEpochMilli());
     }
 
     @Test
