@@ -119,8 +119,11 @@ public class ClientSessionHandler extends AbstractSessionHandler {
                 .beginString(settingsProvider.getBeginString())
                 .senderCompId(settingsProvider.getSenderCompID())
                 .senderSubId(settingsProvider.getSenderSubID())
+                .senderLocationID(settingsProvider.getSenderLocationID())
                 .targetCompId(settingsProvider.getTargetCompID())
                 .targetSubId(settingsProvider.getTargetSubID())
+                .targetLocationID(settingsProvider.getTargetLocationID())
+                .timeStampPrecision(settingsProvider.getTimeStampPrecision())
                 .build();
 
         session.setNextOutgoingMessageSeqNum(messageSequenceProvider.getMsgOutSeqNum());
