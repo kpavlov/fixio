@@ -52,7 +52,7 @@ public class ClientSessionHandler extends AbstractSessionHandler {
         this.messageSequenceProvider = messageSequenceProvider;
     }
 
-    private FixMessageBuilderImpl createLogonRequest(FixSessionSettingsProvider sessionSettingsProvider) {
+    private FixMessageBuilderImpl createLogonRequest(FixSession session, FixSessionSettingsProvider sessionSettingsProvider) {
         FixMessageBuilderImpl messageBuilder = new FixMessageBuilderImpl(MessageTypes.LOGON);
         messageBuilder.add(FieldType.HeartBtInt, sessionSettingsProvider.getHeartbeatInterval());
         messageBuilder.add(FieldType.EncryptMethod, 0);
@@ -61,6 +61,12 @@ public class ClientSessionHandler extends AbstractSessionHandler {
             if (authentication != null) {
                 messageBuilder.add(FieldType.Username, authentication.getUserName());
                 messageBuilder.add(FieldType.Password, String.valueOf(authentication.getPassword()));
+            }
+        }
+        if("FIXT.1.1".equalsIgnoreCase(session.getBeginString())){
+            messageBuilder.add(FieldType.DefaultApplVerID, session.getDefaultApplVerID());
+            if(session.getDefaultApplExtID()!=null && "".equalsIgnoreCase(session.getDefaultApplExtID())){
+                messageBuilder.add(FieldType.DefaultApplExtID, session.getDefaultApplExtID());
             }
         }
         return messageBuilder;
@@ -102,10 +108,10 @@ public class ClientSessionHandler extends AbstractSessionHandler {
     public void channelActive(ChannelHandlerContext ctx) throws Exception {
         getLogger().info("Connection established, starting Client FIX session.");
 
-        FixMessageBuilder logonRequest = createLogonRequest(sessionSettingsProvider);
-
         FixSession pendingSession = createSession(sessionSettingsProvider);
         setSession(ctx, pendingSession);
+
+        FixMessageBuilder logonRequest = createLogonRequest(pendingSession, sessionSettingsProvider);
         prepareMessageToSend(ctx, pendingSession, logonRequest);
         getLogger().info("Sending Logon: {}", logonRequest);
 
