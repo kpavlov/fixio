@@ -79,26 +79,43 @@ public class FixMessageEncoder extends MessageToByteEncoder<FixMessageBuilder> {
         // SenderCompID
         writeField(49, header.getSenderCompID(), out);
 
-        // SenderCompSubID
-        if (header.getSenderSubID() != null && !"".equals(header.getSenderSubID())) {
-            writeField(50, header.getSenderSubID(), out);
-        }
-
         // TargetCompID
         writeField(56, header.getTargetCompID(), out);
 
-        // TargetCompSubID
+        // MsgSeqNum
+        writeField(34, Integer.toString(header.getMsgSeqNum()), out);
+
+        // SenderSubID
+        if (header.getSenderSubID() != null && !"".equals(header.getSenderSubID())) {
+            writeField(50, header.getSenderSubID(), out);
+        }
+        // SenderLocationID
+        if (header.getSenderLocationID() != null && !"".equals(header.getSenderLocationID())) {
+            writeField(142, header.getSenderLocationID(), out);
+        }
+
+        // TargetSubID
         if (header.getTargetSubID() != null && !"".equals(header.getTargetSubID())) {
             writeField(57, header.getTargetSubID(), out);
         }
-
-        // MsgSeqNum
-        writeField(34, Integer.toString(header.getMsgSeqNum()), out);
+        // TargetLocationID
+        if (header.getTargetLocationID() != null && !"".equals(header.getTargetLocationID())) {
+            writeField(143, header.getTargetLocationID(), out);
+        }
 
         // SendingTime
         DateTimeFormatter formatter = (header.getDateTimeFormatter()!=null)? header.getDateTimeFormatter(): FixConst.DATE_TIME_FORMATTER_MILLIS;
         String timeStr = formatter.format(header.getSendingTime());
         writeField(52, timeStr, out);
+
+        // DefaultApplVerID
+        if (header.getDefaultApplVerID() != null && !"".equals(header.getDefaultApplVerID())) {
+            writeField(1137, header.getDefaultApplVerID(), out);
+        }
+        // DefaultApplExtID
+        if (header.getDefaultApplExtID() != null && !"".equals(header.getDefaultApplExtID())) {
+            writeField(1407, header.getDefaultApplExtID(), out);
+        }
 
         // customize tag
         List<FixMessageFragment> customFields = header.getCustomFields();
