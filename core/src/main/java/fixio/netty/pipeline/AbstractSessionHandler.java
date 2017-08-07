@@ -89,8 +89,6 @@ public abstract class AbstractSessionHandler extends MessageToMessageCodec<FixMe
     protected void prepareMessageToSend(ChannelHandlerContext ctx, FixSession session, FixMessageBuilder response) throws Exception {
         session.prepareOutgoing(response);
         response.getHeader().setSendingTime(fixClock.now());
-        response.getHeader().setDefaultApplVerID(session.getDefaultApplVerID());
-        response.getHeader().setDefaultApplExtID(session.getDefaultApplExtID());
         getFixApplication().beforeSendMessage(ctx, response);
     }
 
@@ -165,14 +163,4 @@ public abstract class AbstractSessionHandler extends MessageToMessageCodec<FixMe
         return sessionRepository;
     }
 
-    public static boolean contains(List<FixMessageFragment> list, int tag){
-        if(list!=null){
-            for(FixMessageFragment field : list){
-                if(field.getTagNum()==tag){
-                    return true;
-                }
-            }
-        }
-        return false;
-    }
 }
