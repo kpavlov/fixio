@@ -107,26 +107,15 @@ public class ClientSessionHandler extends AbstractSessionHandler {
         FixSession pendingSession = createSession(sessionSettingsProvider);
         setSession(ctx, pendingSession);
         prepareMessageToSend(ctx, pendingSession, logonRequest);
-        // dmitri support FIXT.1.1
-        FixMessageHeader header = logonRequest.getHeader();
-        if("FIXT.1.1".equalsIgnoreCase(header.getBeginString())){
-            if(!contains(header.getCustomFields(),DefaultApplVerID.tag())){
-                String string = sessionSettingsProvider.getProperty("DefaultApplVerID", "7").trim();
-                header.getCustomFields().add(FieldFactory.fromStringValue(DefaultApplVerID.tag(),string));
-            }
-            if(!contains(header.getCustomFields(),DefaultApplExtID.tag())){
-                String string = sessionSettingsProvider.getProperty("DefaultApplExtID", "").trim();
-                if(string.length()>0){
-                    header.getCustomFields().add(FieldFactory.fromStringValue(DefaultApplExtID.tag(),string));
-                }
-            }
-        }
         getLogger().info("Sending Logon: {}", logonRequest);
 
         ctx.writeAndFlush(logonRequest);
     }
 
     private FixSession createSession(FixSessionSettingsProvider settingsProvider) {
+        String defaultApplVerID = ("FIXT.1.1".equalsIgnoreCase(settingsProvider.getBeginString()))?
+                settingsProvider.getProperty("DefaultApplVerID", "7").trim(): null;
+        //
         final FixSession session = FixSession.newBuilder()
                 .beginString(settingsProvider.getBeginString())
                 .senderCompId(settingsProvider.getSenderCompID())
@@ -136,6 +125,8 @@ public class ClientSessionHandler extends AbstractSessionHandler {
                 .targetSubId(settingsProvider.getTargetSubID())
                 .targetLocationID(settingsProvider.getTargetLocationID())
                 .timeStampPrecision(settingsProvider.getTimeStampPrecision())
+                .defaultApplVerID(defaultApplVerID)
+                .defaultApplExtID(settingsProvider.getProperty("DefaultApplExtID", null))
                 .build();
 
         session.setNextOutgoingMessageSeqNum(messageSequenceProvider.getMsgOutSeqNum());
