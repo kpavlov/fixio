@@ -17,12 +17,7 @@
 package fixio.netty.pipeline;
 
 import fixio.events.LogoutEvent;
-import fixio.fixprotocol.FieldType;
-import fixio.fixprotocol.FixMessage;
-import fixio.fixprotocol.FixMessageBuilder;
-import fixio.fixprotocol.FixMessageBuilderImpl;
-import fixio.fixprotocol.FixMessageHeader;
-import fixio.fixprotocol.MessageTypes;
+import fixio.fixprotocol.*;
 import fixio.fixprotocol.session.FixSession;
 import fixio.handlers.FixApplication;
 import fixio.validator.BusinessRejectException;
@@ -168,4 +163,14 @@ public abstract class AbstractSessionHandler extends MessageToMessageCodec<FixMe
         return sessionRepository;
     }
 
+    public static boolean contains(List<FixMessageFragment> list, int tag){
+        if(list!=null){
+            for(FixMessageFragment field : list){
+                if(field.getTagNum()==tag){
+                    return true;
+                }
+            }
+        }
+        return false;
+    }
 }
