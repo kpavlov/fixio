@@ -38,13 +38,17 @@ public class FixSession {
     private final String targetCompID;
     private final String targetLocationID;
     private final String targetSubID;
+    private final String defaultApplVerID;
+    private String defaultApplExtID = null;
+    //
     private final SessionId sessionId;
     private volatile int nextIncomingMessageSeqNum;
     private DateTimeFormatter dateTimeFormatter = FixConst.DATE_TIME_FORMATTER_MILLIS;
 
     private FixSession(String beginString,
                        String senderCompID, String senderSubID, String senderLocationID,
-                       String targetCompID, String targetSubID, String targetLocationID){
+                       String targetCompID, String targetSubID, String targetLocationID,
+                       String defaultApplVerID){
         this.beginString = beginString;
         this.senderCompID = senderCompID;
         this.senderSubID = senderSubID;
@@ -52,12 +56,17 @@ public class FixSession {
         this.targetCompID = targetCompID;
         this.targetSubID = targetSubID;
         this.targetLocationID = targetLocationID;
+        this.defaultApplVerID = defaultApplVerID;
         //
-        this.sessionId = new SessionId(senderCompID, targetCompID, senderSubID, targetSubID);
+        this.sessionId = new SessionId(senderCompID, targetCompID, senderSubID, targetSubID, senderLocationID, targetLocationID);
     }
 
     public static Builder newBuilder() {
         return new Builder();
+    }
+
+    public String getBeginString() {
+        return beginString;
     }
 
     public String getSenderCompID() {
@@ -82,6 +91,18 @@ public class FixSession {
 
     public String getTargetLocationID() {
         return targetLocationID;
+    }
+
+    public String getDefaultApplVerID() {
+        return defaultApplVerID;
+    }
+
+    public String getDefaultApplExtID() {
+        return defaultApplExtID;
+    }
+
+    public void setDefaultApplExtID(String defaultApplExtID) {
+        this.defaultApplExtID = defaultApplExtID;
     }
 
     public int getNextOutgoingMessageSeqNum() {
@@ -145,6 +166,12 @@ public class FixSession {
         if (header.getTargetLocationID() == null || "".equals(header.getTargetLocationID())) {
             header.setTargetLocationID(targetLocationID);
         }
+        if (header.getDefaultApplVerID() == null || "".equals(header.getDefaultApplVerID())) {
+            header.setDefaultApplVerID(defaultApplVerID);
+        }
+        if (header.getDefaultApplExtID() == null || "".equals(header.getDefaultApplExtID())) {
+            header.setDefaultApplExtID(defaultApplExtID);
+        }
         //
         if (header.getDateTimeFormatter() == null) {
             header.setDateTimeFormatter(dateTimeFormatter);
@@ -165,6 +192,8 @@ public class FixSession {
         private String targetCompId;
         private String targetSubId;
         private String targetLocationID;
+        private String defaultApplVerID;
+        private String defaultApplExtID=null;
         private DateTimeFormatter dateTimeFormatter = FixConst.DATE_TIME_FORMATTER_MILLIS;
 
         private Builder() {
@@ -205,6 +234,16 @@ public class FixSession {
             return this;
         }
 
+        public Builder defaultApplVerID(String defaultApplVerID) {
+            this.defaultApplVerID = defaultApplVerID;
+            return this;
+        }
+
+        public Builder defaultApplExtID(String defaultApplExtID) {
+            this.defaultApplExtID = defaultApplExtID;
+            return this;
+        }
+
         public Builder timeStampPrecision(String timeStampPrecision) {
             if(SECONDS.toString().equals(timeStampPrecision)){
                 this.dateTimeFormatter = FixConst.DATE_TIME_FORMATTER_SECONDS;
@@ -226,9 +265,11 @@ public class FixSession {
                     senderLocationID,
                     targetCompId,
                     targetSubId,
-                    targetLocationID
+                    targetLocationID,
+                    defaultApplVerID
             );
             session.setDateTimeFormatter(dateTimeFormatter);
+            session.setDefaultApplExtID(defaultApplExtID);
             return session;
         }
 
