@@ -32,6 +32,8 @@ public class FixMessageHeader {
     private String targetCompID;
     private String targetSubID;
     private String targetLocationID;
+    private String defaultApplVerID;
+    private String defaultApplExtID;
     private List<FixMessageFragment> customFields;
     private DateTimeFormatter dateTimeFormatter = null;
 
@@ -115,6 +117,22 @@ public class FixMessageHeader {
         this.sendingTime = sendingTime;
     }
 
+    public String getDefaultApplVerID() {
+        return defaultApplVerID;
+    }
+
+    public void setDefaultApplVerID(String defaultApplVerID) {
+        this.defaultApplVerID = defaultApplVerID;
+    }
+
+    public String getDefaultApplExtID() {
+        return defaultApplExtID;
+    }
+
+    public void setDefaultApplExtID(String defaultApplExtID) {
+        this.defaultApplExtID = defaultApplExtID;
+    }
+
     public List<FixMessageFragment> getCustomFields() {
         return customFields;
     }
@@ -150,6 +168,12 @@ public class FixMessageHeader {
         }
         if (targetLocationID != null) {
             sb.append(", targetLocationID='").append(targetLocationID).append('\'');
+        }
+        if (defaultApplVerID != null) {
+            sb.append(", defaultApplVerID='").append(defaultApplVerID).append('\'');
+        }
+        if (defaultApplExtID != null) {
+            sb.append(", defaultApplExtID='").append(defaultApplExtID).append('\'');
         }
         if (customFields != null) {
             sb.append(customFields);
