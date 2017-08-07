@@ -33,6 +33,8 @@ public class FixSessionSettingsProviderImpl implements FixSessionSettingsProvide
     private final boolean resetMsgSeqNum;
     private final int heartbeatIntervalSec;
     private final String timeStampPrecision;
+    private final String defaultApplVerID;
+    private final String defaultApplExtID;
 
     private FixSessionSettingsProviderImpl(Builder builder) {
         beginString = builder.beginString;
@@ -45,6 +47,8 @@ public class FixSessionSettingsProviderImpl implements FixSessionSettingsProvide
         resetMsgSeqNum = builder.resetMsgSeqNum;
         heartbeatIntervalSec = builder.heartbeatInterval;
         timeStampPrecision = builder.timeStampPrecision;
+        defaultApplVerID = builder.defaultApplVerID;
+        defaultApplExtID = builder.defaultApplExtID;
     }
 
     public static Builder newBuilder() {
@@ -113,6 +117,16 @@ public class FixSessionSettingsProviderImpl implements FixSessionSettingsProvide
     }
 
     @Override
+    public String getDefaultApplVerID() {
+        return defaultApplVerID;
+    }
+
+    @Override
+    public String getDefaultApplExtID() {
+        return defaultApplExtID;
+    }
+
+    @Override
     public String getProperty(String key, String defaultValue) {
         throw new UnsupportedOperationException("Get custom property operation not supported");
     }
@@ -128,6 +142,8 @@ public class FixSessionSettingsProviderImpl implements FixSessionSettingsProvide
         private boolean resetMsgSeqNum;
         private int heartbeatInterval = 60;
         private String timeStampPrecision = "";
+        private String defaultApplVerID;
+        private String defaultApplExtID;
 
         private Builder() {
         }
@@ -179,6 +195,16 @@ public class FixSessionSettingsProviderImpl implements FixSessionSettingsProvide
 
         public Builder timeStampPrecision(String val) {
             timeStampPrecision = val;
+            return this;
+        }
+
+        public Builder defaultApplVerID(String val) {
+            defaultApplVerID = val;
+            return this;
+        }
+
+        public Builder defaultApplExtID(String val) {
+            defaultApplExtID = val;
             return this;
         }
 
