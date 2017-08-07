@@ -73,6 +73,16 @@ public class PropertyFixSessionSettingsProviderImpl implements FixSessionSetting
     }
 
     @Override
+    public String getDefaultApplVerID() {
+        return properties.getProperty("DefaultApplVerID", null);
+    }
+
+    @Override
+    public String getDefaultApplExtID() {
+        return properties.getProperty("DefaultApplExtID", null);
+    }
+
+    @Override
     public String getSenderCompID() {
         return properties.getProperty("SenderCompID","").trim();
     }
