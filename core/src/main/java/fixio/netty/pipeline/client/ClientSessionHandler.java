@@ -17,12 +17,8 @@
 package fixio.netty.pipeline.client;
 
 import fixio.events.LogonEvent;
-import fixio.fixprotocol.FieldType;
-import fixio.fixprotocol.FixMessage;
-import fixio.fixprotocol.FixMessageBuilder;
-import fixio.fixprotocol.FixMessageBuilderImpl;
-import fixio.fixprotocol.FixMessageHeader;
-import fixio.fixprotocol.MessageTypes;
+import fixio.fixprotocol.*;
+import fixio.fixprotocol.fields.FieldFactory;
 import fixio.fixprotocol.session.FixSession;
 import fixio.handlers.FixApplication;
 import fixio.netty.pipeline.AbstractSessionHandler;
@@ -34,6 +30,9 @@ import org.slf4j.LoggerFactory;
 
 import java.net.PasswordAuthentication;
 import java.util.List;
+
+import static fixio.fixprotocol.FieldType.DefaultApplExtID;
+import static fixio.fixprotocol.FieldType.DefaultApplVerID;
 
 public class ClientSessionHandler extends AbstractSessionHandler {
 
@@ -108,7 +107,20 @@ public class ClientSessionHandler extends AbstractSessionHandler {
         FixSession pendingSession = createSession(sessionSettingsProvider);
         setSession(ctx, pendingSession);
         prepareMessageToSend(ctx, pendingSession, logonRequest);
-
+        // dmitri support FIXT.1.1
+        FixMessageHeader header = logonRequest.getHeader();
+        if("FIXT.1.1".equalsIgnoreCase(header.getBeginString())){
+            if(!contains(header.getCustomFields(),DefaultApplVerID.tag())){
+                String string = sessionSettingsProvider.getProperty("DefaultApplVerID", "7").trim();
+                header.getCustomFields().add(FieldFactory.fromStringValue(DefaultApplVerID.tag(),string));
+            }
+            if(!contains(header.getCustomFields(),DefaultApplExtID.tag())){
+                String string = sessionSettingsProvider.getProperty("DefaultApplExtID", "").trim();
+                if(string.length()>0){
+                    header.getCustomFields().add(FieldFactory.fromStringValue(DefaultApplExtID.tag(),string));
+                }
+            }
+        }
         getLogger().info("Sending Logon: {}", logonRequest);
 
         ctx.writeAndFlush(logonRequest);
