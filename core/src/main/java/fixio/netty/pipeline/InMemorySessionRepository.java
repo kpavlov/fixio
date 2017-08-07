@@ -48,8 +48,6 @@ public class InMemorySessionRepository implements SessionRepository {
                 .targetCompId(header.getTargetCompID())
                 .targetSubId(header.getTargetSubID())
                 .targetLocationID(header.getTargetLocationID())
-                .defaultApplVerID(header.getDefaultApplVerID())
-                .defaultApplExtID(header.getDefaultApplExtID())
                 .build();
 
         newSession.setNextIncomingMessageSeqNum(1);
