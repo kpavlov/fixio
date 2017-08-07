@@ -31,6 +31,8 @@ public interface FixSessionSettingsProvider {
     boolean isResetMsgSeqNum();
     int getHeartbeatInterval();
     String getTimeStampPrecision(); // Valid values are "SECONDS", "MILLIS", "MICROS", "NANOS". Default is "MILLIS"
+    String getDefaultApplVerID();
+    String getDefaultApplExtID();
 
     String getProperty(String key, String defaultValue);
 
