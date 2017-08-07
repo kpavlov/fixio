@@ -113,8 +113,11 @@ public class ClientSessionHandler extends AbstractSessionHandler {
     }
 
     private FixSession createSession(FixSessionSettingsProvider settingsProvider) {
-        String defaultApplVerID = ("FIXT.1.1".equalsIgnoreCase(settingsProvider.getBeginString()))?
-                settingsProvider.getProperty("DefaultApplVerID", "7").trim(): null;
+        String defaultApplVerID = settingsProvider.getDefaultApplVerID();
+        if("FIXT.1.1".equalsIgnoreCase(settingsProvider.getBeginString()) &&
+                (defaultApplVerID==null || defaultApplVerID.trim().length()==0)){
+            defaultApplVerID = "7";
+        }
         //
         final FixSession session = FixSession.newBuilder()
                 .beginString(settingsProvider.getBeginString())
@@ -126,7 +129,7 @@ public class ClientSessionHandler extends AbstractSessionHandler {
                 .targetLocationID(settingsProvider.getTargetLocationID())
                 .timeStampPrecision(settingsProvider.getTimeStampPrecision())
                 .defaultApplVerID(defaultApplVerID)
-                .defaultApplExtID(settingsProvider.getProperty("DefaultApplExtID", null))
+                .defaultApplExtID(settingsProvider.getDefaultApplExtID())
                 .build();
 
         session.setNextOutgoingMessageSeqNum(messageSequenceProvider.getMsgOutSeqNum());
