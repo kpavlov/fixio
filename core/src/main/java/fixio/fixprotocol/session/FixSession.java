@@ -166,17 +166,10 @@ public class FixSession {
         if (header.getTargetLocationID() == null || "".equals(header.getTargetLocationID())) {
             header.setTargetLocationID(targetLocationID);
         }
-        if (header.getDefaultApplVerID() == null || "".equals(header.getDefaultApplVerID())) {
-            header.setDefaultApplVerID(defaultApplVerID);
-        }
-        if (header.getDefaultApplExtID() == null || "".equals(header.getDefaultApplExtID())) {
-            header.setDefaultApplExtID(defaultApplExtID);
-        }
         //
         if (header.getDateTimeFormatter() == null) {
             header.setDateTimeFormatter(dateTimeFormatter);
         }
-        header.setMessageType(header.getMessageType());
     }
 
     public SessionId getId() {
