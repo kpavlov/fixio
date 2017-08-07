@@ -108,15 +108,6 @@ public class FixMessageEncoder extends MessageToByteEncoder<FixMessageBuilder> {
         String timeStr = formatter.format(header.getSendingTime());
         writeField(52, timeStr, out);
 
-        // DefaultApplVerID
-        if (header.getDefaultApplVerID() != null && !"".equals(header.getDefaultApplVerID())) {
-            writeField(1137, header.getDefaultApplVerID(), out);
-        }
-        // DefaultApplExtID
-        if (header.getDefaultApplExtID() != null && !"".equals(header.getDefaultApplExtID())) {
-            writeField(1407, header.getDefaultApplExtID(), out);
-        }
-
         // customize tag
         List<FixMessageFragment> customFields = header.getCustomFields();
         if (customFields != null) {
