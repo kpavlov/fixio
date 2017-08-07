@@ -89,6 +89,8 @@ public abstract class AbstractSessionHandler extends MessageToMessageCodec<FixMe
     protected void prepareMessageToSend(ChannelHandlerContext ctx, FixSession session, FixMessageBuilder response) throws Exception {
         session.prepareOutgoing(response);
         response.getHeader().setSendingTime(fixClock.now());
+        response.getHeader().setDefaultApplVerID(session.getDefaultApplVerID());
+        response.getHeader().setDefaultApplExtID(session.getDefaultApplExtID());
         getFixApplication().beforeSendMessage(ctx, response);
     }
 
