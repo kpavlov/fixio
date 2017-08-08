@@ -20,7 +20,6 @@ import fixio.fixprotocol.FieldType;
 
 import java.text.ParseException;
 import java.time.Instant;
-import java.time.LocalDate;
 import java.time.ZoneOffset;
 
 public class FieldFactory {
