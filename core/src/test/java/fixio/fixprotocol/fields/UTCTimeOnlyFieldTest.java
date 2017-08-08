@@ -38,10 +38,6 @@ public class UTCTimeOnlyFieldTest {
     private static final String TIMESTAMP_WITH_MICROS = "08:03:31."+MICROS;
     private static final String TIMESTAMP_WITH_NANOS  = "08:03:31."+NANOS;
 
-    private static final long MILLIS_PER_SECOND = 1000L;
-    private static final long MILLIS_PER_MINUTE = 60 * MILLIS_PER_SECOND;
-    private static final long MILLIS_PER_HOUR = 60 * MILLIS_PER_MINUTE;
-
     private final ZonedDateTime testDate = ZonedDateTime.of(LocalDate.of(1970, 1, 1),
             LocalTime.of(8, 3, 31, 0), ZoneId.of("UTC"));
 
