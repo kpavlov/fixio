@@ -28,19 +28,19 @@ public class UTCTimeOnlyField extends AbstractField<LocalTime> implements FixCon
     private final LocalTime value;
     private final int valueLen;
 
-    protected UTCTimeOnlyField(int tagNum, byte[] bytes) throws ParseException {
+    public UTCTimeOnlyField(int tagNum, byte[] bytes) throws ParseException {
         super(tagNum);
         this.value = parse(bytes);
         this.valueLen = bytes.length;
     }
 
-    protected UTCTimeOnlyField(int tagNum, String timestampString) throws ParseException {
+    public UTCTimeOnlyField(int tagNum, String timestampString) throws ParseException {
         super(tagNum);
         this.value = parse(timestampString);
         this.valueLen = timestampString.length();
     }
 
-    protected UTCTimeOnlyField(int tagNum, LocalTime value) {
+    public UTCTimeOnlyField(int tagNum, LocalTime value) {
         super(tagNum);
         this.value = value;
         this.valueLen = TIME_PATTERN_MILLIS.length();
@@ -81,6 +81,7 @@ public class UTCTimeOnlyField extends AbstractField<LocalTime> implements FixCon
                 case 12: return LocalTime.parse(timestampString,TIME_FORMATTER_MILLIS);
                 case 15: return LocalTime.parse(timestampString,TIME_FORMATTER_MICROS);
                 case 18: return LocalTime.parse(timestampString,TIME_FORMATTER_NANOS);
+                default: // no default, logic continues below
             }
             // try to guess
             if(len>18){

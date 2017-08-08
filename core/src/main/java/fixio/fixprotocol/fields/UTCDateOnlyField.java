@@ -40,17 +40,17 @@ public class UTCDateOnlyField extends AbstractField<LocalDate> implements FixCon
 
     private final LocalDate value;
 
-    protected UTCDateOnlyField(int tagNum, byte[] bytes) throws ParseException {
+    public UTCDateOnlyField(int tagNum, byte[] bytes) throws ParseException {
         super(tagNum);
         this.value = parse(bytes);
     }
 
-    protected UTCDateOnlyField(int tagNum, String timestampString) throws ParseException {
+    public UTCDateOnlyField(int tagNum, String timestampString) throws ParseException {
         super(tagNum);
         this.value = parse(timestampString);
     }
 
-    protected UTCDateOnlyField(int tagNum, LocalDate value) {
+    public UTCDateOnlyField(int tagNum, LocalDate value) {
         super(tagNum);
         this.value = value;
     }
@@ -65,25 +65,21 @@ public class UTCDateOnlyField extends AbstractField<LocalDate> implements FixCon
         return value;
     }
 
-    static LocalDate parse(String timestampString) throws ParseException {
+    public static LocalDate parse(String timestampString) throws ParseException {
         if(timestampString!=null){
             int len = timestampString.length();
             if (len < 8) {
-                throwParseException(timestampString, 0);
+                throw new ParseException("Unparseable date: '"+timestampString+"'",0);
             }else if(len==8){
                 return LocalDate.parse(timestampString,DATE_FORMATTER);
             }else{
                 return LocalDate.parse(timestampString.substring(0,8),DATE_FORMATTER);
             }
         }
-        throw new ParseException("Unparseable date: '"+timestampString+"'",-1);
+        throw new ParseException("Unparseable date: '"+timestampString+"'",0);
     }
 
-    static LocalDate parse(byte[] bytes) throws ParseException {
+    public static LocalDate parse(byte[] bytes) throws ParseException {
         return parse(new String(bytes,US_ASCII));
-    }
-
-    private static void throwParseException(String string, int errorOffset) throws ParseException {
-        throw new ParseException("Unparseable date: " + string, errorOffset);
     }
 }
