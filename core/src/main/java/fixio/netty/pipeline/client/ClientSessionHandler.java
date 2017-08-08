@@ -18,7 +18,6 @@ package fixio.netty.pipeline.client;
 
 import fixio.events.LogonEvent;
 import fixio.fixprotocol.*;
-import fixio.fixprotocol.fields.FieldFactory;
 import fixio.fixprotocol.session.FixSession;
 import fixio.handlers.FixApplication;
 import fixio.netty.pipeline.AbstractSessionHandler;
@@ -30,9 +29,6 @@ import org.slf4j.LoggerFactory;
 
 import java.net.PasswordAuthentication;
 import java.util.List;
-
-import static fixio.fixprotocol.FieldType.DefaultApplExtID;
-import static fixio.fixprotocol.FieldType.DefaultApplVerID;
 
 public class ClientSessionHandler extends AbstractSessionHandler {
 
