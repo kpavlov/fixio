@@ -29,19 +29,19 @@ public class UTCTimestampField extends AbstractField<ZonedDateTime> implements F
     private final int valueLen;
 
 
-    protected UTCTimestampField(int tagNum, byte[] bytes, int offset, int length) throws ParseException {
+    public UTCTimestampField(int tagNum, byte[] bytes, int offset, int length) throws ParseException {
         super(tagNum);
         this.value = parse(bytes,offset,length);
         this.valueLen = length;
     }
 
-    protected UTCTimestampField(int tagNum, String timestampString) throws ParseException {
+    public UTCTimestampField(int tagNum, String timestampString) throws ParseException {
         super(tagNum);
         this.value = parse(timestampString);
         this.valueLen = timestampString.length();
     }
 
-    protected UTCTimestampField(int tagNum, ZonedDateTime value) {
+    public UTCTimestampField(int tagNum, ZonedDateTime value) {
         super(tagNum);
         this.value = value;
         this.valueLen = DATE_TIME_PATTERN_MILLIS.length();
@@ -73,15 +73,15 @@ public class UTCTimestampField extends AbstractField<ZonedDateTime> implements F
         }
     }
 
-    static ZonedDateTime parse(byte[] bytes) throws ParseException {
+    public static ZonedDateTime parse(byte[] bytes) throws ParseException {
         return parse(new String(bytes,US_ASCII));
     }
 
-    static ZonedDateTime parse(byte[] bytes, int offset, int length) throws ParseException {
+    public static ZonedDateTime parse(byte[] bytes, int offset, int length) throws ParseException {
         return parse(new String(bytes,offset,length,US_ASCII));
     }
 
-    static ZonedDateTime parse(String timestampString) throws ParseException {
+    public static ZonedDateTime parse(String timestampString) throws ParseException {
         if(timestampString!=null){
             int len = timestampString.length();
             // most likely scenario
@@ -90,6 +90,7 @@ public class UTCTimestampField extends AbstractField<ZonedDateTime> implements F
                 case 21: return ZonedDateTime.parse(timestampString,DATE_TIME_FORMATTER_MILLIS);
                 case 24: return ZonedDateTime.parse(timestampString,DATE_TIME_FORMATTER_MICROS);
                 case 27: return ZonedDateTime.parse(timestampString,DATE_TIME_FORMATTER_NANOS);
+                default: // no default, logic continues below
             }
             // try to guess
             if(len>27){
