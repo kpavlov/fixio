@@ -59,6 +59,7 @@ public class UTCTimeOnlyField extends AbstractField<LocalTime> implements FixCon
             case 12: return TIME_FORMATTER_MILLIS.format(value).getBytes(US_ASCII);
             case 15: return TIME_FORMATTER_MICROS.format(value).getBytes(US_ASCII);
             case 18: return TIME_FORMATTER_NANOS.format(value).getBytes(US_ASCII);
+            default: // no default, logic continues below
         }
         // try to guess
         if(valueLen>18){
@@ -72,7 +73,7 @@ public class UTCTimeOnlyField extends AbstractField<LocalTime> implements FixCon
         }
     }
 
-    static LocalTime parse(String timestampString) throws ParseException {
+    public static LocalTime parse(String timestampString) throws ParseException {
         if(timestampString!=null){
             int len = timestampString.length();
             // most likely scenario
@@ -97,7 +98,7 @@ public class UTCTimeOnlyField extends AbstractField<LocalTime> implements FixCon
         throw new ParseException("Unparseable date: '"+timestampString+"'",-1);
     }
 
-    static LocalTime parse(byte[] bytes) throws ParseException {
+    public static LocalTime parse(byte[] bytes) throws ParseException {
         return parse(new String(bytes,US_ASCII));
     }
 }
