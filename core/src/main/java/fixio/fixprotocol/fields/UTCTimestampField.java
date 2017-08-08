@@ -60,6 +60,7 @@ public class UTCTimestampField extends AbstractField<ZonedDateTime> implements F
             case 21: return DATE_TIME_FORMATTER_MILLIS.format(value).getBytes(US_ASCII);
             case 24: return DATE_TIME_FORMATTER_MICROS.format(value).getBytes(US_ASCII);
             case 27: return DATE_TIME_FORMATTER_NANOS.format(value).getBytes(US_ASCII);
+            default: // no default, logic continues below
         }
         // try to guess
         if(valueLen>27){
