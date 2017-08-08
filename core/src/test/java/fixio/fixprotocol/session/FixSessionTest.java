@@ -32,8 +32,10 @@ public class FixSessionTest {
     private String beginString;
     private String senderCompID;
     private String senderSubID;
+    private String senderLocationID;
     private String targetCompID;
     private String targetSubID;
+    private String targetLocationID;
 
     @Before
     public void setUp() throws Exception {
@@ -41,15 +43,19 @@ public class FixSessionTest {
         beginString = randomAscii(2);
         senderCompID = randomAscii(3);
         senderSubID = randomAscii(4);
+        senderLocationID = randomAscii(4);
         targetCompID = randomAscii(5);
         targetSubID = randomAscii(6);
+        targetLocationID = randomAscii(6);
 
         session = FixSession.newBuilder()
                 .beginString(beginString)
                 .senderCompId(senderCompID)
                 .senderSubId(senderSubID)
+                .senderLocationID(senderLocationID)
                 .targetCompId(targetCompID)
                 .targetSubId(targetSubID)
+                .targetLocationID(targetLocationID)
                 .build();
     }
 
@@ -59,8 +65,10 @@ public class FixSessionTest {
 
         assertEquals("senderCompID", senderCompID, sessionId.getSenderCompID());
         assertEquals("senderSubID", senderSubID, sessionId.getSenderSubID());
+        assertEquals("senderLocationID", senderLocationID, sessionId.getSenderLocationID());
         assertEquals("targetCompID", targetCompID, sessionId.getTargetCompID());
         assertEquals("targetSubID", targetSubID, sessionId.getTargetSubID());
+        assertEquals("targetLocationID", targetLocationID, sessionId.getTargetLocationID());
     }
 
     @Test
@@ -80,8 +88,10 @@ public class FixSessionTest {
         assertEquals("beginString", beginString, header.getBeginString());
         assertEquals("senderCompID", senderCompID, header.getSenderCompID());
         assertEquals("senderSubID", senderSubID, header.getSenderSubID());
+        assertEquals("senderLocationID", senderLocationID, header.getSenderLocationID());
         assertEquals("targetCompID", targetCompID, header.getTargetCompID());
         assertEquals("targetSubID", targetSubID, header.getTargetSubID());
+        assertEquals("targetLocationID", targetLocationID, header.getTargetLocationID());
     }
 
 
