@@ -63,7 +63,7 @@ public class ClientSessionHandler extends AbstractSessionHandler {
                 messageBuilder.add(FieldType.Password, String.valueOf(authentication.getPassword()));
             }
         }
-        if("FIXT.1.1".equalsIgnoreCase(session.getBeginString())){
+        if(FixMessage.FIX_5_0.equalsIgnoreCase(session.getBeginString())){
             messageBuilder.add(FieldType.DefaultApplVerID, session.getDefaultApplVerID());
             if(session.getDefaultApplExtID()!=null && "".equalsIgnoreCase(session.getDefaultApplExtID())){
                 messageBuilder.add(FieldType.DefaultApplExtID, session.getDefaultApplExtID());
@@ -120,7 +120,7 @@ public class ClientSessionHandler extends AbstractSessionHandler {
 
     private FixSession createSession(FixSessionSettingsProvider settingsProvider) {
         String defaultApplVerID = settingsProvider.getDefaultApplVerID();
-        if("FIXT.1.1".equalsIgnoreCase(settingsProvider.getBeginString()) &&
+        if(FixMessage.FIX_5_0.equalsIgnoreCase(settingsProvider.getBeginString()) &&
                 (defaultApplVerID==null || defaultApplVerID.trim().length()==0)){
             defaultApplVerID = "7";
         }
