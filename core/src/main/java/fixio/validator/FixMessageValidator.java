@@ -20,5 +20,5 @@ import io.netty.channel.ChannelHandlerContext;
 
 public interface FixMessageValidator {
 
-    void validate(ChannelHandlerContext ctx, FixMessage msg) throws BusinessRejectException;
+    void validate(ChannelHandlerContext ctx, FixMessage msg);
 }

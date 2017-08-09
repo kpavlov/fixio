@@ -19,7 +19,6 @@ package fixio.fixprotocol;
 import fixio.fixprotocol.fields.DateTimeFormatterWrapper;
 
 import java.time.ZonedDateTime;
-import java.time.format.DateTimeFormatter;
 import java.util.List;
 
 public class FixMessageHeader {

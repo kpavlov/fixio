@@ -17,7 +17,12 @@
 package fixio.netty.pipeline;
 
 import fixio.events.LogoutEvent;
-import fixio.fixprotocol.*;
+import fixio.fixprotocol.FieldType;
+import fixio.fixprotocol.FixMessage;
+import fixio.fixprotocol.FixMessageBuilder;
+import fixio.fixprotocol.FixMessageBuilderImpl;
+import fixio.fixprotocol.FixMessageHeader;
+import fixio.fixprotocol.MessageTypes;
 import fixio.fixprotocol.session.FixSession;
 import fixio.handlers.FixApplication;
 import fixio.validator.BusinessRejectException;
@@ -82,11 +87,11 @@ public abstract class AbstractSessionHandler extends MessageToMessageCodec<FixMe
         }
     }
 
-    protected void prepareMessageToSend(ChannelHandlerContext ctx, FixMessageBuilder response) throws Exception {
+    protected void prepareMessageToSend(ChannelHandlerContext ctx, FixMessageBuilder response) {
         prepareMessageToSend(ctx, getSession(ctx), response);
     }
 
-    protected void prepareMessageToSend(ChannelHandlerContext ctx, FixSession session, FixMessageBuilder response) throws Exception {
+    protected void prepareMessageToSend(ChannelHandlerContext ctx, FixSession session, FixMessageBuilder response) {
         session.prepareOutgoing(response);
         response.getHeader().setSendingTime(fixClock.now());
         getFixApplication().beforeSendMessage(ctx, response);
