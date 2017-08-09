@@ -32,11 +32,13 @@ public class UTCTimeOnlyFieldTest {
     public static final int MILLIS = 537;
     public static final int MICROS = 537123;
     public static final int NANOS  = 537123456;
+    public static final long PICOS = 537123456987L; // java time does not support picos
     //
     private static final String TIMESTAMP_NO_MILLIS = "08:03:31";
-    private static final String TIMESTAMP_WITH_MILLIS = "08:03:31."+MILLIS;
-    private static final String TIMESTAMP_WITH_MICROS = "08:03:31."+MICROS;
-    private static final String TIMESTAMP_WITH_NANOS  = "08:03:31."+NANOS;
+    private static final String TIMESTAMP_WITH_MILLIS = TIMESTAMP_NO_MILLIS+"."+MILLIS;
+    private static final String TIMESTAMP_WITH_MICROS = TIMESTAMP_NO_MILLIS+"."+MICROS;
+    private static final String TIMESTAMP_WITH_NANOS  = TIMESTAMP_NO_MILLIS+"."+NANOS;
+    private static final String TIMESTAMP_WITH_PICOS  = TIMESTAMP_NO_MILLIS+"."+PICOS;
 
     private final ZonedDateTime testDate = ZonedDateTime.of(LocalDate.of(1970, 1, 1),
             LocalTime.of(8, 3, 31, 0), ZoneId.of("UTC"));
@@ -62,6 +64,11 @@ public class UTCTimeOnlyFieldTest {
     }
 
     @Test
+    public void testParseWithPicos() throws Exception {
+        assertEquals(testDate.plus(NANOS, ChronoField.NANO_OF_DAY.getBaseUnit()).toLocalTime(), UTCTimeOnlyField.parse((TIMESTAMP_WITH_PICOS.getBytes())));
+    }
+
+    @Test
     public void testParseLastMillisecond() throws Exception {
         LocalTime expected = LocalTime.of(23, 59, 59).plus(999, ChronoField.MILLI_OF_DAY.getBaseUnit());
         assertEquals(expected, UTCTimeOnlyField.parse(("23:59:59.999".getBytes())));
@@ -77,6 +84,12 @@ public class UTCTimeOnlyFieldTest {
     public void testParseLastNanosecond() throws Exception {
         LocalTime expected = LocalTime.of(23, 59, 59, 999999999);
         assertEquals(expected.toNanoOfDay(), UTCTimeOnlyField.parse(("23:59:59.999999999".getBytes())).toNanoOfDay());
+    }
+
+    @Test
+    public void testParseLastPicosecond() throws Exception {
+        LocalTime expected = LocalTime.of(23, 59, 59, 999999999);
+        assertEquals(expected.toNanoOfDay(), UTCTimeOnlyField.parse(("23:59:59.999999999999".getBytes())).toNanoOfDay());
     }
 
     @Test
@@ -104,6 +117,13 @@ public class UTCTimeOnlyFieldTest {
     public void testCreateWithNanos() throws Exception {
         int tag = new Random().nextInt();
         UTCTimeOnlyField field = new UTCTimeOnlyField(tag, TIMESTAMP_WITH_NANOS.getBytes());
+        assertEquals(testDate.plus(NANOS, ChronoField.NANO_OF_DAY.getBaseUnit()).toLocalTime(), field.getValue());
+    }
+
+    @Test
+    public void testCreateWithPicos() throws Exception {
+        int tag = new Random().nextInt();
+        UTCTimeOnlyField field = new UTCTimeOnlyField(tag, TIMESTAMP_WITH_PICOS.getBytes());
         assertEquals(testDate.plus(NANOS, ChronoField.NANO_OF_DAY.getBaseUnit()).toLocalTime(), field.getValue());
     }
 
@@ -137,5 +157,15 @@ public class UTCTimeOnlyFieldTest {
         byte[] bytes = TIMESTAMP_WITH_NANOS.getBytes();
         UTCTimeOnlyField field = new UTCTimeOnlyField(tag, bytes);
         assertArrayEquals(bytes, field.getBytes());
+    }
+
+    @Test
+    public void testGetBytesWithPicos() throws Exception {
+        int tag = new Random().nextInt();
+        byte[] bytes = TIMESTAMP_WITH_PICOS.getBytes();
+        UTCTimeOnlyField field = new UTCTimeOnlyField(tag, bytes);
+        // pico are not supported, expect last 3 digits to be truncated
+        byte[] nanosBytes = (TIMESTAMP_WITH_NANOS+"000").getBytes();
+        assertArrayEquals(nanosBytes, field.getBytes());
     }
 }

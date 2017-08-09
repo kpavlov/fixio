@@ -32,6 +32,7 @@ import java.time.ZonedDateTime;
 import java.util.ArrayList;
 import java.util.List;
 
+import static fixio.fixprotocol.FixConst.DEFAULT_ZONE_ID;
 import static org.apache.commons.lang3.RandomStringUtils.randomAlphanumeric;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
@@ -66,7 +67,7 @@ public class FixMessageDecoderTest {
         final ZonedDateTime value = fixMessage.getValue(FieldType.SendingTime);
 
         ZonedDateTime expected = ZonedDateTime.of(LocalDate.of(1998, 6, 4),
-                LocalTime.of(8, 3, 31, 0), ZoneId.of("UTC"));
+                LocalTime.of(8, 3, 31, 0), DEFAULT_ZONE_ID);
         assertEquals(expected, value);
     }
 
