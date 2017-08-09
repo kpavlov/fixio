@@ -59,14 +59,17 @@ public class UTCTimeOnlyField extends AbstractField<LocalTime> implements FixCon
             case 12: return TIME_FORMATTER_MILLIS.format(value).getBytes(US_ASCII);
             case 15: return TIME_FORMATTER_MICROS.format(value).getBytes(US_ASCII);
             case 18: return TIME_FORMATTER_NANOS.format(value).getBytes(US_ASCII);
+            case 21: return TIME_FORMATTER_PICOS.format(value).getBytes(US_ASCII);
             default: // no default, logic continues below
         }
         // try to guess
-        if(valueLen>18){
+        if(valueLen>TIME_PATTERN_PICOS_LENGTH){
+            return (TIME_FORMATTER_NANOS.format(value)).getBytes(US_ASCII);
+        }else if(valueLen>TIME_PATTERN_NANOS_LENGTH){
             return TIME_FORMATTER_NANOS.format(value).getBytes(US_ASCII);
-        }else if(valueLen>15){
+        }else if(valueLen>TIME_PATTERN_MICROS_LENGTH){
             return TIME_FORMATTER_MICROS.format(value).getBytes(US_ASCII);
-        }else if(valueLen>12){
+        }else if(valueLen>TIME_PATTERN_MILLIS_LENGTH){
             return TIME_FORMATTER_MILLIS.format(value).getBytes(US_ASCII);
         }else{
             return TIME_FORMATTER_SECONDS.format(value).getBytes(US_ASCII);
@@ -78,21 +81,24 @@ public class UTCTimeOnlyField extends AbstractField<LocalTime> implements FixCon
             int len = timestampString.length();
             // most likely scenario
             switch (len){
-                case 8: return LocalTime.parse(timestampString,TIME_FORMATTER_SECONDS);
-                case 12: return LocalTime.parse(timestampString,TIME_FORMATTER_MILLIS);
-                case 15: return LocalTime.parse(timestampString,TIME_FORMATTER_MICROS);
-                case 18: return LocalTime.parse(timestampString,TIME_FORMATTER_NANOS);
+                case 8:  return TIME_FORMATTER_SECONDS.parseLocalTime(timestampString);
+                case 12: return TIME_FORMATTER_MILLIS.parseLocalTime(timestampString);
+                case 15: return TIME_FORMATTER_MICROS.parseLocalTime(timestampString);
+                case 18: return TIME_FORMATTER_NANOS.parseLocalTime(timestampString);
+                case 21: return TIME_FORMATTER_PICOS.parseLocalTime(timestampString);
                 default: // no default, logic continues below
             }
             // try to guess
-            if(len>18){
-                return LocalTime.parse(timestampString.substring(0,27),TIME_FORMATTER_NANOS);
-            }else if(len>15){
-                return LocalTime.parse(timestampString.substring(0,24),TIME_FORMATTER_MICROS);
-            }else if(len>12){
-                return LocalTime.parse(timestampString.substring(0,21),TIME_FORMATTER_MILLIS);
+            if(len>=TIME_PATTERN_PICOS_LENGTH){
+                return TIME_FORMATTER_PICOS.parseLocalTime(timestampString.substring(0,TIME_PATTERN_NANOS_LENGTH));
+            }else if(len>TIME_PATTERN_NANOS_LENGTH){
+                return TIME_FORMATTER_NANOS.parseLocalTime(timestampString.substring(0,TIME_PATTERN_NANOS_LENGTH));
+            }else if(len>TIME_PATTERN_MICROS_LENGTH){
+                return TIME_FORMATTER_MICROS.parseLocalTime(timestampString.substring(0,TIME_PATTERN_MICROS_LENGTH));
+            }else if(len>TIME_PATTERN_MILLIS_LENGTH){
+                return TIME_FORMATTER_MILLIS.parseLocalTime(timestampString.substring(0,TIME_PATTERN_MILLIS_LENGTH));
             }else{
-                return LocalTime.parse(timestampString.substring(0,17),TIME_FORMATTER_SECONDS);
+                return TIME_FORMATTER_SECONDS.parseLocalTime(timestampString.substring(0,TIME_PATTERN_SECONDS_LENGTH));
             }
         }
         throw new ParseException("Unparseable date: '"+timestampString+"'",-1);

@@ -19,6 +19,7 @@ package fixio.fixprotocol.session;
 import fixio.fixprotocol.FixConst;
 import fixio.fixprotocol.FixMessageBuilder;
 import fixio.fixprotocol.FixMessageHeader;
+import fixio.fixprotocol.fields.DateTimeFormatterWrapper;
 
 import java.time.format.DateTimeFormatter;
 import java.util.concurrent.atomic.AtomicInteger;
@@ -43,7 +44,7 @@ public class FixSession {
     //
     private final SessionId sessionId;
     private volatile int nextIncomingMessageSeqNum;
-    private DateTimeFormatter dateTimeFormatter = FixConst.DATE_TIME_FORMATTER_MILLIS;
+    private DateTimeFormatterWrapper dateTimeFormatter = FixConst.DATE_TIME_FORMATTER_MILLIS;
 
     private FixSession(String beginString,
                        String senderCompID, String senderSubID, String senderLocationID,
@@ -129,11 +130,11 @@ public class FixSession {
         return INCOMING_SEQ_NUM_UPDATER.compareAndSet(this, num, num + 1);
     }
 
-    public DateTimeFormatter getDateTimeFormatter() {
+    public DateTimeFormatterWrapper getDateTimeFormatter() {
         return dateTimeFormatter;
     }
 
-    public void setDateTimeFormatter(DateTimeFormatter dateTimeFormatter) {
+    public void setDateTimeFormatter(DateTimeFormatterWrapper dateTimeFormatter) {
         this.dateTimeFormatter = dateTimeFormatter;
     }
 
@@ -187,7 +188,7 @@ public class FixSession {
         private String targetLocationID;
         private String defaultApplVerID;
         private String defaultApplExtID=null;
-        private DateTimeFormatter dateTimeFormatter = FixConst.DATE_TIME_FORMATTER_MILLIS;
+        private DateTimeFormatterWrapper dateTimeFormatter = FixConst.DATE_TIME_FORMATTER_MILLIS;
 
         private Builder() {
         }
@@ -246,6 +247,8 @@ public class FixSession {
                 this.dateTimeFormatter = FixConst.DATE_TIME_FORMATTER_MICROS;
             }else if(NANOS.toString().equals(timeStampPrecision)){
                 this.dateTimeFormatter = FixConst.DATE_TIME_FORMATTER_NANOS;
+            }else if(PICOS.toString().equals(timeStampPrecision)){
+                this.dateTimeFormatter = FixConst.DATE_TIME_FORMATTER_PICOS;
             }
             return this;
         }

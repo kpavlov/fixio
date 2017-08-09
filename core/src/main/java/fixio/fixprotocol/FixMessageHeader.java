@@ -16,6 +16,8 @@
 
 package fixio.fixprotocol;
 
+import fixio.fixprotocol.fields.DateTimeFormatterWrapper;
+
 import java.time.ZonedDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.List;
@@ -33,7 +35,7 @@ public class FixMessageHeader {
     private String targetSubID;
     private String targetLocationID;
     private List<FixMessageFragment> customFields;
-    private DateTimeFormatter dateTimeFormatter = null;
+    private DateTimeFormatterWrapper dateTimeFormatter = null;
 
     public String getBeginString() {
         return beginString;
@@ -123,11 +125,11 @@ public class FixMessageHeader {
         this.customFields = customFields;
     }
 
-    public DateTimeFormatter getDateTimeFormatter() {
+    public DateTimeFormatterWrapper getDateTimeFormatter() {
         return dateTimeFormatter;
     }
 
-    public void setDateTimeFormatter(DateTimeFormatter dateTimeFormatter) {
+    public void setDateTimeFormatter(DateTimeFormatterWrapper dateTimeFormatter) {
         this.dateTimeFormatter = dateTimeFormatter;
     }
 

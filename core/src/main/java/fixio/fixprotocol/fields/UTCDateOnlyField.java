@@ -71,9 +71,9 @@ public class UTCDateOnlyField extends AbstractField<LocalDate> implements FixCon
             if (len < 8) {
                 throw new ParseException("Unparseable date: '"+timestampString+"'",0);
             }else if(len==8){
-                return LocalDate.parse(timestampString,DATE_FORMATTER);
+                return DATE_FORMATTER.parseLocalDate(timestampString);
             }else{
-                return LocalDate.parse(timestampString.substring(0,8),DATE_FORMATTER);
+                return DATE_FORMATTER.parseLocalDate(timestampString.substring(0,8));
             }
         }
         throw new ParseException("Unparseable date: '"+timestampString+"'",0);
