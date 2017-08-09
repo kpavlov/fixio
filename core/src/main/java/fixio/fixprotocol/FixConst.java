@@ -7,15 +7,7 @@ import java.time.ZoneOffset;
 
 public class FixConst {
 
-    private FixConst() {
-        // to prevent instatiation
-    }
-
     public static final ZoneId DEFAULT_ZONE_ID = ZoneOffset.UTC;
-
-    public enum TimeStampPrecision {
-        SECONDS, MILLIS, MICROS, NANOS, PICOS
-    }
 
     public static final String DATE_PATTERN = "yyyyMMdd";
     //
@@ -56,4 +48,17 @@ public class FixConst {
     public static final DateTimeFormatterWrapper DATE_TIME_FORMATTER_MICROS = new DateTimeFormatterWrapper(DATE_TIME_PATTERN_MICROS, DEFAULT_ZONE_ID);
     public static final DateTimeFormatterWrapper DATE_TIME_FORMATTER_NANOS = new DateTimeFormatterWrapper(DATE_TIME_PATTERN_NANOS, DEFAULT_ZONE_ID);
     public static final DateTimeFormatterWrapper DATE_TIME_FORMATTER_PICOS = new DateTimeFormatterWrapper(DATE_TIME_PATTERN_PICOS, DEFAULT_ZONE_ID);
+
+    private FixConst() {
+        // to prevent instatiation
+    }
+
+    public enum TimeStampPrecision {
+        SECONDS,
+        MILLIS,
+        MICROS,
+        NANOS,
+        PICOS
+    }
+
 }
