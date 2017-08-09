@@ -60,14 +60,17 @@ public class UTCTimestampField extends AbstractField<ZonedDateTime> implements F
             case 21: return DATE_TIME_FORMATTER_MILLIS.format(value).getBytes(US_ASCII);
             case 24: return DATE_TIME_FORMATTER_MICROS.format(value).getBytes(US_ASCII);
             case 27: return DATE_TIME_FORMATTER_NANOS.format(value).getBytes(US_ASCII);
+            case 30: return DATE_TIME_FORMATTER_PICOS.format(value).getBytes(US_ASCII);
             default: // no default, logic continues below
         }
         // try to guess
-        if(valueLen>27){
+        if(valueLen>DATE_TIME_PATTERN_PICOS_LENGTH){
+            return DATE_TIME_FORMATTER_PICOS.format(value).getBytes(US_ASCII);
+        }else if(valueLen>DATE_TIME_PATTERN_NANOS_LENGTH){
             return DATE_TIME_FORMATTER_NANOS.format(value).getBytes(US_ASCII);
-        }else if(valueLen>24){
+        }else if(valueLen>DATE_TIME_PATTERN_MICROS_LENGTH){
             return DATE_TIME_FORMATTER_MICROS.format(value).getBytes(US_ASCII);
-        }else if(valueLen>21){
+        }else if(valueLen>DATE_TIME_PATTERN_MILLIS_LENGTH){
             return DATE_TIME_FORMATTER_MILLIS.format(value).getBytes(US_ASCII);
         }else{
             return DATE_TIME_FORMATTER_SECONDS.format(value).getBytes(US_ASCII);
@@ -87,21 +90,24 @@ public class UTCTimestampField extends AbstractField<ZonedDateTime> implements F
             int len = timestampString.length();
             // most likely scenario
             switch (len){
-                case 17: return ZonedDateTime.parse(timestampString,DATE_TIME_FORMATTER_SECONDS);
-                case 21: return ZonedDateTime.parse(timestampString,DATE_TIME_FORMATTER_MILLIS);
-                case 24: return ZonedDateTime.parse(timestampString,DATE_TIME_FORMATTER_MICROS);
-                case 27: return ZonedDateTime.parse(timestampString,DATE_TIME_FORMATTER_NANOS);
+                case 17: return DATE_TIME_FORMATTER_SECONDS.parseZonedDateTime(timestampString);
+                case 21: return DATE_TIME_FORMATTER_MILLIS.parseZonedDateTime(timestampString);
+                case 24: return DATE_TIME_FORMATTER_MICROS.parseZonedDateTime(timestampString);
+                case 27: return DATE_TIME_FORMATTER_NANOS.parseZonedDateTime(timestampString);
+                case 30: return DATE_TIME_FORMATTER_PICOS.parseZonedDateTime(timestampString);
                 default: // no default, logic continues below
             }
             // try to guess
-            if(len>27){
-                return ZonedDateTime.parse(timestampString.substring(0,27),DATE_TIME_FORMATTER_NANOS);
-            }else if(len>24){
-                return ZonedDateTime.parse(timestampString.substring(0,24),DATE_TIME_FORMATTER_MICROS);
-            }else if(len>21){
-                return ZonedDateTime.parse(timestampString.substring(0,21),DATE_TIME_FORMATTER_MILLIS);
+            if(len>DATE_TIME_PATTERN_PICOS_LENGTH){
+                return DATE_TIME_FORMATTER_PICOS.parseZonedDateTime(timestampString.substring(0,DATE_TIME_PATTERN_PICOS_LENGTH));
+            }else if(len>DATE_TIME_PATTERN_NANOS_LENGTH){
+                return DATE_TIME_FORMATTER_NANOS.parseZonedDateTime(timestampString.substring(0,DATE_TIME_PATTERN_NANOS_LENGTH));
+            }else if(len>DATE_TIME_PATTERN_MICROS_LENGTH){
+                return DATE_TIME_FORMATTER_MICROS.parseZonedDateTime(timestampString.substring(0,DATE_TIME_PATTERN_MICROS_LENGTH));
+            }else if(len>DATE_TIME_PATTERN_MILLIS_LENGTH){
+                return DATE_TIME_FORMATTER_MILLIS.parseZonedDateTime(timestampString.substring(0,DATE_TIME_PATTERN_MILLIS_LENGTH));
             }else{
-                return ZonedDateTime.parse(timestampString.substring(0,17),DATE_TIME_FORMATTER_SECONDS);
+                return DATE_TIME_FORMATTER_SECONDS.parseZonedDateTime(timestampString.substring(0,DATE_TIME_PATTERN_SECONDS_LENGTH));
             }
         }
         throw new ParseException("Unparseable date: '"+timestampString+"'",-1);

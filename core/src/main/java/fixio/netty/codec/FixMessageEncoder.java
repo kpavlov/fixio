@@ -18,6 +18,7 @@ package fixio.netty.codec;
 
 import fixio.fixprotocol.*;
 import fixio.fixprotocol.fields.AbstractField;
+import fixio.fixprotocol.fields.DateTimeFormatterWrapper;
 import io.netty.buffer.ByteBuf;
 import io.netty.buffer.ByteBufAllocator;
 import io.netty.channel.ChannelHandler;
@@ -104,7 +105,7 @@ public class FixMessageEncoder extends MessageToByteEncoder<FixMessageBuilder> {
         }
 
         // SendingTime
-        DateTimeFormatter formatter = (header.getDateTimeFormatter()!=null)? header.getDateTimeFormatter(): FixConst.DATE_TIME_FORMATTER_MILLIS;
+        DateTimeFormatterWrapper formatter = (header.getDateTimeFormatter()!=null)? header.getDateTimeFormatter(): FixConst.DATE_TIME_FORMATTER_MILLIS;
         String timeStr = formatter.format(header.getSendingTime());
         writeField(52, timeStr, out);
 
