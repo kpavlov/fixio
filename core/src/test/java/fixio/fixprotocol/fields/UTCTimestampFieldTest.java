@@ -15,44 +15,68 @@
  */
 package fixio.fixprotocol.fields;
 
+import fixio.netty.pipeline.FixClock;
 import org.junit.Test;
 
 import java.time.LocalDate;
 import java.time.LocalTime;
 import java.time.ZonedDateTime;
+import java.time.temporal.ChronoField;
 import java.util.Random;
-import java.util.concurrent.TimeUnit;
 
-import static fixio.netty.pipeline.FixClock.systemUTC;
 import static org.junit.Assert.assertArrayEquals;
 import static org.junit.Assert.assertEquals;
 
 public class UTCTimestampFieldTest {
-
-    private static final String TIMESTAMP_WITH_MILLIS = "19980604-08:03:31.537";
+    public static final int MILLIS = 537;
+    public static final int MICROS = 537123;
+    public static final int NANOS  = 537123456;
+    public static final long PICOS = 537123456987L; // java time does not support picos
+    //
     private static final String TIMESTAMP_NO_MILLIS = "19980604-08:03:31";
-
-    private final LocalDate testDate = LocalDate.of(1998, 6, 4);
-
-    private final ZonedDateTime testDateTime = ZonedDateTime.of(testDate, LocalTime.of(8, 3, 31), systemUTC().zone());
-    private final ZonedDateTime testDateTimeWithMillis = ZonedDateTime.of(testDate, LocalTime.of(8, 3, 31, (int) TimeUnit.MILLISECONDS.toNanos(537)), systemUTC().zone());
+    private static final String TIMESTAMP_WITH_MILLIS = TIMESTAMP_NO_MILLIS+"."+MILLIS;
+    private static final String TIMESTAMP_WITH_MICROS = TIMESTAMP_NO_MILLIS+"."+MICROS;
+    private static final String TIMESTAMP_WITH_NANOS  = TIMESTAMP_NO_MILLIS+"."+NANOS;
+    private static final String TIMESTAMP_WITH_PICOS  = TIMESTAMP_NO_MILLIS+"."+PICOS;
+    //
+    private final ZonedDateTime testDate = ZonedDateTime.of(LocalDate.of(1998, 6, 4), LocalTime.of(8, 3, 31), FixClock.systemUTC().getZone());
+    private final ZonedDateTime testDateWithMillis = testDate.plus(MILLIS, ChronoField.MILLI_OF_DAY.getBaseUnit());
+    private final ZonedDateTime testDateWithMicros = testDate.plus(MICROS, ChronoField.MICRO_OF_DAY.getBaseUnit());
+    private final ZonedDateTime testDateWithNanos  = testDate.plusNanos(NANOS);
 
     @Test
     public void testParseNoMillis() throws Exception {
-        assertEquals(testDateTime.toInstant().toEpochMilli(), UTCTimestampField.parse(TIMESTAMP_NO_MILLIS.getBytes()).toInstant().toEpochMilli());
+        assertEquals(testDate, UTCTimestampField.parse(TIMESTAMP_NO_MILLIS.getBytes()));
     }
 
     @Test
     public void testParseWithMillis() throws Exception {
-        assertEquals(testDateTimeWithMillis.toInstant().toEpochMilli(), UTCTimestampField.parse((TIMESTAMP_WITH_MILLIS.getBytes())).toInstant().toEpochMilli());
+        assertEquals(testDateWithMillis, UTCTimestampField.parse((TIMESTAMP_WITH_MILLIS.getBytes())));
     }
 
+    @Test
+    public void testParseWithMicros() throws Exception {
+        assertEquals(testDateWithMicros, UTCTimestampField.parse((TIMESTAMP_WITH_MICROS.getBytes())));
+    }
+
+    @Test
+    public void testParseWithNanos() throws Exception {
+        assertEquals(testDateWithNanos, UTCTimestampField.parse((TIMESTAMP_WITH_NANOS.getBytes())));
+    }
+
+    @Test
+    public void testParseWithPicos() throws Exception {
+        // pico are not supported, expect last 3 digits to be truncated
+        assertEquals(testDateWithNanos, UTCTimestampField.parse((TIMESTAMP_WITH_PICOS.getBytes())));
+    }
+
+    /// testCreate ////////////////
     @Test
     public void testCreateNoMillis() throws Exception {
         int tag = new Random().nextInt();
         byte[] bytes = TIMESTAMP_NO_MILLIS.getBytes();
         UTCTimestampField field = new UTCTimestampField(tag, bytes, 0, bytes.length);
-        assertEquals(testDateTime.toInstant().toEpochMilli(), field.getValue().toInstant().toEpochMilli());
+        assertEquals(testDate, field.getValue());
     }
 
     @Test
@@ -60,7 +84,41 @@ public class UTCTimestampFieldTest {
         int tag = new Random().nextInt();
         byte[] bytes = TIMESTAMP_WITH_MILLIS.getBytes();
         UTCTimestampField field = new UTCTimestampField(tag, bytes, 0, bytes.length);
-        assertEquals(testDateTimeWithMillis.toInstant().toEpochMilli(), field.getValue().toInstant().toEpochMilli());
+        assertEquals(testDateWithMillis, field.getValue());
+    }
+
+    @Test
+    public void testCreateWithMicros() throws Exception {
+        int tag = new Random().nextInt();
+        byte[] bytes = TIMESTAMP_WITH_MICROS.getBytes();
+        UTCTimestampField field = new UTCTimestampField(tag, bytes, 0, bytes.length);
+        assertEquals(testDateWithMicros, field.getValue());
+    }
+
+    @Test
+    public void testCreateWithNanos() throws Exception {
+        int tag = new Random().nextInt();
+        byte[] bytes = TIMESTAMP_WITH_NANOS.getBytes();
+        UTCTimestampField field = new UTCTimestampField(tag, bytes, 0, bytes.length);
+        assertEquals(testDateWithNanos, field.getValue());
+    }
+
+    @Test
+    public void testCreateWithPicos() throws Exception {
+        int tag = new Random().nextInt();
+        byte[] bytes = TIMESTAMP_WITH_PICOS.getBytes();
+        UTCTimestampField field = new UTCTimestampField(tag, bytes, 0, bytes.length);
+        // pico are not supported, expect last 3 digits to be truncated
+        assertEquals(testDateWithNanos, field.getValue());
+    }
+
+    /// testGetBytes ////////////////
+    @Test
+    public void testGetBytesNoMillis() throws Exception {
+        int tag = new Random().nextInt();
+        byte[] bytes = TIMESTAMP_NO_MILLIS.getBytes();
+        UTCTimestampField field = new UTCTimestampField(tag, bytes, 0, bytes.length);
+        assertArrayEquals(bytes, field.getBytes());
     }
 
     @Test
@@ -72,10 +130,28 @@ public class UTCTimestampFieldTest {
     }
 
     @Test
-    public void testGetBytesNoMillis() throws Exception {
+    public void testGetBytesMicros() throws Exception {
         int tag = new Random().nextInt();
-        byte[] bytes = TIMESTAMP_NO_MILLIS.getBytes();
+        byte[] bytes = TIMESTAMP_WITH_MICROS.getBytes();
         UTCTimestampField field = new UTCTimestampField(tag, bytes, 0, bytes.length);
         assertArrayEquals(bytes, field.getBytes());
+    }
+
+    @Test
+    public void testGetBytesNanos() throws Exception {
+        int tag = new Random().nextInt();
+        byte[] bytes = TIMESTAMP_WITH_NANOS.getBytes();
+        UTCTimestampField field = new UTCTimestampField(tag, bytes, 0, bytes.length);
+        assertArrayEquals(bytes, field.getBytes());
+    }
+
+    @Test
+    public void testGetBytesPicos() throws Exception {
+        int tag = new Random().nextInt();
+        byte[] bytes = TIMESTAMP_WITH_PICOS.getBytes();
+        UTCTimestampField field = new UTCTimestampField(tag, bytes, 0, bytes.length);
+        // pico are not supported, expect last 3 digits to be truncated
+        byte[] nanosBytes = (TIMESTAMP_WITH_NANOS+"000").getBytes();
+        assertArrayEquals(nanosBytes, field.getBytes());
     }
 }
