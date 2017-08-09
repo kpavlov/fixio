@@ -39,16 +39,16 @@
 
     <properties>
         <autoVersionSubmodules>true</autoVersionSubmodules>
-        <fastutil.version>7.0.13</fastutil.version>
         <java.version>1.8</java.version>
         <maven.compiler.debug>true</maven.compiler.debug>
         <maven.compiler.optimize>true</maven.compiler.optimize>
         <maven.compiler.source>${java.version}</maven.compiler.source>
         <maven.compiler.target>${java.version}</maven.compiler.target>
-        <mockito.version>2.6.2</mockito.version>
-        <netty.version>4.1.7.Final</netty.version>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-        <slf4j.version>1.7.22</slf4j.version>
+        <fastutil.version>8.1.0</fastutil.version>
+        <mockito.version>2.8.47</mockito.version>
+        <netty.version>4.1.14.Final</netty.version>
+        <slf4j.version>1.7.25</slf4j.version>
     </properties>
 
     <modules>
