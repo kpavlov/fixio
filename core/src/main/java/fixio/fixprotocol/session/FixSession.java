@@ -21,11 +21,14 @@ import fixio.fixprotocol.FixMessageBuilder;
 import fixio.fixprotocol.FixMessageHeader;
 import fixio.fixprotocol.fields.DateTimeFormatterWrapper;
 
-import java.time.format.DateTimeFormatter;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.concurrent.atomic.AtomicIntegerFieldUpdater;
 
-import static fixio.fixprotocol.FixConst.TimeStampPrecision.*;
+import static fixio.fixprotocol.FixConst.TimeStampPrecision.MICROS;
+import static fixio.fixprotocol.FixConst.TimeStampPrecision.MILLIS;
+import static fixio.fixprotocol.FixConst.TimeStampPrecision.NANOS;
+import static fixio.fixprotocol.FixConst.TimeStampPrecision.PICOS;
+import static fixio.fixprotocol.FixConst.TimeStampPrecision.SECONDS;
 
 public class FixSession {
 

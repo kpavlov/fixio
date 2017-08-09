@@ -39,7 +39,7 @@ public class FixMessageBuilderImpl implements FixMessage, FixMessageBuilder {
      *
      * @param expectedBodyFieldCount estimated maximum number of field in message body
      */
-    public FixMessageBuilderImpl(int expectedBodyFieldCount) {
+    private FixMessageBuilderImpl(int expectedBodyFieldCount) {
         this.header = new FixMessageHeader();
         this.trailer = new FixMessageTrailer();
         this.body = new Int2ObjectArrayMap<>(expectedBodyFieldCount);
