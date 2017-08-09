@@ -15,15 +15,24 @@
  */
 package fixio.fixprotocol.fields;
 
-import fixio.fixprotocol.FixConst;
-
 import java.text.ParseException;
 import java.time.ZonedDateTime;
 
+import static fixio.fixprotocol.FixConst.DATE_TIME_FORMATTER_MICROS;
+import static fixio.fixprotocol.FixConst.DATE_TIME_FORMATTER_MILLIS;
+import static fixio.fixprotocol.FixConst.DATE_TIME_FORMATTER_NANOS;
+import static fixio.fixprotocol.FixConst.DATE_TIME_FORMATTER_PICOS;
+import static fixio.fixprotocol.FixConst.DATE_TIME_FORMATTER_SECONDS;
+import static fixio.fixprotocol.FixConst.DATE_TIME_PATTERN_MICROS_LENGTH;
+import static fixio.fixprotocol.FixConst.DATE_TIME_PATTERN_MILLIS;
+import static fixio.fixprotocol.FixConst.DATE_TIME_PATTERN_MILLIS_LENGTH;
+import static fixio.fixprotocol.FixConst.DATE_TIME_PATTERN_NANOS_LENGTH;
+import static fixio.fixprotocol.FixConst.DATE_TIME_PATTERN_PICOS_LENGTH;
+import static fixio.fixprotocol.FixConst.DATE_TIME_PATTERN_SECONDS_LENGTH;
 import static java.nio.charset.StandardCharsets.US_ASCII;
 
 
-public class UTCTimestampField extends AbstractField<ZonedDateTime> implements FixConst {
+public class UTCTimestampField extends AbstractField<ZonedDateTime> {
 
     private final ZonedDateTime value;
     private final int valueLen;
@@ -31,7 +40,7 @@ public class UTCTimestampField extends AbstractField<ZonedDateTime> implements F
 
     public UTCTimestampField(int tagNum, byte[] bytes, int offset, int length) throws ParseException {
         super(tagNum);
-        this.value = parse(bytes,offset,length);
+        this.value = parse(bytes, offset, length);
         this.valueLen = length;
     }
 
@@ -55,61 +64,72 @@ public class UTCTimestampField extends AbstractField<ZonedDateTime> implements F
     @Override
     public byte[] getBytes() {
         // most likely scenario
-        switch (valueLen){
-            case 17: return DATE_TIME_FORMATTER_SECONDS.format(value).getBytes(US_ASCII);
-            case 21: return DATE_TIME_FORMATTER_MILLIS.format(value).getBytes(US_ASCII);
-            case 24: return DATE_TIME_FORMATTER_MICROS.format(value).getBytes(US_ASCII);
-            case 27: return DATE_TIME_FORMATTER_NANOS.format(value).getBytes(US_ASCII);
-            case 30: return DATE_TIME_FORMATTER_PICOS.format(value).getBytes(US_ASCII);
-            default: // no default, logic continues below
-        }
-        // try to guess
-        if(valueLen>DATE_TIME_PATTERN_PICOS_LENGTH){
-            return DATE_TIME_FORMATTER_PICOS.format(value).getBytes(US_ASCII);
-        }else if(valueLen>DATE_TIME_PATTERN_NANOS_LENGTH){
-            return DATE_TIME_FORMATTER_NANOS.format(value).getBytes(US_ASCII);
-        }else if(valueLen>DATE_TIME_PATTERN_MICROS_LENGTH){
-            return DATE_TIME_FORMATTER_MICROS.format(value).getBytes(US_ASCII);
-        }else if(valueLen>DATE_TIME_PATTERN_MILLIS_LENGTH){
-            return DATE_TIME_FORMATTER_MILLIS.format(value).getBytes(US_ASCII);
-        }else{
-            return DATE_TIME_FORMATTER_SECONDS.format(value).getBytes(US_ASCII);
+        switch (valueLen) {
+            case 17:
+                return DATE_TIME_FORMATTER_SECONDS.format(value).getBytes(US_ASCII);
+            case 21:
+                return DATE_TIME_FORMATTER_MILLIS.format(value).getBytes(US_ASCII);
+            case 24:
+                return DATE_TIME_FORMATTER_MICROS.format(value).getBytes(US_ASCII);
+            case 27:
+                return DATE_TIME_FORMATTER_NANOS.format(value).getBytes(US_ASCII);
+            case 30:
+                return DATE_TIME_FORMATTER_PICOS.format(value).getBytes(US_ASCII);
+            default:
+                // try to guess
+                if (valueLen > DATE_TIME_PATTERN_PICOS_LENGTH) {
+                    return DATE_TIME_FORMATTER_PICOS.format(value).getBytes(US_ASCII);
+                } else if (valueLen > DATE_TIME_PATTERN_NANOS_LENGTH) {
+                    return DATE_TIME_FORMATTER_NANOS.format(value).getBytes(US_ASCII);
+                } else if (valueLen > DATE_TIME_PATTERN_MICROS_LENGTH) {
+                    return DATE_TIME_FORMATTER_MICROS.format(value).getBytes(US_ASCII);
+                } else if (valueLen > DATE_TIME_PATTERN_MILLIS_LENGTH) {
+                    return DATE_TIME_FORMATTER_MILLIS.format(value).getBytes(US_ASCII);
+                } else {
+                    return DATE_TIME_FORMATTER_SECONDS.format(value).getBytes(US_ASCII);
+                }
         }
     }
 
     public static ZonedDateTime parse(byte[] bytes) throws ParseException {
-        return parse(new String(bytes,US_ASCII));
+        return parse(new String(bytes, US_ASCII));
     }
 
     public static ZonedDateTime parse(byte[] bytes, int offset, int length) throws ParseException {
-        return parse(new String(bytes,offset,length,US_ASCII));
+        return parse(new String(bytes, offset, length, US_ASCII));
     }
 
     public static ZonedDateTime parse(String timestampString) throws ParseException {
-        if(timestampString!=null){
+        if (timestampString != null) {
             int len = timestampString.length();
             // most likely scenario
-            switch (len){
-                case 17: return DATE_TIME_FORMATTER_SECONDS.parseZonedDateTime(timestampString);
-                case 21: return DATE_TIME_FORMATTER_MILLIS.parseZonedDateTime(timestampString);
-                case 24: return DATE_TIME_FORMATTER_MICROS.parseZonedDateTime(timestampString);
-                case 27: return DATE_TIME_FORMATTER_NANOS.parseZonedDateTime(timestampString);
-                case 30: return DATE_TIME_FORMATTER_PICOS.parseZonedDateTime(timestampString);
-                default: // no default, logic continues below
+            switch (len) {
+                case 17:
+                    return DATE_TIME_FORMATTER_SECONDS.parseZonedDateTime(timestampString);
+                case 21:
+                    return DATE_TIME_FORMATTER_MILLIS.parseZonedDateTime(timestampString);
+                case 24:
+                    return DATE_TIME_FORMATTER_MICROS.parseZonedDateTime(timestampString);
+                case 27:
+                    return DATE_TIME_FORMATTER_NANOS.parseZonedDateTime(timestampString);
+                case 30:
+                    return DATE_TIME_FORMATTER_PICOS.parseZonedDateTime(timestampString);
+                default:
+                    // try to guess
+                    if (len > DATE_TIME_PATTERN_PICOS_LENGTH) {
+                        return DATE_TIME_FORMATTER_PICOS.parseZonedDateTime(timestampString.substring(0, DATE_TIME_PATTERN_PICOS_LENGTH));
+                    } else if (len > DATE_TIME_PATTERN_NANOS_LENGTH) {
+                        return DATE_TIME_FORMATTER_NANOS.parseZonedDateTime(timestampString.substring(0, DATE_TIME_PATTERN_NANOS_LENGTH));
+                    } else if (len > DATE_TIME_PATTERN_MICROS_LENGTH) {
+                        return DATE_TIME_FORMATTER_MICROS.parseZonedDateTime(timestampString.substring(0, DATE_TIME_PATTERN_MICROS_LENGTH));
+                    } else if (len > DATE_TIME_PATTERN_MILLIS_LENGTH) {
+                        return DATE_TIME_FORMATTER_MILLIS.parseZonedDateTime(timestampString.substring(0, DATE_TIME_PATTERN_MILLIS_LENGTH));
+                    } else {
+                        return DATE_TIME_FORMATTER_SECONDS.parseZonedDateTime(timestampString.substring(0, DATE_TIME_PATTERN_SECONDS_LENGTH));
+                    }
             }
-            // try to guess
-            if(len>DATE_TIME_PATTERN_PICOS_LENGTH){
-                return DATE_TIME_FORMATTER_PICOS.parseZonedDateTime(timestampString.substring(0,DATE_TIME_PATTERN_PICOS_LENGTH));
-            }else if(len>DATE_TIME_PATTERN_NANOS_LENGTH){
-                return DATE_TIME_FORMATTER_NANOS.parseZonedDateTime(timestampString.substring(0,DATE_TIME_PATTERN_NANOS_LENGTH));
-            }else if(len>DATE_TIME_PATTERN_MICROS_LENGTH){
-                return DATE_TIME_FORMATTER_MICROS.parseZonedDateTime(timestampString.substring(0,DATE_TIME_PATTERN_MICROS_LENGTH));
-            }else if(len>DATE_TIME_PATTERN_MILLIS_LENGTH){
-                return DATE_TIME_FORMATTER_MILLIS.parseZonedDateTime(timestampString.substring(0,DATE_TIME_PATTERN_MILLIS_LENGTH));
-            }else{
-                return DATE_TIME_FORMATTER_SECONDS.parseZonedDateTime(timestampString.substring(0,DATE_TIME_PATTERN_SECONDS_LENGTH));
-            }
+
         }
-        throw new ParseException("Unparseable date: '"+timestampString+"'",-1);
+        throw new ParseException("Timestamp is null", -1);
     }
 }
