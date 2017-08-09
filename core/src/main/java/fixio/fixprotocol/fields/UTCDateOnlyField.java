@@ -15,11 +15,10 @@
  */
 package fixio.fixprotocol.fields;
 
-import fixio.fixprotocol.FixConst;
-
 import java.text.ParseException;
 import java.time.LocalDate;
 
+import static fixio.fixprotocol.FixConst.DATE_FORMATTER;
 import static java.nio.charset.StandardCharsets.US_ASCII;
 
 
@@ -36,7 +35,7 @@ import static java.nio.charset.StandardCharsets.US_ASCII;
  * </p>
  * Example(s): <code>MDEntryDate="20030910"</code>
  */
-public class UTCDateOnlyField extends AbstractField<LocalDate> implements FixConst {
+public class UTCDateOnlyField extends AbstractField<LocalDate> {
 
     private final LocalDate value;
 
@@ -66,20 +65,20 @@ public class UTCDateOnlyField extends AbstractField<LocalDate> implements FixCon
     }
 
     public static LocalDate parse(String timestampString) throws ParseException {
-        if(timestampString!=null){
+        if (timestampString != null) {
             int len = timestampString.length();
             if (len < 8) {
-                throw new ParseException("Unparseable date: '"+timestampString+"'",0);
-            }else if(len==8){
+                throw new ParseException("Unparseable date: '" + timestampString + "'", 0);
+            } else if (len == 8) {
                 return DATE_FORMATTER.parseLocalDate(timestampString);
-            }else{
-                return DATE_FORMATTER.parseLocalDate(timestampString.substring(0,8));
+            } else {
+                return DATE_FORMATTER.parseLocalDate(timestampString.substring(0, 8));
             }
         }
-        throw new ParseException("Unparseable date: '"+timestampString+"'",0);
+        throw new ParseException("Date is null", 0);
     }
 
     public static LocalDate parse(byte[] bytes) throws ParseException {
-        return parse(new String(bytes,US_ASCII));
+        return parse(new String(bytes, US_ASCII));
     }
 }
