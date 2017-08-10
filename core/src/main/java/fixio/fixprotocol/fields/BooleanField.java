@@ -17,9 +17,10 @@ package fixio.fixprotocol.fields;
 
 public class BooleanField extends AbstractField<Boolean> {
 
+    private static final byte[] TRUE_BYTES = new byte[]{(byte) 'Y'};
+    private static final byte[] FALSE_BYTES = new byte[]{(byte) 'N'};
+    
     private final boolean value;
-    private final byte[] TRUE_BYTES = new byte[]{(byte) 'Y'};
-    private final byte[] FALSE_BYTES = new byte[]{(byte) 'N'};
 
     protected BooleanField(int tagNum, boolean value) {
         super(tagNum);
