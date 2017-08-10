@@ -17,12 +17,7 @@
 package fixio.netty.pipeline.client;
 
 import fixio.events.LogonEvent;
-import fixio.fixprotocol.FieldType;
-import fixio.fixprotocol.FixMessage;
-import fixio.fixprotocol.FixMessageBuilder;
-import fixio.fixprotocol.FixMessageBuilderImpl;
-import fixio.fixprotocol.FixMessageHeader;
-import fixio.fixprotocol.MessageTypes;
+import fixio.fixprotocol.*;
 import fixio.fixprotocol.session.FixSession;
 import fixio.handlers.FixApplication;
 import fixio.netty.pipeline.AbstractSessionHandler;
@@ -53,7 +48,7 @@ public class ClientSessionHandler extends AbstractSessionHandler {
         this.messageSequenceProvider = messageSequenceProvider;
     }
 
-    private FixMessageBuilderImpl createLogonRequest(FixSessionSettingsProvider sessionSettingsProvider) {
+    private FixMessageBuilderImpl createLogonRequest(FixSession session, FixSessionSettingsProvider sessionSettingsProvider) {
         FixMessageBuilderImpl messageBuilder = new FixMessageBuilderImpl(MessageTypes.LOGON);
         messageBuilder.add(FieldType.HeartBtInt, sessionSettingsProvider.getHeartbeatInterval());
         messageBuilder.add(FieldType.EncryptMethod, 0);
@@ -62,6 +57,12 @@ public class ClientSessionHandler extends AbstractSessionHandler {
             if (authentication != null) {
                 messageBuilder.add(FieldType.Username, authentication.getUserName());
                 messageBuilder.add(FieldType.Password, String.valueOf(authentication.getPassword()));
+            }
+        }
+        if(FixMessage.FIX_5_0.equalsIgnoreCase(session.getBeginString())){
+            messageBuilder.add(FieldType.DefaultApplVerID, session.getDefaultApplVerID());
+            if(session.getDefaultApplExtID()!=null && "".equalsIgnoreCase(session.getDefaultApplExtID())){
+                messageBuilder.add(FieldType.DefaultApplExtID, session.getDefaultApplExtID());
             }
         }
         return messageBuilder;
@@ -103,24 +104,34 @@ public class ClientSessionHandler extends AbstractSessionHandler {
     public void channelActive(ChannelHandlerContext ctx) throws Exception {
         getLogger().info("Connection established, starting Client FIX session.");
 
-        FixMessageBuilder logonRequest = createLogonRequest(sessionSettingsProvider);
-
         FixSession pendingSession = createSession(sessionSettingsProvider);
         setSession(ctx, pendingSession);
-        prepareMessageToSend(ctx, pendingSession, logonRequest);
 
+        FixMessageBuilder logonRequest = createLogonRequest(pendingSession, sessionSettingsProvider);
+        prepareMessageToSend(ctx, pendingSession, logonRequest);
         getLogger().info("Sending Logon: {}", logonRequest);
 
         ctx.writeAndFlush(logonRequest);
     }
 
     private FixSession createSession(FixSessionSettingsProvider settingsProvider) {
+        String defaultApplVerID = settingsProvider.getDefaultApplVerID();
+        if(FixMessage.FIX_5_0.equalsIgnoreCase(settingsProvider.getBeginString()) &&
+                (defaultApplVerID==null || defaultApplVerID.trim().length()==0)){
+            defaultApplVerID = "7";
+        }
+        //
         final FixSession session = FixSession.newBuilder()
                 .beginString(settingsProvider.getBeginString())
                 .senderCompId(settingsProvider.getSenderCompID())
                 .senderSubId(settingsProvider.getSenderSubID())
+                .senderLocationID(settingsProvider.getSenderLocationID())
                 .targetCompId(settingsProvider.getTargetCompID())
                 .targetSubId(settingsProvider.getTargetSubID())
+                .targetLocationID(settingsProvider.getTargetLocationID())
+                .timeStampPrecision(settingsProvider.getTimeStampPrecision())
+                .defaultApplVerID(defaultApplVerID)
+                .defaultApplExtID(settingsProvider.getDefaultApplExtID())
                 .build();
 
         session.setNextOutgoingMessageSeqNum(messageSequenceProvider.getMsgOutSeqNum());

@@ -39,7 +39,7 @@ public class FixMessageBuilderImpl implements FixMessage, FixMessageBuilder {
      *
      * @param expectedBodyFieldCount estimated maximum number of field in message body
      */
-    public FixMessageBuilderImpl(int expectedBodyFieldCount) {
+    private FixMessageBuilderImpl(int expectedBodyFieldCount) {
         this.header = new FixMessageHeader();
         this.trailer = new FixMessageTrailer();
         this.body = new Int2ObjectArrayMap<>(expectedBodyFieldCount);
@@ -280,9 +280,11 @@ public class FixMessageBuilderImpl implements FixMessage, FixMessageBuilder {
         this.header.setMsgSeqNum(header.getMsgSeqNum());
         this.header.setSenderCompID(header.getSenderCompID());
         this.header.setSenderSubID(header.getSenderSubID());
+        this.header.setSenderLocationID(header.getSenderLocationID());
         this.header.setBeginString(header.getBeginString());
         this.header.setTargetCompID(header.getTargetCompID());
         this.header.setTargetSubID(header.getTargetSubID());
+        this.header.setTargetLocationID(header.getTargetLocationID());
     }
 
     public int getMsgSeqNum() {

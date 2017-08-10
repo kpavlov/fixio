@@ -15,39 +15,54 @@
  */
 package fixio.netty.pipeline;
 
+import fixio.fixprotocol.FixConst;
+
 import java.time.Clock;
+import java.time.Instant;
 import java.time.ZoneId;
+import java.time.ZonedDateTime;
 
 /**
  * Fix clock that uses Java 8 system UTC clock by default,
  * it should be easy to add other time zones clock using
  * Java 8 time API.
  */
-public class FixClock {
+public class FixClock extends Clock {
 
-    private static final FixClock INSTANCE = new FixClock(Clock.systemUTC());
+    private static final FixClock INSTANCE = new FixClock(Clock.system(FixConst.DEFAULT_ZONE_ID));
 
     private final Clock clock;
     private final ZoneId zoneId;
+    private final long initialNanos;
+    private final Instant initialInstant;
 
     private FixClock(Clock clock) {
         this.clock = clock;
-        zoneId = clock.getZone();
+        this.zoneId = clock.getZone();
+        this.initialInstant = clock.instant();
+        this.initialNanos = System.nanoTime();
     }
 
     public static FixClock systemUTC() {
         return INSTANCE;
     }
 
-    public Clock clock() {
-        return clock;
+    @Override
+    public Instant instant() {
+        return initialInstant.plusNanos(System.nanoTime() - initialNanos);
     }
 
-    public ZoneId zone() {
+    @Override
+    public ZoneId getZone() {
         return zoneId;
     }
 
-    public long millis() {
-        return clock.millis();
+    @Override
+    public FixClock withZone(final ZoneId zone) {
+        return new FixClock(clock.withZone(zone));
+    }
+
+    public ZonedDateTime now(){
+        return ZonedDateTime.now(this);
     }
 }

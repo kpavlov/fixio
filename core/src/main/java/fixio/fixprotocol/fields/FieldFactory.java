@@ -19,6 +19,8 @@ import fixio.fixprotocol.DataType;
 import fixio.fixprotocol.FieldType;
 
 import java.text.ParseException;
+import java.time.Instant;
+import java.time.ZoneOffset;
 
 public class FieldFactory {
 
@@ -95,11 +97,11 @@ public class FieldFactory {
             case NUMINGROUP:
                 return (F) new IntField(tagNum, value);
             case UTCTIMESTAMP:
-                return (F) new UTCTimestampField(tagNum, value);
+                return (F) new UTCTimestampField(tagNum, Instant.ofEpochMilli(value).atOffset(ZoneOffset.UTC).toZonedDateTime());
             case UTCTIMEONLY:
-                return (F) new UTCTimeOnlyField(tagNum, value);
+                return (F) new UTCTimeOnlyField(tagNum, Instant.ofEpochMilli(value).atOffset(ZoneOffset.UTC).toLocalTime());
             case UTCDATEONLY:
-                return (F) new UTCDateOnlyField(tagNum, value);
+                return (F) new UTCDateOnlyField(tagNum, Instant.ofEpochMilli(value).atOffset(ZoneOffset.UTC).toLocalDate());
             default:
                 throw new IllegalArgumentException("Value " + value + " is not applicable for field: " + tagNum
                         + '(' + type + ')');
@@ -138,11 +140,11 @@ public class FieldFactory {
             case NUMINGROUP:
                 return (F) new IntField(tagNum, (int) value);
             case UTCTIMESTAMP:
-                return (F) new UTCTimestampField(tagNum, value);
+                return (F) new UTCTimestampField(tagNum, Instant.ofEpochMilli(value).atOffset(ZoneOffset.UTC).toZonedDateTime());
             case UTCTIMEONLY:
-                return (F) new UTCTimeOnlyField(tagNum, value);
+                return (F) new UTCTimeOnlyField(tagNum, Instant.ofEpochMilli(value).atOffset(ZoneOffset.UTC).toLocalTime());
             case UTCDATEONLY:
-                return (F) new UTCDateOnlyField(tagNum, value);
+                return (F) new UTCDateOnlyField(tagNum, Instant.ofEpochMilli(value).atOffset(ZoneOffset.UTC).toLocalDate());
             default:
                 throw new IllegalArgumentException("Value " + value + " is not applicable for field: " + tagNum
                         + '(' + type + ')');

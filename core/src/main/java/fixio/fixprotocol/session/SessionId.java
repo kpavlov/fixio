@@ -21,19 +21,22 @@ public class SessionId {
     private final String targetCompID;
     private final String senderSubID;
     private final String targetSubID;
+    private final String senderLocationID;
+    private final String targetLocationID;
     private final int hash;
 
-    public SessionId(String senderCompID,
-                     String targetCompID,
-                     String senderSubID,
-                     String targetSubID) {
+    public SessionId(String senderCompID, String targetCompID,
+                     String senderSubID, String targetSubID,
+                     String senderLocationID, String targetLocationID) {
         assert (senderCompID != null) : "SenderCompID is required.";
         assert (targetCompID != null) : "TargetCompID is required.";
         this.senderCompID = senderCompID;
         this.targetCompID = targetCompID;
         this.senderSubID = senderSubID;
         this.targetSubID = targetSubID;
-
+        this.senderLocationID = senderLocationID;
+        this.targetLocationID = targetLocationID;
+        //
         this.hash = calculateHash();
     }
 
@@ -53,17 +56,26 @@ public class SessionId {
         return targetSubID;
     }
 
+    public String getSenderLocationID() {
+        return senderLocationID;
+    }
+
+    public String getTargetLocationID() {
+        return targetLocationID;
+    }
+
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
         SessionId other = (SessionId) o;
         return this.hashCode() == other.hashCode() &&
-                senderCompID.equals(other.senderCompID) &&
-                !(senderSubID != null ? !senderSubID.equals(other.senderSubID) : other.senderSubID != null) &&
-                targetCompID.equals(other.targetCompID) &&
-                !(targetSubID != null ? !targetSubID.equals(other.targetSubID) : other.targetSubID != null);
-
+                idEquals(senderCompID,other.senderCompID) &&
+                idEquals(senderSubID,other.senderSubID) &&
+                idEquals(senderLocationID,other.senderLocationID) &&
+                idEquals(targetCompID,other.targetCompID) &&
+                idEquals(targetSubID,other.targetSubID) &&
+                idEquals(targetLocationID,other.targetLocationID);
     }
 
     @Override
@@ -80,6 +92,16 @@ public class SessionId {
         if (targetSubID != null) {
             result = 31 * result + targetSubID.hashCode();
         }
+        if (senderLocationID != null) {
+            result = 31 * result + senderLocationID.hashCode();
+        }
+        if (targetLocationID != null) {
+            result = 31 * result + targetLocationID.hashCode();
+        }
         return result;
+    }
+
+    private static boolean idEquals(String s1, String s2){
+        return (s1==null && s2==null) || (s1!=null && s1.equals(s2));
     }
 }

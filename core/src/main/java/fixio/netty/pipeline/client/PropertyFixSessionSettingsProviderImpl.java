@@ -16,6 +16,7 @@
 
 package fixio.netty.pipeline.client;
 
+import fixio.fixprotocol.FixConst;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -67,23 +68,48 @@ public class PropertyFixSessionSettingsProviderImpl implements FixSessionSetting
     }
 
     @Override
+    public String getTimeStampPrecision() {// "SECONDS", "MILLIS", "MICROS", "NANOS". Default is "MILLIS"
+        return properties.getProperty("TimeStampPrecision", FixConst.TimeStampPrecision.MILLIS.toString()).trim();
+    }
+
+    @Override
+    public String getDefaultApplVerID() {
+        return properties.getProperty("DefaultApplVerID", null);
+    }
+
+    @Override
+    public String getDefaultApplExtID() {
+        return properties.getProperty("DefaultApplExtID", null);
+    }
+
+    @Override
     public String getSenderCompID() {
-        return properties.getProperty("SenderCompID");
+        return properties.getProperty("SenderCompID","").trim();
     }
 
     @Override
     public String getSenderSubID() {
-        return properties.getProperty("SenderSubID");
+        return properties.getProperty("SenderSubID","").trim();
+    }
+
+    @Override
+    public String getSenderLocationID() {
+        return properties.getProperty("SenderLocationID","").trim();
     }
 
     @Override
     public String getTargetCompID() {
-        return properties.getProperty("TargetCompID");
+        return properties.getProperty("TargetCompID","").trim();
     }
 
     @Override
     public String getTargetSubID() {
-        return properties.getProperty("TargetSubID");
+        return properties.getProperty("TargetSubID","").trim();
+    }
+
+    @Override
+    public String getTargetLocationID() {
+        return properties.getProperty("TargetLocationID","").trim();
     }
 
     @Override

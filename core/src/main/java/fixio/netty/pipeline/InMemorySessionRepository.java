@@ -30,7 +30,9 @@ public class InMemorySessionRepository implements SessionRepository {
                 header.getSenderCompID(),
                 header.getTargetCompID(),
                 header.getSenderSubID(),
-                header.getTargetSubID()
+                header.getTargetSubID(),
+                header.getSenderLocationID(),
+                header.getTargetLocationID()
         );
     }
 
@@ -42,8 +44,10 @@ public class InMemorySessionRepository implements SessionRepository {
                 .beginString(header.getBeginString())
                 .senderCompId(header.getSenderCompID())
                 .senderSubId(header.getSenderSubID())
+                .senderLocationID(header.getSenderLocationID())
                 .targetCompId(header.getTargetCompID())
                 .targetSubId(header.getTargetSubID())
+                .targetLocationID(header.getTargetLocationID())
                 .build();
 
         newSession.setNextIncomingMessageSeqNum(1);

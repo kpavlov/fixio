@@ -15,14 +15,12 @@
  */
 package fixio.fixprotocol.fields;
 
-import org.joda.time.DateTime;
-import org.joda.time.format.DateTimeFormat;
-import org.joda.time.format.DateTimeFormatter;
-
 import java.text.ParseException;
+import java.time.LocalDate;
 
+import static fixio.fixprotocol.FixConst.DATE_FORMATTER;
 import static java.nio.charset.StandardCharsets.US_ASCII;
-import static org.joda.time.DateTimeZone.UTC;
+
 
 /**
  * Field representing Date represented in UTC (Universal Time Coordinated, also known as "GMT") in YYYYMMDD format.
@@ -37,42 +35,50 @@ import static org.joda.time.DateTimeZone.UTC;
  * </p>
  * Example(s): <code>MDEntryDate="20030910"</code>
  */
-public class UTCDateOnlyField extends AbstractTemporalField {
+public class UTCDateOnlyField extends AbstractField<LocalDate> {
 
-    private static final DateTimeFormatter FORMATTER = DateTimeFormat.forPattern("yyyyMMdd").withZone(UTC);
+    private final LocalDate value;
 
-    protected UTCDateOnlyField(int tagNum, byte[] bytes) throws ParseException {
-        super(tagNum, parse(bytes));
+    public UTCDateOnlyField(int tagNum, byte[] bytes) throws ParseException {
+        super(tagNum);
+        this.value = parse(bytes);
     }
 
-    protected UTCDateOnlyField(int tagNum, String timestampString) throws ParseException {
-        super(tagNum, parse(timestampString));
+    public UTCDateOnlyField(int tagNum, String timestampString) throws ParseException {
+        super(tagNum);
+        this.value = parse(timestampString);
     }
 
-    protected UTCDateOnlyField(int tagNum, long value) {
-        super(tagNum, value);
-    }
-
-    static long parse(String timestampString) throws ParseException {
-        return FORMATTER.parseMillis(timestampString);
-    }
-
-    static long parse(byte[] bytes) throws ParseException {
-        if (bytes.length != 8) {
-            throwParseException(bytes, 0);
-        }
-        int year = (bytes[0] - '0') * 1000 + (bytes[1] - '0') * 100 + (bytes[2] - '0') * 10 + (bytes[3] - '0');
-        int month = (bytes[4] - '0') * 10 + (bytes[5] - '0');
-        int date = (bytes[6] - '0') * 10 + (bytes[7] - '0');
-        return new DateTime(year, month, date, 0, 0, 0, 0, UTC).getMillis();
-    }
-
-    private static void throwParseException(byte[] bytes, int errorOffset) throws ParseException {
-        throw new ParseException("Unparseable date: " + new String(bytes, US_ASCII), errorOffset);
+    public UTCDateOnlyField(int tagNum, LocalDate value) {
+        super(tagNum);
+        this.value = value;
     }
 
     @Override
     public byte[] getBytes() {
-        return new DateTime(value).toString(FORMATTER).getBytes(US_ASCII);
+        return DATE_FORMATTER.format(value).getBytes(US_ASCII);
+    }
+
+    @Override
+    public LocalDate getValue() {
+        return value;
+    }
+
+    public static LocalDate parse(String timestampString) throws ParseException {
+        if (timestampString != null) {
+            int len = timestampString.length();
+            if (len < 8) {
+                throw new ParseException("Unparseable date: '" + timestampString + "'", 0);
+            } else if (len == 8) {
+                return DATE_FORMATTER.parseLocalDate(timestampString);
+            } else {
+                return DATE_FORMATTER.parseLocalDate(timestampString.substring(0, 8));
+            }
+        }
+        throw new ParseException("Date is null", 0);
+    }
+
+    public static LocalDate parse(byte[] bytes) throws ParseException {
+        return parse(new String(bytes, US_ASCII));
     }
 }

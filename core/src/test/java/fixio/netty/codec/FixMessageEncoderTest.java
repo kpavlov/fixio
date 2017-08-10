@@ -15,7 +15,12 @@
  */
 package fixio.netty.codec;
 
-import fixio.fixprotocol.*;
+import fixio.fixprotocol.FixMessage;
+import fixio.fixprotocol.FixMessageBuilder;
+import fixio.fixprotocol.FixMessageBuilderImpl;
+import fixio.fixprotocol.FixMessageHeader;
+import fixio.fixprotocol.Group;
+import fixio.fixprotocol.MessageTypes;
 import fixio.fixprotocol.fields.FieldFactory;
 import io.netty.buffer.ByteBuf;
 import io.netty.buffer.ByteBufAllocator;
@@ -26,8 +31,11 @@ import org.junit.BeforeClass;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.Mock;
-import org.mockito.runners.MockitoJUnitRunner;
+import org.mockito.junit.MockitoJUnitRunner;
 
+import java.time.Instant;
+import java.time.ZoneId;
+import java.time.ZonedDateTime;
 import java.util.Arrays;
 
 import static java.nio.charset.StandardCharsets.US_ASCII;
@@ -39,7 +47,7 @@ import static org.mockito.Mockito.when;
 public class FixMessageEncoderTest {
 
     private static FixMessageEncoder encoder;
-    private final long timestamp = 123456789;
+    private final ZonedDateTime timestamp = ZonedDateTime.ofInstant(Instant.ofEpochMilli(123456789), ZoneId.of("UTC"));
     @Mock
     private ChannelHandlerContext ctx;
     @Mock
@@ -120,7 +128,7 @@ public class FixMessageEncoderTest {
     public void testEncodeWithCustomHeader() throws Exception {
         messageBuilder.getHeader().setCustomFields(Arrays.asList(
                 FieldFactory.fromIntValue(1128, 9),
-                (FixMessageFragment) FieldFactory.fromStringValue(1129, "1.0")
+                FieldFactory.fromStringValue(1129, "1.0")
         ));
 
         encoder.encode(ctx, messageBuilder, out);

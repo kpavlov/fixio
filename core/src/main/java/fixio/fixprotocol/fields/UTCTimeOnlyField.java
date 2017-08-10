@@ -15,88 +15,116 @@
  */
 package fixio.fixprotocol.fields;
 
-import org.joda.time.DateTime;
-import org.joda.time.LocalDate;
-import org.joda.time.format.DateTimeFormat;
-import org.joda.time.format.DateTimeFormatter;
+import fixio.fixprotocol.FixConst;
 
-import java.nio.charset.StandardCharsets;
 import java.text.ParseException;
+import java.time.LocalTime;
 
+import static fixio.fixprotocol.FixConst.TIME_FORMATTER_MICROS;
+import static fixio.fixprotocol.FixConst.TIME_FORMATTER_MILLIS;
+import static fixio.fixprotocol.FixConst.TIME_FORMATTER_NANOS;
+import static fixio.fixprotocol.FixConst.TIME_FORMATTER_PICOS;
+import static fixio.fixprotocol.FixConst.TIME_FORMATTER_SECONDS;
+import static fixio.fixprotocol.FixConst.TIME_PATTERN_MICROS_LENGTH;
+import static fixio.fixprotocol.FixConst.TIME_PATTERN_MILLIS_LENGTH;
+import static fixio.fixprotocol.FixConst.TIME_PATTERN_NANOS_LENGTH;
+import static fixio.fixprotocol.FixConst.TIME_PATTERN_PICOS_LENGTH;
+import static fixio.fixprotocol.FixConst.TIME_PATTERN_SECONDS_LENGTH;
 import static java.nio.charset.StandardCharsets.US_ASCII;
-import static org.joda.time.DateTimeZone.UTC;
 
-public class UTCTimeOnlyField extends AbstractField<Long> {
 
-    private static final long MILLIS_PER_SECOND = 1000;
-    private static final long MILLIS_PER_MINUTE = 60 * MILLIS_PER_SECOND;
-    private static final long MILLIS_PER_HOUR = 60 * MILLIS_PER_MINUTE;
+public class UTCTimeOnlyField extends AbstractField<LocalTime> {
 
-    private static final DateTimeFormatter FORMATTER_WITH_MILLIS = DateTimeFormat.forPattern("HH:mm:ss.SSS").withZone(UTC);
-    private static final DateTimeFormatter FORMATTER = DateTimeFormat.forPattern("HH:mm:ss").withZone(UTC);
+    private final LocalTime value;
+    private final int valueLen;
 
-    private final long value;
-
-    protected UTCTimeOnlyField(int tagNum, byte[] bytes) throws ParseException {
+    public UTCTimeOnlyField(int tagNum, byte[] bytes) throws ParseException {
         super(tagNum);
         this.value = parse(bytes);
+        this.valueLen = bytes.length;
     }
 
-    protected UTCTimeOnlyField(int tagNum, String timestampString) throws ParseException {
+    public UTCTimeOnlyField(int tagNum, String timestampString) throws ParseException {
         super(tagNum);
         this.value = parse(timestampString);
+        this.valueLen = timestampString.length();
     }
 
-    protected UTCTimeOnlyField(int tagNum, long value) {
+    public UTCTimeOnlyField(int tagNum, LocalTime value) {
         super(tagNum);
         this.value = value;
-    }
-
-    static long parse(String timestampString) throws ParseException {
-        return new LocalDate(UTC).toDateTime(FORMATTER.parseLocalTime(timestampString), UTC).getMillis();
-    }
-
-    static long parse(byte[] bytes) throws ParseException {
-        if (bytes.length != 8 && bytes.length != 12) {
-            throwParseException(bytes, 0);
-        }
-        if (bytes[2] != ':') {
-            throwParseException(bytes, 2);
-        }
-        if (bytes[5] != ':') {
-            throwParseException(bytes, 5);
-        }
-
-        int hour = (bytes[0] - '0') * 10 + (bytes[1] - '0');
-        int minute = (bytes[3] - '0') * 10 + (bytes[4] - '0');
-        int second = (bytes[6] - '0') * 10 + (bytes[7] - '0');
-        int millisecond = 0;
-        if (bytes.length > 8) {
-            if (bytes[8] != '.') {
-                throwParseException(bytes, 8);
-            }
-            millisecond = (bytes[9] - '0') * 100 + (bytes[10] - '0') * 10 + (bytes[11] - '0');
-        }
-        assert (hour >= 0 && hour <= 23) : "Invalid value for hour: " + hour;
-        assert (minute >= 0 && minute <= 59) : "Invalid value for minute: " + minute;
-        assert (second >= 0 && second <= 59) : "Invalid value for second: " + second;
-        assert (millisecond >= 0 && millisecond < 1000) : "Invalid value for millisecond: " + millisecond;
-
-        return MILLIS_PER_HOUR * hour + MILLIS_PER_MINUTE * minute + MILLIS_PER_SECOND * second + millisecond;
-    }
-
-    private static void throwParseException(byte[] bytes, int errorOffset) throws ParseException {
-        throw new ParseException("Unparseable date: " + new String(bytes, StandardCharsets.US_ASCII), errorOffset);
+        this.valueLen = FixConst.TIME_PATTERN_MILLIS.length();
     }
 
     @Override
-    public Long getValue() {
+    public LocalTime getValue() {
         return value;
     }
 
     @Override
     public byte[] getBytes() {
-        return new DateTime(value).toString(value % 1000 != 0 ? FORMATTER_WITH_MILLIS : FORMATTER).getBytes(US_ASCII);
+        // most likely scenario
+        switch (valueLen) {
+            case 8:
+                return TIME_FORMATTER_SECONDS.format(value).getBytes(US_ASCII);
+            case 12:
+                return TIME_FORMATTER_MILLIS.format(value).getBytes(US_ASCII);
+            case 15:
+                return TIME_FORMATTER_MICROS.format(value).getBytes(US_ASCII);
+            case 18:
+                return TIME_FORMATTER_NANOS.format(value).getBytes(US_ASCII);
+            case 21:
+                return TIME_FORMATTER_PICOS.format(value).getBytes(US_ASCII);
+            default: // no default, logic continues below
+        }
+        // try to guess
+        if (valueLen > TIME_PATTERN_PICOS_LENGTH) {
+            return (TIME_FORMATTER_NANOS.format(value)).getBytes(US_ASCII);
+        } else if (valueLen > TIME_PATTERN_NANOS_LENGTH) {
+            return TIME_FORMATTER_NANOS.format(value).getBytes(US_ASCII);
+        } else if (valueLen > TIME_PATTERN_MICROS_LENGTH) {
+            return TIME_FORMATTER_MICROS.format(value).getBytes(US_ASCII);
+        } else if (valueLen > TIME_PATTERN_MILLIS_LENGTH) {
+            return TIME_FORMATTER_MILLIS.format(value).getBytes(US_ASCII);
+        } else {
+            return TIME_FORMATTER_SECONDS.format(value).getBytes(US_ASCII);
+        }
     }
 
+    public static LocalTime parse(String timestampString) throws ParseException {
+        if (timestampString != null) {
+            int len = timestampString.length();
+            // most likely scenario
+            switch (len) {
+                case 8:
+                    return TIME_FORMATTER_SECONDS.parseLocalTime(timestampString);
+                case 12:
+                    return TIME_FORMATTER_MILLIS.parseLocalTime(timestampString);
+                case 15:
+                    return TIME_FORMATTER_MICROS.parseLocalTime(timestampString);
+                case 18:
+                    return TIME_FORMATTER_NANOS.parseLocalTime(timestampString);
+                case 21:
+                    return TIME_FORMATTER_PICOS.parseLocalTime(timestampString);
+                default: // no default, logic continues below
+            }
+            // try to guess
+            if (len >= TIME_PATTERN_PICOS_LENGTH) {
+                return TIME_FORMATTER_PICOS.parseLocalTime(timestampString.substring(0, TIME_PATTERN_NANOS_LENGTH));
+            } else if (len > TIME_PATTERN_NANOS_LENGTH) {
+                return TIME_FORMATTER_NANOS.parseLocalTime(timestampString.substring(0, TIME_PATTERN_NANOS_LENGTH));
+            } else if (len > TIME_PATTERN_MICROS_LENGTH) {
+                return TIME_FORMATTER_MICROS.parseLocalTime(timestampString.substring(0, TIME_PATTERN_MICROS_LENGTH));
+            } else if (len > TIME_PATTERN_MILLIS_LENGTH) {
+                return TIME_FORMATTER_MILLIS.parseLocalTime(timestampString.substring(0, TIME_PATTERN_MILLIS_LENGTH));
+            } else {
+                return TIME_FORMATTER_SECONDS.parseLocalTime(timestampString.substring(0, TIME_PATTERN_SECONDS_LENGTH));
+            }
+        }
+        throw new ParseException("Time is null", -1);
+    }
+
+    public static LocalTime parse(byte[] bytes) throws ParseException {
+        return parse(new String(bytes, US_ASCII));
+    }
 }

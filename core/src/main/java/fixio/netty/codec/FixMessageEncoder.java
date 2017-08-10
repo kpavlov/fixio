@@ -16,19 +16,19 @@
 
 package fixio.netty.codec;
 
+import fixio.fixprotocol.FixConst;
 import fixio.fixprotocol.FixMessageBuilder;
 import fixio.fixprotocol.FixMessageFragment;
 import fixio.fixprotocol.FixMessageHeader;
 import fixio.fixprotocol.Group;
 import fixio.fixprotocol.GroupField;
 import fixio.fixprotocol.fields.AbstractField;
+import fixio.fixprotocol.fields.DateTimeFormatterWrapper;
 import io.netty.buffer.ByteBuf;
 import io.netty.buffer.ByteBufAllocator;
 import io.netty.channel.ChannelHandler;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.handler.codec.MessageToByteEncoder;
-import org.joda.time.DateTime;
-import org.joda.time.format.DateTimeFormat;
 
 import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;
@@ -38,8 +38,6 @@ import java.util.List;
 public class FixMessageEncoder extends MessageToByteEncoder<FixMessageBuilder> {
 
     private static final Charset CHARSET = StandardCharsets.US_ASCII;
-    private static final String UTC_TIMESTAMP_WITH_MILLIS_PATTERN = "yyyyMMdd-HH:mm:ss.SSS";
-    private static final org.joda.time.format.DateTimeFormatter SDF = DateTimeFormat.forPattern(UTC_TIMESTAMP_WITH_MILLIS_PATTERN).withZoneUTC();
 
     private static void validateRequiredFields(FixMessageHeader header) {
         if (header.getBeginString() == null) {
@@ -86,24 +84,33 @@ public class FixMessageEncoder extends MessageToByteEncoder<FixMessageBuilder> {
         // SenderCompID
         writeField(49, header.getSenderCompID(), out);
 
-        // SenderCompSubID
-        if (header.getSenderSubID() != null && !"".equals(header.getSenderSubID())) {
-            writeField(50, header.getSenderSubID(), out);
-        }
-
         // TargetCompID
         writeField(56, header.getTargetCompID(), out);
-
-        // TargetCompSubID
-        if (header.getTargetSubID() != null && !"".equals(header.getTargetSubID())) {
-            writeField(57, header.getTargetSubID(), out);
-        }
 
         // MsgSeqNum
         writeField(34, Integer.toString(header.getMsgSeqNum()), out);
 
+        // SenderSubID
+        if (header.getSenderSubID() != null && !"".equals(header.getSenderSubID())) {
+            writeField(50, header.getSenderSubID(), out);
+        }
+        // SenderLocationID
+        if (header.getSenderLocationID() != null && !"".equals(header.getSenderLocationID())) {
+            writeField(142, header.getSenderLocationID(), out);
+        }
+
+        // TargetSubID
+        if (header.getTargetSubID() != null && !"".equals(header.getTargetSubID())) {
+            writeField(57, header.getTargetSubID(), out);
+        }
+        // TargetLocationID
+        if (header.getTargetLocationID() != null && !"".equals(header.getTargetLocationID())) {
+            writeField(143, header.getTargetLocationID(), out);
+        }
+
         // SendingTime
-        String timeStr = new DateTime(header.getSendingTime()).toString(SDF);
+        DateTimeFormatterWrapper formatter = (header.getDateTimeFormatter()!=null)? header.getDateTimeFormatter(): FixConst.DATE_TIME_FORMATTER_MILLIS;
+        String timeStr = formatter.format(header.getSendingTime());
         writeField(52, timeStr, out);
 
         // customize tag
