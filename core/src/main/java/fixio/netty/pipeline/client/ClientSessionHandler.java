@@ -17,7 +17,12 @@
 package fixio.netty.pipeline.client;
 
 import fixio.events.LogonEvent;
-import fixio.fixprotocol.*;
+import fixio.fixprotocol.FieldType;
+import fixio.fixprotocol.FixMessage;
+import fixio.fixprotocol.FixMessageBuilder;
+import fixio.fixprotocol.FixMessageBuilderImpl;
+import fixio.fixprotocol.FixMessageHeader;
+import fixio.fixprotocol.MessageTypes;
 import fixio.fixprotocol.session.FixSession;
 import fixio.handlers.FixApplication;
 import fixio.netty.pipeline.AbstractSessionHandler;
@@ -38,9 +43,9 @@ public class ClientSessionHandler extends AbstractSessionHandler {
     private final AuthenticationProvider authenticationProvider;
 
     protected ClientSessionHandler(FixSessionSettingsProvider settingsProvider,
-                                AuthenticationProvider authenticationProvider,
-                                MessageSequenceProvider messageSequenceProvider,
-                                FixApplication fixApplication) {
+                                   AuthenticationProvider authenticationProvider,
+                                   MessageSequenceProvider messageSequenceProvider,
+                                   FixApplication fixApplication) {
         super(fixApplication, FixClock.systemUTC(), new InMemorySessionRepository());
         this.authenticationProvider = authenticationProvider;
         assert (settingsProvider != null) : "FixSessionSettingsProvider is expected.";
@@ -59,9 +64,9 @@ public class ClientSessionHandler extends AbstractSessionHandler {
                 messageBuilder.add(FieldType.Password, String.valueOf(authentication.getPassword()));
             }
         }
-        if(FixMessage.FIX_5_0.equalsIgnoreCase(session.getBeginString())){
+        if (FixMessage.FIX_5_0.equalsIgnoreCase(session.getBeginString())) {
             messageBuilder.add(FieldType.DefaultApplVerID, session.getDefaultApplVerID());
-            if(session.getDefaultApplExtID()!=null && "".equalsIgnoreCase(session.getDefaultApplExtID())){
+            if (session.getDefaultApplExtID() != null && "".equalsIgnoreCase(session.getDefaultApplExtID())) {
                 messageBuilder.add(FieldType.DefaultApplExtID, session.getDefaultApplExtID());
             }
         }
@@ -116,18 +121,18 @@ public class ClientSessionHandler extends AbstractSessionHandler {
 
     private FixSession createSession(FixSessionSettingsProvider settingsProvider) {
         String defaultApplVerID = settingsProvider.getDefaultApplVerID();
-        if(FixMessage.FIX_5_0.equalsIgnoreCase(settingsProvider.getBeginString()) &&
-                (defaultApplVerID==null || defaultApplVerID.trim().length()==0)){
+        if (FixMessage.FIX_5_0.equalsIgnoreCase(settingsProvider.getBeginString()) &&
+                (defaultApplVerID == null || defaultApplVerID.trim().length() == 0)) {
             defaultApplVerID = "7";
         }
         //
         final FixSession session = FixSession.newBuilder()
                 .beginString(settingsProvider.getBeginString())
-                .senderCompId(settingsProvider.getSenderCompID())
-                .senderSubId(settingsProvider.getSenderSubID())
+                .senderCompID(settingsProvider.getSenderCompID())
+                .senderSubID(settingsProvider.getSenderSubID())
                 .senderLocationID(settingsProvider.getSenderLocationID())
-                .targetCompId(settingsProvider.getTargetCompID())
-                .targetSubId(settingsProvider.getTargetSubID())
+                .targetCompID(settingsProvider.getTargetCompID())
+                .targetSubID(settingsProvider.getTargetSubID())
                 .targetLocationID(settingsProvider.getTargetLocationID())
                 .timeStampPrecision(settingsProvider.getTimeStampPrecision())
                 .defaultApplVerID(defaultApplVerID)

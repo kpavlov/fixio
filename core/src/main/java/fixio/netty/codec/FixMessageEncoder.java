@@ -109,7 +109,7 @@ public class FixMessageEncoder extends MessageToByteEncoder<FixMessageBuilder> {
         }
 
         // SendingTime
-        DateTimeFormatterWrapper formatter = (header.getDateTimeFormatter()!=null)? header.getDateTimeFormatter(): FixConst.DATE_TIME_FORMATTER_MILLIS;
+        DateTimeFormatterWrapper formatter = (header.getDateTimeFormatter() != null) ? header.getDateTimeFormatter() : FixConst.DATE_TIME_FORMATTER_MILLIS;
         String timeStr = formatter.format(header.getSendingTime());
         writeField(52, timeStr, out);
 

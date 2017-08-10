@@ -62,7 +62,7 @@ public class FixClock extends Clock {
         return new FixClock(clock.withZone(zone));
     }
 
-    public ZonedDateTime now(){
+    public ZonedDateTime now() {
         return ZonedDateTime.now(this);
     }
 }

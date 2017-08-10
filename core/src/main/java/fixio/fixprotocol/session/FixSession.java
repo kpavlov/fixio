@@ -34,6 +34,7 @@ public class FixSession {
 
     private static final AtomicIntegerFieldUpdater<FixSession> INCOMING_SEQ_NUM_UPDATER = AtomicIntegerFieldUpdater.newUpdater
             (FixSession.class, "nextIncomingMessageSeqNum");
+
     private final AtomicInteger nextOutgoingMessageSeqNum = new AtomicInteger();
     private final String beginString;
     private final String senderCompID;
@@ -43,26 +44,29 @@ public class FixSession {
     private final String targetLocationID;
     private final String targetSubID;
     private final String defaultApplVerID;
-    private String defaultApplExtID = null;
-    //
+    private final String defaultApplExtID;
     private final SessionId sessionId;
     private volatile int nextIncomingMessageSeqNum;
     private DateTimeFormatterWrapper dateTimeFormatter = FixConst.DATE_TIME_FORMATTER_MILLIS;
 
-    private FixSession(String beginString,
-                       String senderCompID, String senderSubID, String senderLocationID,
-                       String targetCompID, String targetSubID, String targetLocationID,
-                       String defaultApplVerID){
-        this.beginString = beginString;
-        this.senderCompID = senderCompID;
-        this.senderSubID = senderSubID;
-        this.senderLocationID = senderLocationID;
-        this.targetCompID = targetCompID;
-        this.targetSubID = targetSubID;
-        this.targetLocationID = targetLocationID;
-        this.defaultApplVerID = defaultApplVerID;
-        //
-        this.sessionId = new SessionId(senderCompID, targetCompID, senderSubID, targetSubID, senderLocationID, targetLocationID);
+    private FixSession(Builder builder) {
+        this.beginString = builder.beginString;
+        this.senderCompID = builder.senderCompID;
+        this.senderSubID = builder.senderSubID;
+        this.senderLocationID = builder.senderLocationID;
+        this.targetCompID = builder.targetCompID;
+        this.targetSubID = builder.targetSubID;
+        this.targetLocationID = builder.targetLocationID;
+        this.defaultApplVerID = builder.defaultApplVerID;
+        this.defaultApplExtID = builder.defaultApplExtID;
+
+        this.sessionId = new SessionId(
+                senderCompID,
+                targetCompID,
+                senderSubID,
+                targetSubID,
+                senderLocationID,
+                targetLocationID);
     }
 
     public static Builder newBuilder() {
@@ -103,10 +107,6 @@ public class FixSession {
 
     public String getDefaultApplExtID() {
         return defaultApplExtID;
-    }
-
-    public void setDefaultApplExtID(String defaultApplExtID) {
-        this.defaultApplExtID = defaultApplExtID;
     }
 
     public int getNextOutgoingMessageSeqNum() {
@@ -183,14 +183,14 @@ public class FixSession {
     public static class Builder {
 
         private String beginString;
-        private String senderCompId;
-        private String senderSubId;
+        private String senderCompID;
+        private String senderSubID;
         private String senderLocationID;
-        private String targetCompId;
-        private String targetSubId;
+        private String targetCompID;
+        private String targetSubID;
         private String targetLocationID;
         private String defaultApplVerID;
-        private String defaultApplExtID=null;
+        private String defaultApplExtID;
         private DateTimeFormatterWrapper dateTimeFormatter = FixConst.DATE_TIME_FORMATTER_MILLIS;
 
         private Builder() {
@@ -201,13 +201,13 @@ public class FixSession {
             return this;
         }
 
-        public Builder senderCompId(String senderCompId) {
-            this.senderCompId = senderCompId;
+        public Builder senderCompID(String senderCompId) {
+            this.senderCompID = senderCompId;
             return this;
         }
 
-        public Builder senderSubId(String senderSubId) {
-            this.senderSubId = senderSubId;
+        public Builder senderSubID(String senderSubId) {
+            this.senderSubID = senderSubId;
             return this;
         }
 
@@ -216,13 +216,13 @@ public class FixSession {
             return this;
         }
 
-        public Builder targetCompId(String targetCompId) {
-            this.targetCompId = targetCompId;
+        public Builder targetCompID(String targetCompId) {
+            this.targetCompID = targetCompId;
             return this;
         }
 
-        public Builder targetSubId(String targetSubId) {
-            this.targetSubId = targetSubId;
+        public Builder targetSubID(String targetSubId) {
+            this.targetSubID = targetSubId;
             return this;
         }
 
@@ -242,34 +242,22 @@ public class FixSession {
         }
 
         public Builder timeStampPrecision(String timeStampPrecision) {
-            if(SECONDS.toString().equals(timeStampPrecision)){
+            if (SECONDS.toString().equals(timeStampPrecision)) {
                 this.dateTimeFormatter = FixConst.DATE_TIME_FORMATTER_SECONDS;
-            }else if(MILLIS.toString().equals(timeStampPrecision)){
+            } else if (MILLIS.toString().equals(timeStampPrecision)) {
                 this.dateTimeFormatter = FixConst.DATE_TIME_FORMATTER_MILLIS;
-            }else if(MICROS.toString().equals(timeStampPrecision)){
+            } else if (MICROS.toString().equals(timeStampPrecision)) {
                 this.dateTimeFormatter = FixConst.DATE_TIME_FORMATTER_MICROS;
-            }else if(NANOS.toString().equals(timeStampPrecision)){
+            } else if (NANOS.toString().equals(timeStampPrecision)) {
                 this.dateTimeFormatter = FixConst.DATE_TIME_FORMATTER_NANOS;
-            }else if(PICOS.toString().equals(timeStampPrecision)){
+            } else if (PICOS.toString().equals(timeStampPrecision)) {
                 this.dateTimeFormatter = FixConst.DATE_TIME_FORMATTER_PICOS;
             }
             return this;
         }
 
         public FixSession build() {
-            FixSession session = new FixSession(
-                    beginString,
-                    senderCompId,
-                    senderSubId,
-                    senderLocationID,
-                    targetCompId,
-                    targetSubId,
-                    targetLocationID,
-                    defaultApplVerID
-            );
-            session.setDateTimeFormatter(dateTimeFormatter);
-            session.setDefaultApplExtID(defaultApplExtID);
-            return session;
+            return new FixSession(this);
         }
 
     }

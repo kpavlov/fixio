@@ -38,10 +38,8 @@ import io.netty.handler.logging.LoggingHandler;
  */
 public abstract class FixChannelInitializer<C extends Channel> extends ChannelInitializer<C> {
 
-    private static final FixMessageEncoder ENCODER = new FixMessageEncoder();
-
     protected static final String TAG_DECODER_HANDLER_NAME = "tagDecoder";
-
+    private static final FixMessageEncoder ENCODER = new FixMessageEncoder();
     private final EventLoopGroup workerGroup;
 
     private final FixApplication fixApplication;

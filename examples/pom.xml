@@ -25,7 +25,7 @@
     <artifactId>examples</artifactId>
 
     <properties>
-        <quickfix.version>1.6.3</quickfix.version>
+        <quickfix.version>1.6.4</quickfix.version>
     </properties>
 
     <dependencies>

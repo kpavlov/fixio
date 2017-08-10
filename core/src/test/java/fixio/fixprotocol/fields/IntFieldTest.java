@@ -17,7 +17,6 @@ package fixio.fixprotocol.fields;
 
 import org.junit.Test;
 
-import java.nio.charset.StandardCharsets;
 import java.text.ParseException;
 import java.util.Random;
 
@@ -39,6 +38,6 @@ public class IntFieldTest {
 
     @Test(expected = ParseException.class)
     public void testFailParseNonInteger() throws ParseException {
-        new IntField(10, "12a345".getBytes(StandardCharsets.US_ASCII), 0, 6);
+        new IntField(10, "12a345".getBytes(US_ASCII), 0, 6);
     }
 }

@@ -22,7 +22,9 @@ import org.junit.Before;
 import org.junit.Test;
 
 import static org.apache.commons.lang3.RandomStringUtils.randomAscii;
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertNull;
+import static org.junit.Assert.assertSame;
 
 public class InMemorySessionRepositoryTest {
 

@@ -42,11 +42,11 @@ public class InMemorySessionRepository implements SessionRepository {
 
         FixSession newSession = FixSession.newBuilder()
                 .beginString(header.getBeginString())
-                .senderCompId(header.getSenderCompID())
-                .senderSubId(header.getSenderSubID())
+                .senderCompID(header.getSenderCompID())
+                .senderSubID(header.getSenderSubID())
                 .senderLocationID(header.getSenderLocationID())
-                .targetCompId(header.getTargetCompID())
-                .targetSubId(header.getTargetSubID())
+                .targetCompID(header.getTargetCompID())
+                .targetSubID(header.getTargetSubID())
                 .targetLocationID(header.getTargetLocationID())
                 .build();
 

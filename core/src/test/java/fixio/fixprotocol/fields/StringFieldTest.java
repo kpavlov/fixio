@@ -28,11 +28,10 @@ public class StringFieldTest {
 
     private String value;
     private StringField field;
-    private int tag;
 
     @Before
     public void setUp() throws Exception {
-        tag = new Random().nextInt();
+        int tag = new Random().nextInt();
         value = randomAscii(10);
 
         field = new StringField(tag, value);
