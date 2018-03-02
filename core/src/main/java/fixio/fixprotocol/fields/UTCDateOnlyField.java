@@ -54,16 +54,6 @@ public class UTCDateOnlyField extends AbstractField<LocalDate> {
         this.value = value;
     }
 
-    @Override
-    public byte[] getBytes() {
-        return DATE_FORMATTER.format(value).getBytes(US_ASCII);
-    }
-
-    @Override
-    public LocalDate getValue() {
-        return value;
-    }
-
     public static LocalDate parse(String timestampString) throws ParseException {
         if (timestampString != null) {
             int len = timestampString.length();
@@ -80,5 +70,15 @@ public class UTCDateOnlyField extends AbstractField<LocalDate> {
 
     public static LocalDate parse(byte[] bytes) throws ParseException {
         return parse(new String(bytes, US_ASCII));
+    }
+
+    @Override
+    public byte[] getBytes() {
+        return DATE_FORMATTER.format(value).getBytes(US_ASCII);
+    }
+
+    @Override
+    public LocalDate getValue() {
+        return value;
     }
 }

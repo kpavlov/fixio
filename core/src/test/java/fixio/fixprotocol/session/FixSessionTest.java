@@ -50,11 +50,11 @@ public class FixSessionTest {
 
         session = FixSession.newBuilder()
                 .beginString(beginString)
-                .senderCompId(senderCompID)
-                .senderSubId(senderSubID)
+                .senderCompID(senderCompID)
+                .senderSubID(senderSubID)
                 .senderLocationID(senderLocationID)
-                .targetCompId(targetCompID)
-                .targetSubId(targetSubID)
+                .targetCompID(targetCompID)
+                .targetSubID(targetSubID)
                 .targetLocationID(targetLocationID)
                 .build();
     }

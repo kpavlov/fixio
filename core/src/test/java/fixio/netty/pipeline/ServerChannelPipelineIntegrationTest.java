@@ -15,7 +15,11 @@
  */
 package fixio.netty.pipeline;
 
-import fixio.fixprotocol.*;
+import fixio.fixprotocol.FieldType;
+import fixio.fixprotocol.FixMessage;
+import fixio.fixprotocol.FixMessageBuilderImpl;
+import fixio.fixprotocol.FixMessageHeader;
+import fixio.fixprotocol.MessageTypes;
 import fixio.handlers.FixApplicationAdapter;
 import fixio.netty.pipeline.server.FixAcceptorChannelInitializer;
 import fixio.netty.pipeline.server.FixAuthenticator;
@@ -31,7 +35,7 @@ import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.Mock;
-import org.mockito.runners.MockitoJUnitRunner;
+import org.mockito.junit.MockitoJUnitRunner;
 
 import static org.apache.commons.lang3.RandomStringUtils.randomAscii;
 import static org.mockito.Matchers.any;

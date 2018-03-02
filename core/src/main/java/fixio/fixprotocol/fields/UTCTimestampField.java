@@ -56,41 +56,6 @@ public class UTCTimestampField extends AbstractField<ZonedDateTime> {
         this.valueLen = DATE_TIME_PATTERN_MILLIS.length();
     }
 
-    @Override
-    public ZonedDateTime getValue() {
-        return value;
-    }
-
-    @Override
-    public byte[] getBytes() {
-        // most likely scenario
-        switch (valueLen) {
-            case 17:
-                return DATE_TIME_FORMATTER_SECONDS.format(value).getBytes(US_ASCII);
-            case 21:
-                return DATE_TIME_FORMATTER_MILLIS.format(value).getBytes(US_ASCII);
-            case 24:
-                return DATE_TIME_FORMATTER_MICROS.format(value).getBytes(US_ASCII);
-            case 27:
-                return DATE_TIME_FORMATTER_NANOS.format(value).getBytes(US_ASCII);
-            case 30:
-                return DATE_TIME_FORMATTER_PICOS.format(value).getBytes(US_ASCII);
-            default:
-                // try to guess
-                if (valueLen > DATE_TIME_PATTERN_PICOS_LENGTH) {
-                    return DATE_TIME_FORMATTER_PICOS.format(value).getBytes(US_ASCII);
-                } else if (valueLen > DATE_TIME_PATTERN_NANOS_LENGTH) {
-                    return DATE_TIME_FORMATTER_NANOS.format(value).getBytes(US_ASCII);
-                } else if (valueLen > DATE_TIME_PATTERN_MICROS_LENGTH) {
-                    return DATE_TIME_FORMATTER_MICROS.format(value).getBytes(US_ASCII);
-                } else if (valueLen > DATE_TIME_PATTERN_MILLIS_LENGTH) {
-                    return DATE_TIME_FORMATTER_MILLIS.format(value).getBytes(US_ASCII);
-                } else {
-                    return DATE_TIME_FORMATTER_SECONDS.format(value).getBytes(US_ASCII);
-                }
-        }
-    }
-
     public static ZonedDateTime parse(byte[] bytes) throws ParseException {
         return parse(new String(bytes, US_ASCII));
     }
@@ -131,5 +96,40 @@ public class UTCTimestampField extends AbstractField<ZonedDateTime> {
 
         }
         throw new ParseException("Timestamp is null", -1);
+    }
+
+    @Override
+    public ZonedDateTime getValue() {
+        return value;
+    }
+
+    @Override
+    public byte[] getBytes() {
+        // most likely scenario
+        switch (valueLen) {
+            case 17:
+                return DATE_TIME_FORMATTER_SECONDS.format(value).getBytes(US_ASCII);
+            case 21:
+                return DATE_TIME_FORMATTER_MILLIS.format(value).getBytes(US_ASCII);
+            case 24:
+                return DATE_TIME_FORMATTER_MICROS.format(value).getBytes(US_ASCII);
+            case 27:
+                return DATE_TIME_FORMATTER_NANOS.format(value).getBytes(US_ASCII);
+            case 30:
+                return DATE_TIME_FORMATTER_PICOS.format(value).getBytes(US_ASCII);
+            default:
+                // try to guess
+                if (valueLen > DATE_TIME_PATTERN_PICOS_LENGTH) {
+                    return DATE_TIME_FORMATTER_PICOS.format(value).getBytes(US_ASCII);
+                } else if (valueLen > DATE_TIME_PATTERN_NANOS_LENGTH) {
+                    return DATE_TIME_FORMATTER_NANOS.format(value).getBytes(US_ASCII);
+                } else if (valueLen > DATE_TIME_PATTERN_MICROS_LENGTH) {
+                    return DATE_TIME_FORMATTER_MICROS.format(value).getBytes(US_ASCII);
+                } else if (valueLen > DATE_TIME_PATTERN_MILLIS_LENGTH) {
+                    return DATE_TIME_FORMATTER_MILLIS.format(value).getBytes(US_ASCII);
+                } else {
+                    return DATE_TIME_FORMATTER_SECONDS.format(value).getBytes(US_ASCII);
+                }
+        }
     }
 }

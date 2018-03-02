@@ -17,7 +17,17 @@ package fixio.examples.quickfix;
 
 import fixio.examples.common.Quote;
 import fixio.examples.common.QuoteGeneratorTask;
-import quickfix.*;
+import quickfix.Acceptor;
+import quickfix.Application;
+import quickfix.ConfigError;
+import quickfix.DefaultMessageFactory;
+import quickfix.LogFactory;
+import quickfix.MemoryStoreFactory;
+import quickfix.MessageFactory;
+import quickfix.MessageStoreFactory;
+import quickfix.SLF4JLogFactory;
+import quickfix.SessionSettings;
+import quickfix.SocketAcceptor;
 
 import java.util.concurrent.ArrayBlockingQueue;
 

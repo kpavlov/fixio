@@ -7,7 +7,9 @@ import java.net.PasswordAuthentication;
 import java.util.Properties;
 
 import static org.apache.commons.lang3.RandomStringUtils.randomAscii;
-import static org.hamcrest.CoreMatchers.*;
+import static org.hamcrest.CoreMatchers.is;
+import static org.hamcrest.CoreMatchers.notNullValue;
+import static org.hamcrest.CoreMatchers.nullValue;
 import static org.junit.Assert.assertThat;
 
 public class PropertyAuthenticationProviderTest {

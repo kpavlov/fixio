@@ -56,41 +56,6 @@ public class UTCTimeOnlyField extends AbstractField<LocalTime> {
         this.valueLen = FixConst.TIME_PATTERN_MILLIS.length();
     }
 
-    @Override
-    public LocalTime getValue() {
-        return value;
-    }
-
-    @Override
-    public byte[] getBytes() {
-        // most likely scenario
-        switch (valueLen) {
-            case 8:
-                return TIME_FORMATTER_SECONDS.format(value).getBytes(US_ASCII);
-            case 12:
-                return TIME_FORMATTER_MILLIS.format(value).getBytes(US_ASCII);
-            case 15:
-                return TIME_FORMATTER_MICROS.format(value).getBytes(US_ASCII);
-            case 18:
-                return TIME_FORMATTER_NANOS.format(value).getBytes(US_ASCII);
-            case 21:
-                return TIME_FORMATTER_PICOS.format(value).getBytes(US_ASCII);
-            default: // no default, logic continues below
-        }
-        // try to guess
-        if (valueLen > TIME_PATTERN_PICOS_LENGTH) {
-            return (TIME_FORMATTER_NANOS.format(value)).getBytes(US_ASCII);
-        } else if (valueLen > TIME_PATTERN_NANOS_LENGTH) {
-            return TIME_FORMATTER_NANOS.format(value).getBytes(US_ASCII);
-        } else if (valueLen > TIME_PATTERN_MICROS_LENGTH) {
-            return TIME_FORMATTER_MICROS.format(value).getBytes(US_ASCII);
-        } else if (valueLen > TIME_PATTERN_MILLIS_LENGTH) {
-            return TIME_FORMATTER_MILLIS.format(value).getBytes(US_ASCII);
-        } else {
-            return TIME_FORMATTER_SECONDS.format(value).getBytes(US_ASCII);
-        }
-    }
-
     public static LocalTime parse(String timestampString) throws ParseException {
         if (timestampString != null) {
             int len = timestampString.length();
@@ -126,5 +91,40 @@ public class UTCTimeOnlyField extends AbstractField<LocalTime> {
 
     public static LocalTime parse(byte[] bytes) throws ParseException {
         return parse(new String(bytes, US_ASCII));
+    }
+
+    @Override
+    public LocalTime getValue() {
+        return value;
+    }
+
+    @Override
+    public byte[] getBytes() {
+        // most likely scenario
+        switch (valueLen) {
+            case 8:
+                return TIME_FORMATTER_SECONDS.format(value).getBytes(US_ASCII);
+            case 12:
+                return TIME_FORMATTER_MILLIS.format(value).getBytes(US_ASCII);
+            case 15:
+                return TIME_FORMATTER_MICROS.format(value).getBytes(US_ASCII);
+            case 18:
+                return TIME_FORMATTER_NANOS.format(value).getBytes(US_ASCII);
+            case 21:
+                return TIME_FORMATTER_PICOS.format(value).getBytes(US_ASCII);
+            default: // no default, logic continues below
+        }
+        // try to guess
+        if (valueLen > TIME_PATTERN_PICOS_LENGTH) {
+            return (TIME_FORMATTER_NANOS.format(value)).getBytes(US_ASCII);
+        } else if (valueLen > TIME_PATTERN_NANOS_LENGTH) {
+            return TIME_FORMATTER_NANOS.format(value).getBytes(US_ASCII);
+        } else if (valueLen > TIME_PATTERN_MICROS_LENGTH) {
+            return TIME_FORMATTER_MICROS.format(value).getBytes(US_ASCII);
+        } else if (valueLen > TIME_PATTERN_MILLIS_LENGTH) {
+            return TIME_FORMATTER_MILLIS.format(value).getBytes(US_ASCII);
+        } else {
+            return TIME_FORMATTER_SECONDS.format(value).getBytes(US_ASCII);
+        }
     }
 }

@@ -18,10 +18,10 @@ public class DateTimeFormatterWrapper {
         this.pattern = pattern;
         this.zoneId = zoneId;
         int idx = pattern.indexOf('\'');
-        if(idx>0){
-            this.dateTimeFormatter = DateTimeFormatter.ofPattern(pattern.substring(0,idx)).withZone(zoneId);
-            this.padding = pattern.substring(idx).replaceAll("'","");
-        }else{
+        if (idx > 0) {
+            this.dateTimeFormatter = DateTimeFormatter.ofPattern(pattern.substring(0, idx)).withZone(zoneId);
+            this.padding = pattern.substring(idx).replaceAll("'", "");
+        } else {
             this.dateTimeFormatter = DateTimeFormatter.ofPattern(pattern).withZone(zoneId);
             this.padding = "";
         }
@@ -46,32 +46,32 @@ public class DateTimeFormatterWrapper {
 
 
     public String format(TemporalAccessor value) {
-        return dateTimeFormatter.format(value)+padding;
+        return dateTimeFormatter.format(value) + padding;
     }
 
-    public LocalDate parseLocalDate(String timestampString){
-        return LocalDate.parse(timestampString,dateTimeFormatter);
+    public LocalDate parseLocalDate(String timestampString) {
+        return LocalDate.parse(timestampString, dateTimeFormatter);
     }
 
-    public LocalTime parseLocalTime(String timestampString){
-        if(timestampString!=null){
-            if(paddingLen>0){
-                int idx = timestampString.length()-paddingLen;
-                return LocalTime.parse(timestampString.substring(0,idx),dateTimeFormatter);
-            }else{
-                return LocalTime.parse(timestampString,dateTimeFormatter);
+    public LocalTime parseLocalTime(String timestampString) {
+        if (timestampString != null) {
+            if (paddingLen > 0) {
+                int idx = timestampString.length() - paddingLen;
+                return LocalTime.parse(timestampString.substring(0, idx), dateTimeFormatter);
+            } else {
+                return LocalTime.parse(timestampString, dateTimeFormatter);
             }
         }
         return null;
     }
 
-    public ZonedDateTime parseZonedDateTime(String timestampString){
-        if(timestampString!=null){
-            if(paddingLen>0){
-                int idx = timestampString.length()-paddingLen;
-                return ZonedDateTime.parse(timestampString.substring(0,idx),dateTimeFormatter);
-            }else{
-                return ZonedDateTime.parse(timestampString,dateTimeFormatter);
+    public ZonedDateTime parseZonedDateTime(String timestampString) {
+        if (timestampString != null) {
+            if (paddingLen > 0) {
+                int idx = timestampString.length() - paddingLen;
+                return ZonedDateTime.parse(timestampString.substring(0, idx), dateTimeFormatter);
+            } else {
+                return ZonedDateTime.parse(timestampString, dateTimeFormatter);
             }
         }
         return null;

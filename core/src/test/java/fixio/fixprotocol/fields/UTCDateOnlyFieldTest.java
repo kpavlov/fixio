@@ -15,9 +15,9 @@
  */
 package fixio.fixprotocol.fields;
 
-import java.time.LocalDate;
 import org.junit.Test;
 
+import java.time.LocalDate;
 import java.util.Random;
 
 import static org.junit.Assert.assertArrayEquals;

@@ -162,8 +162,8 @@ public class ClientSessionHandlerTest {
         logonResponseMsg.getHeader().setMsgSeqNum(3);
 
         FixSession fixSession = FixSession.newBuilder()
-                .senderCompId(header.getSenderCompID())
-                .targetCompId(header.getTargetCompID())
+                .senderCompID(header.getSenderCompID())
+                .targetCompID(header.getTargetCompID())
                 .build();
         fixSession.setNextIncomingMessageSeqNum(1);
 
@@ -194,8 +194,8 @@ public class ClientSessionHandlerTest {
         logonResponseMsg.getHeader().setMsgSeqNum(3);
 
         FixSession fixSession = FixSession.newBuilder()
-                .senderCompId(header.getSenderCompID())
-                .targetCompId(header.getTargetCompID())
+                .senderCompID(header.getSenderCompID())
+                .targetCompID(header.getTargetCompID())
                 .build();
         fixSession.setNextIncomingMessageSeqNum(4);
 

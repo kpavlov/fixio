@@ -84,32 +84,32 @@ public class PropertyFixSessionSettingsProviderImpl implements FixSessionSetting
 
     @Override
     public String getSenderCompID() {
-        return properties.getProperty("SenderCompID","").trim();
+        return properties.getProperty("SenderCompID", "").trim();
     }
 
     @Override
     public String getSenderSubID() {
-        return properties.getProperty("SenderSubID","").trim();
+        return properties.getProperty("SenderSubID", "").trim();
     }
 
     @Override
     public String getSenderLocationID() {
-        return properties.getProperty("SenderLocationID","").trim();
+        return properties.getProperty("SenderLocationID", "").trim();
     }
 
     @Override
     public String getTargetCompID() {
-        return properties.getProperty("TargetCompID","").trim();
+        return properties.getProperty("TargetCompID", "").trim();
     }
 
     @Override
     public String getTargetSubID() {
-        return properties.getProperty("TargetSubID","").trim();
+        return properties.getProperty("TargetSubID", "").trim();
     }
 
     @Override
     public String getTargetLocationID() {
-        return properties.getProperty("TargetLocationID","").trim();
+        return properties.getProperty("TargetLocationID", "").trim();
     }
 
     @Override

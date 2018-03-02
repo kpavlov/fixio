@@ -47,9 +47,9 @@ public class CompositeFixApplicationAdapter extends FixApplicationAdapter {
         LOGGER.info("Received : {}", msg);
 
         //Validate
-            for (FixMessageValidator validator : validators) {
-                validator.validate(ctx, msg);
-            }
+        for (FixMessageValidator validator : validators) {
+            validator.validate(ctx, msg);
+        }
 
         //Business handler
         if (handlers != null) {

@@ -40,6 +40,10 @@ public class SessionId {
         this.hash = calculateHash();
     }
 
+    private static boolean idEquals(String s1, String s2) {
+        return (s1 == null && s2 == null) || (s1 != null && s1.equals(s2));
+    }
+
     public String getSenderCompID() {
         return senderCompID;
     }
@@ -70,12 +74,12 @@ public class SessionId {
         if (o == null || getClass() != o.getClass()) return false;
         SessionId other = (SessionId) o;
         return this.hashCode() == other.hashCode() &&
-                idEquals(senderCompID,other.senderCompID) &&
-                idEquals(senderSubID,other.senderSubID) &&
-                idEquals(senderLocationID,other.senderLocationID) &&
-                idEquals(targetCompID,other.targetCompID) &&
-                idEquals(targetSubID,other.targetSubID) &&
-                idEquals(targetLocationID,other.targetLocationID);
+                idEquals(senderCompID, other.senderCompID) &&
+                idEquals(senderSubID, other.senderSubID) &&
+                idEquals(senderLocationID, other.senderLocationID) &&
+                idEquals(targetCompID, other.targetCompID) &&
+                idEquals(targetSubID, other.targetSubID) &&
+                idEquals(targetLocationID, other.targetLocationID);
     }
 
     @Override
@@ -99,9 +103,5 @@ public class SessionId {
             result = 31 * result + targetLocationID.hashCode();
         }
         return result;
-    }
-
-    private static boolean idEquals(String s1, String s2){
-        return (s1==null && s2==null) || (s1!=null && s1.equals(s2));
     }
 }
