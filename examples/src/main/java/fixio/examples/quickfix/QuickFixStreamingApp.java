@@ -20,18 +20,12 @@ import fixio.examples.common.Quote;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import quickfix.Application;
-import quickfix.DoNotSend;
 import quickfix.DoubleField;
 import quickfix.FieldNotFound;
-import quickfix.IncorrectDataFormat;
-import quickfix.IncorrectTagValue;
-import quickfix.InvalidMessage;
 import quickfix.Message;
-import quickfix.RejectLogon;
 import quickfix.Session;
 import quickfix.SessionID;
 import quickfix.SessionNotFound;
-import quickfix.UnsupportedMessageType;
 import quickfix.field.MktBidPx;
 import quickfix.field.MktOfferPx;
 import quickfix.field.MsgType;
@@ -136,8 +130,6 @@ public class QuickFixStreamingApp implements Application {
                         Session.sendToTarget(quoteMessage, subscriptionEntry.getValue());
                     } catch (SessionNotFound e) {
                         LOGGER.error("Can't send message", e);
-                    } catch (InvalidMessage e) {
-                        LOGGER.error("Can't send invalid message", e);
                     }
                 }
             });
