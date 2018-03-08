@@ -42,7 +42,7 @@ public class FixMessageDecoderTest {
     private static FixMessageDecoder decoder;
 
     @BeforeClass
-    public static void setUp() throws Exception {
+    public static void setUp() {
         decoder = new FixMessageDecoder();
     }
 

@@ -53,7 +53,7 @@ public class CompositeFixApplicationAdapterTest {
     private ArrayList<Object> out;
 
     @Before
-    public void setUp() throws Exception {
+    public void setUp() {
         adapter = new CompositeFixApplicationAdapter(
                 Arrays.asList(messageValidator1, messageValidator2),
                 Arrays.asList(messageHandler1, messageHandler2, messageHandler3));
@@ -82,7 +82,7 @@ public class CompositeFixApplicationAdapterTest {
     }
 
     @Test
-    public void testBeforeSendMessage() throws Exception {
+    public void testBeforeSendMessage() {
         final FixMessageBuilder message = new FixMessageBuilderImpl();
 
 

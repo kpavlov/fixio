@@ -30,7 +30,7 @@ public class FloatFieldTest {
     private FloatField field;
 
     @Before
-    public void setUp() throws Exception {
+    public void setUp() {
         value = new FixedPointNumber(new Random().nextDouble(), 13);
         tag = new Random().nextInt();
 
@@ -38,7 +38,7 @@ public class FloatFieldTest {
     }
 
     @Test
-    public void testGetBytes() throws Exception {
+    public void testGetBytes() {
         byte[] bytes = field.getBytes();
 
         byte[] expectedBytes = value.toString().getBytes(US_ASCII);
@@ -47,7 +47,7 @@ public class FloatFieldTest {
     }
 
     @Test
-    public void testGetDouble() throws Exception {
+    public void testGetDouble() {
         String valueStr = "203.03";
         byte[] val = valueStr.getBytes();
         value = new FixedPointNumber(val, 0, val.length);

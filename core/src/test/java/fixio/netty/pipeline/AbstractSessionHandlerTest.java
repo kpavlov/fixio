@@ -74,11 +74,11 @@ public class AbstractSessionHandlerTest {
         when(ctx.channel()).thenReturn(channel);
         sessionHandler = new AbstractSessionHandler(fixApplication, FixClock.systemUTC(), sessionRepository) {
             @Override
-            protected void encode(ChannelHandlerContext ctx, FixMessageBuilder msg, List<Object> out) throws Exception {
+            protected void encode(ChannelHandlerContext ctx, FixMessageBuilder msg, List<Object> out) {
             }
 
             @Override
-            protected void decode(ChannelHandlerContext ctx, FixMessage msg, List<Object> out) throws Exception {
+            protected void decode(ChannelHandlerContext ctx, FixMessage msg, List<Object> out) {
             }
 
             @Override
@@ -89,7 +89,7 @@ public class AbstractSessionHandlerTest {
     }
 
     @Test
-    public void testSendReject() throws Exception {
+    public void testSendReject() {
         String msgType = randomAscii(3);
         FixMessage originalMsg = mock(FixMessage.class);
         int originalMsgSeqNum = RANDOM.nextInt();

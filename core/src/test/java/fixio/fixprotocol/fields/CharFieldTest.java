@@ -30,7 +30,7 @@ public class CharFieldTest {
     private CharField charField;
 
     @Before
-    public void setUp() throws Exception {
+    public void setUp() {
         ch = randomAscii(1).charAt(0);
         tag = new Random().nextInt();
 

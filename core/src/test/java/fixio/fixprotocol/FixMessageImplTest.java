@@ -26,7 +26,7 @@ public class FixMessageImplTest {
     private FixMessageImpl fixMessage;
 
     @Before
-    public void setUp() throws Exception {
+    public void setUp() {
         fixMessage = new FixMessageImpl();
     }
 

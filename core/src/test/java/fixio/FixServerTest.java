@@ -35,7 +35,7 @@ public class FixServerTest {
     private SessionRepository sessionRepository;
 
     @Before
-    public void setUp() throws Exception {
+    public void setUp() {
         server = new FixServer(10100, fixApplication, fixAuthenticator, sessionRepository);
     }
 
@@ -46,7 +46,7 @@ public class FixServerTest {
     }
 
     @Test(expected = IllegalStateException.class)
-    public void testStopBeforeStart() throws Exception {
+    public void testStopBeforeStart() {
         server.stop();
     }
 }

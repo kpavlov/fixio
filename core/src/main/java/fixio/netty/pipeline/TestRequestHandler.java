@@ -41,7 +41,7 @@ public class TestRequestHandler extends MessageToMessageDecoder<FixMessage> {
     }
 
     @Override
-    protected void decode(ChannelHandlerContext ctx, FixMessage msg, List<Object> out) throws Exception {
+    protected void decode(ChannelHandlerContext ctx, FixMessage msg, List<Object> out) {
         if (!MessageTypes.TEST_REQUEST.equals(msg.getMessageType())) {
             return;
         }

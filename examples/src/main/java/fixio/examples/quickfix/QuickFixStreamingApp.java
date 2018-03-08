@@ -20,18 +20,12 @@ import fixio.examples.common.Quote;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import quickfix.Application;
-import quickfix.DoNotSend;
 import quickfix.DoubleField;
 import quickfix.FieldNotFound;
-import quickfix.IncorrectDataFormat;
-import quickfix.IncorrectTagValue;
-import quickfix.InvalidMessage;
 import quickfix.Message;
-import quickfix.RejectLogon;
 import quickfix.Session;
 import quickfix.SessionID;
 import quickfix.SessionNotFound;
-import quickfix.UnsupportedMessageType;
 import quickfix.field.MktBidPx;
 import quickfix.field.MktOfferPx;
 import quickfix.field.MsgType;
@@ -54,7 +48,7 @@ public class QuickFixStreamingApp implements Application {
         new Thread(streamingWorker, "StreamingWorker").start();
     }
 
-    private static Message createQuoteMessage(String reqId, Quote quote) throws InvalidMessage {
+    private static Message createQuoteMessage(String reqId, Quote quote) {
         Message message = new Message();
         message.getHeader().setField(QUOTE_MSG_TYPE);
         message.setField(new QuoteReqID(reqId));
@@ -83,16 +77,16 @@ public class QuickFixStreamingApp implements Application {
     }
 
     @Override
-    public void fromAdmin(Message message, SessionID sessionID) throws FieldNotFound, IncorrectDataFormat, IncorrectTagValue, RejectLogon {
+    public void fromAdmin(Message message, SessionID sessionID) {
     }
 
     @Override
-    public void toApp(Message message, SessionID sessionID) throws DoNotSend {
+    public void toApp(Message message, SessionID sessionID) {
 
     }
 
     @Override
-    public void fromApp(Message message, SessionID sessionID) throws FieldNotFound, IncorrectDataFormat, IncorrectTagValue, UnsupportedMessageType {
+    public void fromApp(Message message, SessionID sessionID) {
         try {
             String msgType = message.getHeader().getString(35);
             switch (msgType) {
@@ -136,8 +130,6 @@ public class QuickFixStreamingApp implements Application {
                         Session.sendToTarget(quoteMessage, subscriptionEntry.getValue());
                     } catch (SessionNotFound e) {
                         LOGGER.error("Can't send message", e);
-                    } catch (InvalidMessage e) {
-                        LOGGER.error("Can't send invalid message", e);
                     }
                 }
             });

@@ -55,7 +55,7 @@ public class FixedPointNumberFromDoubleTest {
     }
 
     @Before
-    public void setUp() throws Exception {
+    public void setUp() {
         value = new FixedPointNumber(source, expectedScale);
     }
 

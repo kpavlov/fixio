@@ -75,7 +75,7 @@ public abstract class AbstractSessionHandler extends MessageToMessageCodec<FixMe
     }
 
     @Override
-    public void channelInactive(ChannelHandlerContext ctx) throws Exception {
+    public void channelInactive(ChannelHandlerContext ctx) {
         Attribute<FixSession> fixSessionAttribute = ctx.channel().attr(FIX_SESSION_KEY);
         if (fixSessionAttribute != null) {
             FixSession session = fixSessionAttribute.getAndSet(null);
