@@ -36,7 +36,7 @@ public class InMemorySessionRepositoryTest {
     private FixMessageHeader header;
 
     @Before
-    public void setUp() throws Exception {
+    public void setUp() {
         senderCompID = randomAscii(2);
         senderSubID = randomAscii(3);
         targetCompID = randomAscii(4);
@@ -52,7 +52,7 @@ public class InMemorySessionRepositoryTest {
     }
 
     @Test
-    public void testNormalLifecycle() throws Exception {
+    public void testNormalLifecycle() {
 
         FixSession session = sessionRepository.getOrCreateSession(header);
 

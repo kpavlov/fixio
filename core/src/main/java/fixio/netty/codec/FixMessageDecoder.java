@@ -63,7 +63,7 @@ public class FixMessageDecoder extends MessageToMessageDecoder<ByteBuf> {
     private Group group;
 
     @Override
-    protected void decode(ChannelHandlerContext ctx, ByteBuf in, List<Object> out) throws Exception {
+    protected void decode(ChannelHandlerContext ctx, ByteBuf in, List<Object> out) {
         assert (in != null) : "No Buffer";
 
         int arrayIndex = 0;

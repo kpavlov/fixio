@@ -168,7 +168,7 @@ public class FixMessageEncoder extends MessageToByteEncoder<FixMessageBuilder> {
     @Override
     public void encode(ChannelHandlerContext ctx,
                        FixMessageBuilder msg,
-                       ByteBuf out) throws Exception {
+                       ByteBuf out) {
         final FixMessageHeader header = msg.getHeader();
         validateRequiredFields(header);
 

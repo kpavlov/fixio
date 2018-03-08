@@ -54,7 +54,7 @@ public class TestRequestHandlerTest {
     private ArgumentCaptor<FixMessageBuilderImpl> messageBuilderCaptor;
 
     @Before
-    public void setUp() throws Exception {
+    public void setUp() {
         handler = new TestRequestHandler();
     }
 

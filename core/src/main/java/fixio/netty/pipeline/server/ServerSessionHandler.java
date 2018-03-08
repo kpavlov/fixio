@@ -50,7 +50,7 @@ public class ServerSessionHandler extends AbstractSessionHandler {
     }
 
     @Override
-    public void channelActive(ChannelHandlerContext ctx) throws Exception {
+    public void channelActive(ChannelHandlerContext ctx) {
         LOGGER.info("Connection established. Waiting for Logon.");
     }
 
@@ -131,7 +131,7 @@ public class ServerSessionHandler extends AbstractSessionHandler {
         return session;
     }
 
-    private void sendLogoutAndClose(ChannelHandlerContext ctx, FixSession session, String text) throws Exception {
+    private void sendLogoutAndClose(ChannelHandlerContext ctx, FixSession session, String text) {
         //rejected logon
 
         FixMessageBuilderImpl logout = new FixMessageBuilderImpl(MessageTypes.LOGOUT);

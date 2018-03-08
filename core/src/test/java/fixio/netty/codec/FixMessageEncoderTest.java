@@ -61,7 +61,7 @@ public class FixMessageEncoderTest {
     }
 
     @Before
-    public void setUp() throws Exception {
+    public void setUp() {
         when(ctx.alloc()).thenReturn(byteBufAllocator);
         when(byteBufAllocator.buffer()).thenReturn(Unpooled.buffer(), Unpooled.buffer());
 

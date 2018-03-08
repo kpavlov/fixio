@@ -32,7 +32,7 @@ public class FixMessageBuilderImplTest {
     private FixMessageBuilderImpl fixMessage;
 
     @Before
-    public void setUp() throws Exception {
+    public void setUp() {
         fixMessage = new FixMessageBuilderImpl();
     }
 

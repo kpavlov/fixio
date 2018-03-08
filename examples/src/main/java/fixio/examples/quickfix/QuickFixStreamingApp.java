@@ -54,7 +54,7 @@ public class QuickFixStreamingApp implements Application {
         new Thread(streamingWorker, "StreamingWorker").start();
     }
 
-    private static Message createQuoteMessage(String reqId, Quote quote) throws InvalidMessage {
+    private static Message createQuoteMessage(String reqId, Quote quote) {
         Message message = new Message();
         message.getHeader().setField(QUOTE_MSG_TYPE);
         message.setField(new QuoteReqID(reqId));
@@ -83,16 +83,16 @@ public class QuickFixStreamingApp implements Application {
     }
 
     @Override
-    public void fromAdmin(Message message, SessionID sessionID) throws FieldNotFound, IncorrectDataFormat, IncorrectTagValue, RejectLogon {
+    public void fromAdmin(Message message, SessionID sessionID) {
     }
 
     @Override
-    public void toApp(Message message, SessionID sessionID) throws DoNotSend {
+    public void toApp(Message message, SessionID sessionID) {
 
     }
 
     @Override
-    public void fromApp(Message message, SessionID sessionID) throws FieldNotFound, IncorrectDataFormat, IncorrectTagValue, UnsupportedMessageType {
+    public void fromApp(Message message, SessionID sessionID) {
         try {
             String msgType = message.getHeader().getString(35);
             switch (msgType) {

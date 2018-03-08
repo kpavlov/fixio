@@ -39,18 +39,18 @@ public class LogoutEventTest {
     }
 
     @Test
-    public void testEqualsSameSession() throws Exception {
+    public void testEqualsSameSession() {
         assertEquals(new LogoutEvent(session1), new LogoutEvent(session1));
     }
 
     @Test
-    public void testEqualsSelf() throws Exception {
+    public void testEqualsSelf() {
         LogoutEvent logoutEvent = new LogoutEvent(session1);
         assertEquals(logoutEvent, logoutEvent);
     }
 
     @Test
-    public void testNotEqualsDifferentSession() throws Exception {
+    public void testNotEqualsDifferentSession() {
         LogoutEvent firstEvent = new LogoutEvent(session1);
         LogoutEvent secondEvent = new LogoutEvent(session2);
 
@@ -59,18 +59,18 @@ public class LogoutEventTest {
     }
 
     @Test
-    public void testHashCodeIsSameForSelf() throws Exception {
+    public void testHashCodeIsSameForSelf() {
         LogoutEvent logoutEvent = new LogoutEvent(session1);
         assertEquals(logoutEvent.hashCode(), logoutEvent.hashCode());
     }
 
     @Test
-    public void testHashCodeIsSameForSameSession() throws Exception {
+    public void testHashCodeIsSameForSameSession() {
         assertEquals(new LogoutEvent(session1).hashCode(), new LogoutEvent(session1).hashCode());
     }
 
     @Test
-    public void testHashCodeIsDifferentForSameSessionDifferentSession() throws Exception {
+    public void testHashCodeIsDifferentForSameSessionDifferentSession() {
         LogoutEvent firstEvent = new LogoutEvent(session1);
         LogoutEvent secondEvent = new LogoutEvent(session2);
 

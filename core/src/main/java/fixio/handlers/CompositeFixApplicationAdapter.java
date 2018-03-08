@@ -42,7 +42,7 @@ public class CompositeFixApplicationAdapter extends FixApplicationAdapter {
     }
 
     @Override
-    public void onMessage(ChannelHandlerContext ctx, FixMessage msg, List<Object> out) throws BusinessRejectException {
+    public void onMessage(ChannelHandlerContext ctx, FixMessage msg, List<Object> out) {
         assert (msg != null) : "Message can't be null";
         LOGGER.info("Received : {}", msg);
 
