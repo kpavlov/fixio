@@ -32,7 +32,10 @@ import java.util.ArrayList;
 import java.util.List;
 
 import static fixio.fixprotocol.FixConst.DEFAULT_ZONE_ID;
+import static fixio.netty.codec.DecodingTestHelper.decode;
+import static fixio.netty.codec.DecodingTestHelper.decodeOne;
 import static org.apache.commons.lang3.RandomStringUtils.randomAlphanumeric;
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
@@ -42,17 +45,13 @@ public class FixMessageDecoderTest {
     private static FixMessageDecoder decoder;
 
     @BeforeClass
-    public static void setUp() throws Exception {
+    public static void setUp() {
         decoder = new FixMessageDecoder();
     }
 
     @Test
-    public void testDecode() throws Exception {
-        List<Object> result = decode("8=FIX.4.1\u00019=90\u000135=0\u000149=INVMGR\u000156=BRKR\u000134=240\u000152=19980604-08:03:31\u000110=129\u0001");
-
-        assertEquals(1, result.size());
-        assertTrue(result.get(0) instanceof FixMessageImpl);
-        final FixMessageImpl fixMessage = (FixMessageImpl) result.get(0);
+    public void testDecode() {
+        FixMessageImpl fixMessage = decodeOne("8=FIX.4.1\u00019=90\u000135=0\u000149=INVMGR\u000156=BRKR\u000134=240\u000152=19980604-08:03:31\u000110=129\u0001", decoder);
 
         FixMessageHeader header = fixMessage.getHeader();
 
@@ -71,29 +70,11 @@ public class FixMessageDecoderTest {
     }
 
     @Test
-    public void testCmeRealData() throws Exception {
-        List<Object> result = decode("8=FIX.4.29=39635=BZ34=148949=CME50=G52=20141210-04:12:58.68956=17ACPON57=DUMMY369=36701180=0K41181=42811350=428011=ACP141818477867860=20141210-04:12:58.686533=3797=Y893=Y1028=Y1300=991369=9971:21373=31374=91375=1453=2448=000447=D452=7448=US,IL447=D452=54534=341=ACP141818477617384=60535=99499752041=ACP141818477621484=60535=99499752141=ACP141818477625384=180535=99499752210=228");
-        assertEquals(1, result.size());
-        assertTrue(result.get(0) instanceof FixMessageImpl);
-        System.out.println(result.get(0));
-    }
-
-    private List<Object> decode(String message) throws Exception {
-        String[] tags = message.split("\u0001");
-
-        List<Object> result = new ArrayList<>();
-        for (String tag : tags) {
-            decoder.decode(null, Unpooled.wrappedBuffer(tag.getBytes(StandardCharsets.US_ASCII)), result);
-        }
-        return result;
-    }
-
-    @Test
-    public void testNoBeginTag() throws Exception {
+    public void testNoBeginTag() {
         String random = randomAlphanumeric(50);
 
         try {
-            decode("100=" + random + "\u00018=FIX.4.2...");
+            decode("100=" + random + "\u00018=FIX.4.2...", decoder);
             fail("DecoderException is expected");
         } catch (DecoderException e) {
             assertEquals("BeginString tag expected, but got: 100=" + random.substring(0, 10) + "...", e.getMessage());
