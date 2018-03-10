@@ -9,8 +9,12 @@ import java.util.List;
 
 public class DecodingTestHelper {
 
+    private static String normalizeMessage(String source) {
+        return source.replace('|', '\u0001');
+    }
+
     public static List<Object> decode(String message, FixMessageDecoder decoder)  {
-        String[] tags = message.split("\u0001");
+        String[] tags = normalizeMessage(message).split("\u0001");
 
         List<Object> result = new ArrayList<>();
         for (String tag : tags) {
@@ -20,7 +24,7 @@ public class DecodingTestHelper {
     }
 
     public static FixMessageImpl decodeOne(String message, FixMessageDecoder decoder) {
-        String[] tags = message.split("\u0001");
+        String[] tags = normalizeMessage(message).split("\u0001");
 
         List<Object> result = new ArrayList<>();
         for (String tag : tags) {

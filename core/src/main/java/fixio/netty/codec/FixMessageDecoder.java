@@ -98,8 +98,9 @@ public class FixMessageDecoder extends MessageToMessageDecoder<ByteBuf> {
                 message.add(tagNum, bytes, offset, valueLength);
                 break;
             case 10: // checksum
-                if (groupField != null)
+                if (groupField != null) {
                     finishRepeatingGroup();
+                }
                 appendField(tagNum, bytes, offset, valueLength);
                 verifyChecksum(message.getChecksum());
                 out.add(message);
@@ -126,6 +127,11 @@ public class FixMessageDecoder extends MessageToMessageDecoder<ByteBuf> {
                     + tag + "=" + strValue);
         }
 
+        FieldType type = FieldType.forTag(tag);
+        if (type == null) {
+            throw new DecoderException("Unknown tag: " + tag);
+        }
+
         //group body
         if (groupField != null && group != null) {
             AbstractField field = FieldFactory.valueOf(tag, value, offset, valueLength);
@@ -148,8 +154,7 @@ public class FixMessageDecoder extends MessageToMessageDecoder<ByteBuf> {
         }
 
         //check for group tag
-        FieldType type = FieldType.forTag(tag);
-        if (type.type().equals(DataType.NUMINGROUP) && message.getInt(tag) > 0) {
+        if (DataType.NUMINGROUP.equals(type.type()) && message.getInt(tag) != null && message.getInt(tag) > 0) {
             groupNum = message.getInt(tag);
             groupField = new GroupField(tag);
             group = new Group();
