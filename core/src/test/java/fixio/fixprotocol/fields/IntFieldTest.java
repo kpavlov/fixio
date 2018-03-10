@@ -26,7 +26,7 @@ import static org.junit.Assert.assertArrayEquals;
 public class IntFieldTest {
 
     @Test
-    public void testGetBytes() throws Exception {
+    public void testGetBytes() {
         int value = new Random().nextInt();
         int tag = new Random().nextInt();
 

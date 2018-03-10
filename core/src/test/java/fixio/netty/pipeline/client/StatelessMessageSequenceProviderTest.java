@@ -25,12 +25,12 @@ public class StatelessMessageSequenceProviderTest {
     private static final StatelessMessageSequenceProvider SEQUENCE_PROVIDER = StatelessMessageSequenceProvider.getInstance();
 
     @Test
-    public void testGetMsgOutSeqNum() throws Exception {
+    public void testGetMsgOutSeqNum() {
         assertEquals(1, SEQUENCE_PROVIDER.getMsgInSeqNum());
     }
 
     @Test
-    public void testGetMsgInSeqNum() throws Exception {
+    public void testGetMsgInSeqNum() {
         assertEquals(1, SEQUENCE_PROVIDER.getMsgOutSeqNum());
     }
 }

@@ -30,7 +30,7 @@ public class StringFieldTest {
     private StringField field;
 
     @Before
-    public void setUp() throws Exception {
+    public void setUp() {
         int tag = new Random().nextInt();
         value = randomAscii(10);
 
@@ -38,7 +38,7 @@ public class StringFieldTest {
     }
 
     @Test
-    public void testGetBytes() throws Exception {
+    public void testGetBytes() {
         byte[] bytes = field.getBytes();
 
         assertArrayEquals(value.getBytes(US_ASCII), bytes);

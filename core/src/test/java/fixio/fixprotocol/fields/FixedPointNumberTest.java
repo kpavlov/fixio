@@ -7,13 +7,13 @@ import static org.junit.Assert.assertEquals;
 public class FixedPointNumberTest {
 
     @Test
-    public void testZeroToString() throws Exception {
+    public void testZeroToString() {
         final FixedPointNumber fixedPointNumber = new FixedPointNumber(0, 0);
         assertEquals("0", fixedPointNumber.toString());
     }
 
     @Test
-    public void testScaledZeroToString() throws Exception {
+    public void testScaledZeroToString() {
         final FixedPointNumber fixedPointNumber = new FixedPointNumber(0, 20);
         assertEquals("0", fixedPointNumber.toString());
     }

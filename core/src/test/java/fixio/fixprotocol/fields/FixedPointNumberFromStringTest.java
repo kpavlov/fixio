@@ -60,7 +60,7 @@ public class FixedPointNumberFromStringTest {
     }
 
     @Before
-    public void setUp() throws Exception {
+    public void setUp() {
         value = new FixedPointNumber(string.getBytes(US_ASCII), offset, length);
     }
 

@@ -19,25 +19,19 @@ import fixio.fixprotocol.FieldType;
 import fixio.fixprotocol.FixMessageHeader;
 import fixio.fixprotocol.FixMessageImpl;
 import fixio.fixprotocol.MessageTypes;
-import io.netty.buffer.Unpooled;
 import io.netty.handler.codec.DecoderException;
 import org.junit.BeforeClass;
 import org.junit.Test;
 
-import java.nio.charset.StandardCharsets;
 import java.time.LocalDate;
 import java.time.LocalTime;
 import java.time.ZonedDateTime;
-import java.util.ArrayList;
-import java.util.List;
 
 import static fixio.fixprotocol.FixConst.DEFAULT_ZONE_ID;
 import static fixio.netty.codec.DecodingTestHelper.decode;
 import static fixio.netty.codec.DecodingTestHelper.decodeOne;
 import static org.apache.commons.lang3.RandomStringUtils.randomAlphanumeric;
-import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
 
 public class FixMessageDecoderTest {

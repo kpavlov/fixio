@@ -45,6 +45,7 @@
         <maven.compiler.source>${java.version}</maven.compiler.source>
         <maven.compiler.target>${java.version}</maven.compiler.target>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+        <!-- Version -->
         <fastutil.version>8.1.0</fastutil.version>
         <mockito.version>2.12.0</mockito.version>
         <netty.version>4.1.14.Final</netty.version>

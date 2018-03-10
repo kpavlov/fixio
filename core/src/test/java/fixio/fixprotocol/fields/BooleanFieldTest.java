@@ -27,12 +27,12 @@ public class BooleanFieldTest {
     private int tag;
 
     @Before
-    public void setUp() throws Exception {
+    public void setUp() {
         tag = new Random().nextInt(10000);
     }
 
     @Test
-    public void testGetBytesTrue() throws Exception {
+    public void testGetBytesTrue() {
         BooleanField booleanField = new BooleanField(tag, true);
         byte[] bytes = booleanField.getBytes();
         assertEquals(1, bytes.length);
@@ -40,7 +40,7 @@ public class BooleanFieldTest {
     }
 
     @Test
-    public void testGetBytesFalse() throws Exception {
+    public void testGetBytesFalse() {
         BooleanField booleanField = new BooleanField(tag, false);
         byte[] bytes = booleanField.getBytes();
         assertEquals(1, bytes.length);

@@ -22,7 +22,7 @@ public class PropertyAuthenticationProviderTest {
     }
 
     @Test
-    public void testGetPasswordAuthentication() throws Exception {
+    public void testGetPasswordAuthentication() {
         String username = randomAscii(10);
         String password = randomAscii(20);
         properties.setProperty("Username", username);
@@ -37,7 +37,7 @@ public class PropertyAuthenticationProviderTest {
     }
 
     @Test
-    public void testNoAuthentication() throws Exception {
+    public void testNoAuthentication() {
         final PropertyAuthenticationProvider authenticationProvider = new PropertyAuthenticationProvider(properties);
         assertThat(authenticationProvider.getPasswordAuthentication(), nullValue());
     }

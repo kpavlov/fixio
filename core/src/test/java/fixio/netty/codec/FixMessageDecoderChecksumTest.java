@@ -58,7 +58,7 @@ public class FixMessageDecoderChecksumTest {
     }
 
     @BeforeClass
-    public static void beforeClass() throws Exception {
+    public static void beforeClass() {
         decoder = new FixMessageDecoder();
     }
 

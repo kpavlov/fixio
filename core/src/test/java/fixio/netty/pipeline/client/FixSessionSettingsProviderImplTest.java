@@ -58,37 +58,37 @@ public class FixSessionSettingsProviderImplTest {
     }
 
     @Test
-    public void testGetSenderCompID() throws Exception {
+    public void testGetSenderCompID() {
         assertEquals(senderCompID, settingsProvider.getSenderCompID());
     }
 
     @Test
-    public void testGetSenderSubID() throws Exception {
+    public void testGetSenderSubID() {
         assertEquals(senderSubID, settingsProvider.getSenderSubID());
     }
 
     @Test
-    public void testGetTargetCompID() throws Exception {
+    public void testGetTargetCompID() {
         assertEquals(targetCompID, settingsProvider.getTargetCompID());
     }
 
     @Test
-    public void testGetTargetSubID() throws Exception {
+    public void testGetTargetSubID() {
         assertEquals(targetSubID, settingsProvider.getTargetSubID());
     }
 
     @Test
-    public void testGetBeginString() throws Exception {
+    public void testGetBeginString() {
         assertEquals(beginString, settingsProvider.getBeginString());
     }
 
     @Test
-    public void testIsResetMsgSeqNum() throws Exception {
+    public void testIsResetMsgSeqNum() {
         assertEquals(resetMsgSeqNum, settingsProvider.isResetMsgSeqNum());
     }
 
     @Test
-    public void testGetHeartbeatInterval() throws Exception {
+    public void testGetHeartbeatInterval() {
         assertEquals(heartbeatInterval, settingsProvider.getHeartbeatInterval());
     }
 }

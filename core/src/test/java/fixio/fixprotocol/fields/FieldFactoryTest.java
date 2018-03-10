@@ -42,13 +42,13 @@ import static org.junit.Assert.assertTrue;
 public class FieldFactoryTest {
 
     @Test(expected = IllegalArgumentException.class)
-    public void testInvalidTagField() throws Exception {
+    public void testInvalidTagField() {
         String value = randomAlphanumeric(5);
         FieldFactory.valueOf(0, value.getBytes(US_ASCII));
     }
 
     @Test
-    public void testValueOfString() throws Exception {
+    public void testValueOfString() {
         String value = randomAscii(5);
         StringField field = FieldFactory.valueOf(FieldType.MsgType.tag(), value.getBytes(US_ASCII));
 
@@ -57,7 +57,7 @@ public class FieldFactoryTest {
     }
 
     @Test
-    public void testBigTagNumber() throws Exception {
+    public void testBigTagNumber() {
         String value = randomAscii(5);
         int tagNum = 100_000;
         StringField field = FieldFactory.valueOf(tagNum, value.getBytes(US_ASCII));
@@ -67,7 +67,7 @@ public class FieldFactoryTest {
     }
 
     @Test
-    public void testValueOfChar() throws Exception {
+    public void testValueOfChar() {
         char value = randomAscii(1).charAt(0);
         CharField field = FieldFactory.valueOf(FieldType.AdvSide.tag(), new byte[]{(byte) value});
 
@@ -77,7 +77,7 @@ public class FieldFactoryTest {
     }
 
     @Test
-    public void testValueOfInt() throws Exception {
+    public void testValueOfInt() {
         int value = new Random().nextInt(1000);
         IntField field = FieldFactory.valueOf(FieldType.EncryptMethod.tag(), String.valueOf(value).getBytes(US_ASCII));
 
@@ -87,7 +87,7 @@ public class FieldFactoryTest {
     }
 
     @Test
-    public void testValueOfLength() throws Exception {
+    public void testValueOfLength() {
         int value = new Random().nextInt(1000);
 
         IntField field = FieldFactory.valueOf(FieldType.BodyLength.tag(), String.valueOf(value).getBytes(US_ASCII));
@@ -98,7 +98,7 @@ public class FieldFactoryTest {
     }
 
     @Test
-    public void testValueOfSeqNum() throws Exception {
+    public void testValueOfSeqNum() {
         int value = new Random().nextInt(1000);
 
         IntField field = FieldFactory.valueOf(FieldType.RefSeqNum.tag(), String.valueOf(value).getBytes(US_ASCII));
@@ -109,7 +109,7 @@ public class FieldFactoryTest {
     }
 
     @Test
-    public void testValueOfNumInGroup() throws Exception {
+    public void testValueOfNumInGroup() {
         int value = new Random().nextInt(1000);
 
         IntField field = FieldFactory.valueOf(FieldType.NoMDEntries.tag(), String.valueOf(value).getBytes(US_ASCII));
@@ -120,7 +120,7 @@ public class FieldFactoryTest {
     }
 
     @Test
-    public void testValueOfFloat() throws Exception {
+    public void testValueOfFloat() {
         BigDecimal value = BigDecimal.valueOf(new Random().nextInt()).movePointLeft(5);
 
         FloatField field = FieldFactory.valueOf(FieldType.SettlCurrFxRate.tag(), value.toPlainString().getBytes(US_ASCII));
@@ -131,7 +131,7 @@ public class FieldFactoryTest {
     }
 
     @Test
-    public void testValueOfQty() throws Exception {
+    public void testValueOfQty() {
         BigDecimal value = BigDecimal.valueOf(new Random().nextInt()).movePointLeft(5);
 
         FloatField field = FieldFactory.valueOf(FieldType.OrderQty.tag(), value.toPlainString().getBytes(US_ASCII));
@@ -142,7 +142,7 @@ public class FieldFactoryTest {
     }
 
     @Test
-    public void testValueOfPrice() throws Exception {
+    public void testValueOfPrice() {
         BigDecimal value = BigDecimal.valueOf(new Random().nextInt()).movePointLeft(5);
 
         FloatField field = FieldFactory.valueOf(FieldType.MktBidPx.tag(), value.toPlainString().getBytes(US_ASCII));
@@ -153,7 +153,7 @@ public class FieldFactoryTest {
     }
 
     @Test
-    public void testValueOfBooleanTrue() throws Exception {
+    public void testValueOfBooleanTrue() {
         String value = "Y";
         BooleanField field = FieldFactory.valueOf(FieldType.PossDupFlag.tag(), value.getBytes(US_ASCII));
 
@@ -163,7 +163,7 @@ public class FieldFactoryTest {
     }
 
     @Test
-    public void testValueOfBooleanFalse() throws Exception {
+    public void testValueOfBooleanFalse() {
         String value = "N";
         BooleanField field = FieldFactory.valueOf(FieldType.PossDupFlag.tag(), value.getBytes(US_ASCII));
 
@@ -174,12 +174,12 @@ public class FieldFactoryTest {
 
     @Test(expected = IllegalArgumentException.class)
     @Parameters({"XXX", "", "-"})
-    public void testFailValueOfIncorrectBoolean(String value) throws Exception {
+    public void testFailValueOfIncorrectBoolean(String value) {
         FieldFactory.valueOf(FieldType.PossDupFlag.tag(), value.getBytes(US_ASCII));
     }
 
     @Test
-    public void testValueOfUtcTimestampWithMillis() throws Exception {
+    public void testValueOfUtcTimestampWithMillis() {
         String value = "19980604-08:03:31.537";
         UTCTimestampField field = FieldFactory.valueOf(FieldType.OrigTime.tag(), value.getBytes(US_ASCII));
 
@@ -188,7 +188,7 @@ public class FieldFactoryTest {
     }
 
     @Test
-    public void testValueOfUtcTimestampNoMillis() throws Exception {
+    public void testValueOfUtcTimestampNoMillis() {
         String value = "19980604-08:03:31";
         UTCTimestampField field = FieldFactory.valueOf(FieldType.OrigTime.tag(), value.getBytes(US_ASCII));
 
@@ -198,7 +198,7 @@ public class FieldFactoryTest {
 
     @Test
     @Parameters({"200303", "20030320", "200303w2"})
-    public void testFromStringValueMonthYear(final String value) throws Exception {
+    public void testFromStringValueMonthYear(final String value) {
         final int tag = FieldType.MaturityMonthYear.tag();
         StringField field = FieldFactory.fromStringValue(DataType.MONTHYEAR, tag, value);
 
@@ -208,7 +208,7 @@ public class FieldFactoryTest {
 
     @Test
     @Parameters({"2003-09-10"})
-    public void testFromStringValueLocalMktDate(final String value) throws Exception {
+    public void testFromStringValueLocalMktDate(final String value) {
         final int tag = FieldType.TradeOriginationDate.tag();
         StringField field = FieldFactory.fromStringValue(DataType.LOCALMKTDATE, tag, value);
 
@@ -218,7 +218,7 @@ public class FieldFactoryTest {
 
     @Test
     @Parameters({"Y", "true", "TRUE"})
-    public void testFromStringValueBooleanTrue(final String value) throws Exception {
+    public void testFromStringValueBooleanTrue(final String value) {
         final int tag = FieldType.PossDupFlag.tag();
         BooleanField field = FieldFactory.fromStringValue(DataType.BOOLEAN, tag, value);
 
@@ -229,7 +229,7 @@ public class FieldFactoryTest {
 
     @Test
     @Parameters({"N", "false", "FALSE"})
-    public void testValueStringValueBooleanFalse(final String value) throws Exception {
+    public void testValueStringValueBooleanFalse(final String value) {
         final int tag = FieldType.PossDupFlag.tag();
         BooleanField field = FieldFactory.fromStringValue(DataType.BOOLEAN, tag, value);
 

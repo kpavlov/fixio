@@ -38,7 +38,7 @@ public class FixSessionTest {
     private String targetLocationID;
 
     @Before
-    public void setUp() throws Exception {
+    public void setUp() {
 
         beginString = randomAscii(2);
         senderCompID = randomAscii(3);
@@ -72,7 +72,7 @@ public class FixSessionTest {
     }
 
     @Test
-    public void testPrepareOutgoing() throws Exception {
+    public void testPrepareOutgoing() {
         int nextOutgoingMsgSeqNum = new Random().nextInt(100) + 100;
         session.setNextOutgoingMessageSeqNum(nextOutgoingMsgSeqNum);
 

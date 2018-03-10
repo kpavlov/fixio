@@ -106,7 +106,7 @@ public class ClientSessionHandler extends AbstractSessionHandler {
     }
 
     @Override
-    public void channelActive(ChannelHandlerContext ctx) throws Exception {
+    public void channelActive(ChannelHandlerContext ctx) {
         getLogger().info("Connection established, starting Client FIX session.");
 
         FixSession pendingSession = createSession(sessionSettingsProvider);

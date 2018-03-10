@@ -19,7 +19,7 @@ import fixio.fixprotocol.session.FixSession;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.Mock;
-import org.mockito.runners.MockitoJUnitRunner;
+import org.mockito.junit.MockitoJUnitRunner;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotEquals;
@@ -39,18 +39,18 @@ public class LogonEventTest {
     }
 
     @Test
-    public void testEqualsSameSession() throws Exception {
+    public void testEqualsSameSession() {
         assertEquals(new LogonEvent(session1), new LogonEvent(session1));
     }
 
     @Test
-    public void testEqualsSelf() throws Exception {
+    public void testEqualsSelf() {
         LogonEvent LogonEvent = new LogonEvent(session1);
         assertEquals(LogonEvent, LogonEvent);
     }
 
     @Test
-    public void testNotEqualsDifferentSession() throws Exception {
+    public void testNotEqualsDifferentSession() {
         LogonEvent firstEvent = new LogonEvent(session1);
         LogonEvent secondEvent = new LogonEvent(session2);
 
@@ -59,18 +59,18 @@ public class LogonEventTest {
     }
 
     @Test
-    public void testHashCodeIsSameForSelf() throws Exception {
+    public void testHashCodeIsSameForSelf() {
         LogonEvent LogonEvent = new LogonEvent(session1);
         assertEquals(LogonEvent.hashCode(), LogonEvent.hashCode());
     }
 
     @Test
-    public void testHashCodeIsSameForSameSession() throws Exception {
+    public void testHashCodeIsSameForSameSession() {
         assertEquals(new LogonEvent(session1).hashCode(), new LogonEvent(session1).hashCode());
     }
 
     @Test
-    public void testHashCodeIsDifferentForSameSessionDifferentSession() throws Exception {
+    public void testHashCodeIsDifferentForSameSessionDifferentSession() {
         LogonEvent firstEvent = new LogonEvent(session1);
         LogonEvent secondEvent = new LogonEvent(session2);
 
