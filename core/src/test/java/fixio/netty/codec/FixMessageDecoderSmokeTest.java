@@ -20,6 +20,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 public class FixMessageDecoderSmokeTest {
 
     private static FixMessageDecoder decoder;
+    private final String message;
 
     public FixMessageDecoderSmokeTest(String message) {
         this.message = message;
@@ -34,8 +35,6 @@ public class FixMessageDecoderSmokeTest {
                 .filter(l -> l.startsWith("8="))
                 .toArray(String[]::new);
     }
-
-    private final String message;
 
     @BeforeClass
     public static void setUp() {
