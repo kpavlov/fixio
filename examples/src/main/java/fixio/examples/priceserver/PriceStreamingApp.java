@@ -17,7 +17,7 @@ package fixio.examples.priceserver;
 
 import fixio.events.LogonEvent;
 import fixio.events.LogoutEvent;
-import fixio.examples.common.AbstractQouteStreamingWorker;
+import fixio.examples.common.AbstractQuoteStreamingWorker;
 import fixio.examples.common.Quote;
 import fixio.fixprotocol.FieldType;
 import fixio.fixprotocol.FixMessage;
@@ -108,7 +108,7 @@ class PriceStreamingApp extends FixApplicationAdapter {
         return message;
     }
 
-    private class StreamingWorker extends AbstractQouteStreamingWorker {
+    private class StreamingWorker extends AbstractQuoteStreamingWorker {
 
         public StreamingWorker(BlockingQueue<Quote> quoteQueue) {
             super(quoteQueue);

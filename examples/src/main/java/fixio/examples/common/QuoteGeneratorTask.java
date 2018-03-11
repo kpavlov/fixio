@@ -22,11 +22,17 @@ import java.util.concurrent.BlockingQueue;
 
 public class QuoteGeneratorTask implements Runnable {
 
-    public static final Logger LOGGER = LoggerFactory.getLogger(QuoteGeneratorTask.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(QuoteGeneratorTask.class);
     private final BlockingQueue<Quote> receiver;
+
+    private static int DATA_SIZE = 1000;
+    private final Quote[] data = new Quote[DATA_SIZE];
 
     public QuoteGeneratorTask(BlockingQueue<Quote> receiverQueue) {
         receiver = receiverQueue;
+        for (int i = 0; i < DATA_SIZE; i++) {
+            data[i] = createQuote(i);
+        }
     }
 
     @Override
@@ -37,11 +43,10 @@ public class QuoteGeneratorTask implements Runnable {
         while (!thread.isInterrupted()) {
             if (receiver.remainingCapacity() > 1000) {
                 try {
-                    double bid = Math.sin((double) t / 100) * 2 + 0.5;
-                    double offer = Math.sin((double) t - 10 / 100) * 2 + 0.5;
-                    Quote quote = new Quote(bid, offer);
+                    Quote quote = data[t % DATA_SIZE];
                     t++;
                     receiver.put(quote);
+                    Thread.yield();
                 } catch (InterruptedException e) {
                     LOGGER.info("Interrupted.");
                     thread.interrupt();
@@ -53,6 +58,12 @@ public class QuoteGeneratorTask implements Runnable {
             Thread.yield();
         }
         LOGGER.info("Stopped");
+    }
+
+    private static Quote createQuote(double t) {
+        double bid = Math.sin(t / 100) * 2 + 0.5;
+        double offer = Math.sin(t - 10 / 100) * 2 + 0.5;
+        return new Quote(bid, offer);
     }
 
     public void stop() {

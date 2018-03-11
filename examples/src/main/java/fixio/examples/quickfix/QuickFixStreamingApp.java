@@ -15,7 +15,7 @@
  */
 package fixio.examples.quickfix;
 
-import fixio.examples.common.AbstractQouteStreamingWorker;
+import fixio.examples.common.AbstractQuoteStreamingWorker;
 import fixio.examples.common.Quote;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -115,7 +115,7 @@ public class QuickFixStreamingApp implements Application {
         LOGGER.info("Streaming Stopped for {}", sessionID);
     }
 
-    private class StreamingWorker extends AbstractQouteStreamingWorker {
+    private class StreamingWorker extends AbstractQuoteStreamingWorker {
 
         public StreamingWorker(BlockingQueue<Quote> quoteQueue) {
             super(quoteQueue);

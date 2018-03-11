@@ -32,7 +32,7 @@ import java.util.List;
 
 class PriceReadingApp extends FixApplicationAdapter {
 
-    public static final int MAX_QUOTE_COUNT = 1_000_000;
+    public static final int MAX_QUOTE_COUNT = 300_000;
     private static final Logger LOGGER = LoggerFactory.getLogger(PriceReadingApp.class);
     private int counter;
     private long startTimeNanos;
