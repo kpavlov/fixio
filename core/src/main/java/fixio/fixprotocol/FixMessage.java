@@ -16,6 +16,7 @@
 
 package fixio.fixprotocol;
 
+import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -62,6 +63,18 @@ public interface FixMessage {
             }
         }
         return null;
+    }
+
+    default List<FixMessageFragment> getAll(int tagNum) {
+        final List<FixMessageFragment> body = getBody();
+        List<FixMessageFragment> result = new ArrayList<>(8);
+        for (int i = 0; i < body.size(); i++) {
+            FixMessageFragment item = body.get(i);
+            if (item.getTagNum() == tagNum) {
+                result.add(item);
+            }
+        }
+        return result;
     }
 
     default FixMessageFragment getLast(int tagNum) {
