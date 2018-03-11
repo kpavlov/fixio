@@ -19,7 +19,6 @@ import fixio.fixprotocol.fields.CharField;
 import fixio.fixprotocol.fields.FixedPointNumber;
 import fixio.fixprotocol.fields.IntField;
 import fixio.fixprotocol.fields.StringField;
-import it.unimi.dsi.fastutil.ints.Int2ObjectArrayMap;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -29,7 +28,7 @@ public class FixMessageBuilderImpl implements FixMessage, FixMessageBuilder {
     private static final int DEFAULT_BODY_FIELD_COUNT = 16;
     private final FixMessageHeader header;
     private final FixMessageTrailer trailer;
-    private final Int2ObjectArrayMap<FixMessageFragment> body;
+    private final List<FixMessageFragment> body;
 
     /**
      * Creates FixMessageBuilderImpl with expected body field count.
@@ -42,7 +41,7 @@ public class FixMessageBuilderImpl implements FixMessage, FixMessageBuilder {
     private FixMessageBuilderImpl(int expectedBodyFieldCount) {
         this.header = new FixMessageHeader();
         this.trailer = new FixMessageTrailer();
-        this.body = new Int2ObjectArrayMap<>(expectedBodyFieldCount);
+        body = new ArrayList<>(expectedBodyFieldCount);
     }
 
     /**
@@ -56,7 +55,7 @@ public class FixMessageBuilderImpl implements FixMessage, FixMessageBuilder {
         assert (trailer != null) : "FixMessageTrailer is expected";
         this.header = header;
         this.trailer = trailer;
-        this.body = new Int2ObjectArrayMap<>(DEFAULT_BODY_FIELD_COUNT);
+        body = new ArrayList<>(DEFAULT_BODY_FIELD_COUNT);
     }
 
     /**
@@ -198,20 +197,20 @@ public class FixMessageBuilderImpl implements FixMessage, FixMessageBuilder {
 
     @Override
     public List<FixMessageFragment> getBody() {
-        return new ArrayList<>(body.values());
+        return body;
     }
 
     @Override
     public void copyBody(List<? extends FixMessageFragment> body) {
         this.body.clear();
         for (FixMessageFragment fragment : body) {
-            this.body.put(fragment.getTagNum(), fragment);
+            this.body.add(fragment);
         }
     }
 
     @Override
     public String getString(int tagNum) {
-        FixMessageFragment item = getFragment(tagNum);
+        FixMessageFragment item = getFirst(tagNum);
         if (item == null) {
             return null;
         }
@@ -225,7 +224,13 @@ public class FixMessageBuilderImpl implements FixMessage, FixMessageBuilder {
     @SuppressWarnings("unchecked")
     @Override
     public <T> T getValue(FieldType fieldType) {
-        FixMessageFragment field = getFragment(fieldType.tag());
+        return getValue(fieldType.tag());
+    }
+
+    @SuppressWarnings("unchecked")
+    @Override
+    public <T> T getValue(int tagNum) {
+        FixMessageFragment field = getFirst(tagNum);
         if (field != null) {
             return (T) field.getValue();
         }
@@ -244,7 +249,7 @@ public class FixMessageBuilderImpl implements FixMessage, FixMessageBuilder {
 
     @Override
     public Character getChar(int tagNum) {
-        FixMessageFragment field = getFragment(tagNum);
+        FixMessageFragment field = getFirst(tagNum);
         if (field == null) {
             return null;
         }
@@ -257,7 +262,7 @@ public class FixMessageBuilderImpl implements FixMessage, FixMessageBuilder {
 
     @Override
     public Integer getInt(int tagNum) {
-        FixMessageFragment field = getFragment(tagNum);
+        FixMessageFragment field = getFirst(tagNum);
         if (field instanceof IntField) {
             return ((IntField) field).getValue();
         }
@@ -312,15 +317,19 @@ public class FixMessageBuilderImpl implements FixMessage, FixMessageBuilder {
         header.setMessageType(messageType);
     }
 
-    private FixMessageFragment getFragment(int tagNum) {
-        return body.get(tagNum);
+    public List<Group> getGroups(int tagNum) {
+        FixMessageFragment fragment = getFirst(tagNum);
+        if (fragment instanceof GroupField) {
+            return ((GroupField) fragment).getGroups();
+        }
+        return null;
     }
 
     private void addGroup(int tagNum, Group group) {
-        GroupField g = (GroupField) getFragment(tagNum);
+        GroupField g = (GroupField) getLast(tagNum);
         if (g == null) {
             g = new GroupField(tagNum);
-            body.put(tagNum, g);
+            body.add(g);
         }
         g.add(group);
     }

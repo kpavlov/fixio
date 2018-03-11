@@ -17,18 +17,9 @@ package fixio.fixprotocol.fields;
 
 import java.text.ParseException;
 import java.time.ZonedDateTime;
+import java.util.Objects;
 
-import static fixio.fixprotocol.FixConst.DATE_TIME_FORMATTER_MICROS;
-import static fixio.fixprotocol.FixConst.DATE_TIME_FORMATTER_MILLIS;
-import static fixio.fixprotocol.FixConst.DATE_TIME_FORMATTER_NANOS;
-import static fixio.fixprotocol.FixConst.DATE_TIME_FORMATTER_PICOS;
-import static fixio.fixprotocol.FixConst.DATE_TIME_FORMATTER_SECONDS;
-import static fixio.fixprotocol.FixConst.DATE_TIME_PATTERN_MICROS_LENGTH;
-import static fixio.fixprotocol.FixConst.DATE_TIME_PATTERN_MILLIS;
-import static fixio.fixprotocol.FixConst.DATE_TIME_PATTERN_MILLIS_LENGTH;
-import static fixio.fixprotocol.FixConst.DATE_TIME_PATTERN_NANOS_LENGTH;
-import static fixio.fixprotocol.FixConst.DATE_TIME_PATTERN_PICOS_LENGTH;
-import static fixio.fixprotocol.FixConst.DATE_TIME_PATTERN_SECONDS_LENGTH;
+import static fixio.fixprotocol.FixConst.*;
 import static java.nio.charset.StandardCharsets.US_ASCII;
 
 
@@ -131,5 +122,19 @@ public class UTCTimestampField extends AbstractField<ZonedDateTime> {
                     return DATE_TIME_FORMATTER_SECONDS.format(value).getBytes(US_ASCII);
                 }
         }
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        UTCTimestampField that = (UTCTimestampField) o;
+        return valueLen == that.valueLen &&
+                Objects.equals(value, that.value);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(value, valueLen);
     }
 }

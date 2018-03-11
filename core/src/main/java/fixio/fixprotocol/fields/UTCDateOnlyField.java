@@ -17,6 +17,7 @@ package fixio.fixprotocol.fields;
 
 import java.text.ParseException;
 import java.time.LocalDate;
+import java.util.Objects;
 
 import static fixio.fixprotocol.FixConst.DATE_FORMATTER;
 import static java.nio.charset.StandardCharsets.US_ASCII;
@@ -80,5 +81,18 @@ public class UTCDateOnlyField extends AbstractField<LocalDate> {
     @Override
     public LocalDate getValue() {
         return value;
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        UTCDateOnlyField that = (UTCDateOnlyField) o;
+        return Objects.equals(value, that.value);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(value);
     }
 }

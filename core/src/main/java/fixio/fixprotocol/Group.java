@@ -17,7 +17,6 @@ package fixio.fixprotocol;
 
 import fixio.fixprotocol.fields.FixedPointNumber;
 import fixio.fixprotocol.fields.StringField;
-import it.unimi.dsi.fastutil.ints.Int2ObjectArrayMap;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -28,35 +27,29 @@ import java.util.List;
 public class Group implements FieldListBuilder<Group> {
 
     private static final int DEFAULT_GROUP_SIZE = 8;
-    private final Int2ObjectArrayMap<FixMessageFragment> contents;
+    private final ArrayList<FixMessageFragment> contents;
 
     public Group(int expectedSize) {
-        this.contents = new Int2ObjectArrayMap<>(expectedSize);
+        this.contents = new ArrayList<>(expectedSize);
     }
 
     public Group() {
-        this.contents = new Int2ObjectArrayMap<>(DEFAULT_GROUP_SIZE);
+        this.contents = new ArrayList<>(DEFAULT_GROUP_SIZE);
     }
 
     public void add(FixMessageFragment element) {
-        contents.put(element.getTagNum(), element);
+        contents.add(element);
     }
 
     @Override
     public Group add(FieldType fieldType, String value) {
-        contents.put(fieldType.tag(), new StringField(fieldType.tag(), value));
+        contents.add(new StringField(fieldType.tag(), value));
         return this;
     }
 
     @Override
     public Group add(int tagNum, String value) {
         FieldListBuilderHelper.add(contents, tagNum, value);
-        return this;
-    }
-
-    @Override
-    public Group add(FieldType field, char value) {
-        FieldListBuilderHelper.add(contents, field.tag(), value);
         return this;
     }
 
@@ -120,20 +113,25 @@ public class Group implements FieldListBuilder<Group> {
         return this;
     }
 
+    @Override
+    public Group add(FieldType field, char value) {
+        FieldListBuilderHelper.add(contents, field, value);
+        return this;
+    }
+
     @SuppressWarnings("unchecked")
     public <T> T getValue(int tagNum) {
-        FixMessageFragment field = contents.get(tagNum);
-        if (field != null)
-            return (T) field.getValue();
+        for (FixMessageFragment field : contents) {
+            if (field.getTagNum() == tagNum) {
+                return (T) field.getValue();
+            }
+        }
         return null;
     }
 
     @SuppressWarnings("unchecked")
     public <T> T getValue(FieldType fieldType) {
-        FixMessageFragment field = contents.get(fieldType.tag());
-        if (field != null)
-            return (T) field.getValue();
-        return null;
+        return getValue(fieldType.tag());
     }
 
     @Override
@@ -166,7 +164,7 @@ public class Group implements FieldListBuilder<Group> {
         GroupField g = (GroupField) getFragment(tagNum);
         if (g == null) {
             g = new GroupField(tagNum);
-            contents.put(tagNum, g);
+            contents.add(g);
         }
         g.add(group);
     }
@@ -176,15 +174,15 @@ public class Group implements FieldListBuilder<Group> {
     }
 
     public List<FixMessageFragment> getContents() {
-        return new ArrayList<>(contents.values());
+        return contents;
     }
 
     @Override
     public String toString() {
         StringBuilder sb = new StringBuilder();
-        for (FixMessageFragment fragment : contents.values()) {
+        for (FixMessageFragment fragment : contents) {
             int tagNum = fragment.getTagNum();
-            sb.append(FieldType.forTag(tagNum)).append("(").append(tagNum).append(")=").append(fragment.getValue()).append(", ");
+            sb.append(FieldType.forTag(tagNum) + "(" + tagNum + ")=" + fragment.getValue()).append(", ");
         }
         return sb.toString();
     }

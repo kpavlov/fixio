@@ -21,7 +21,6 @@ import fixio.fixprotocol.fields.CharField;
 import fixio.fixprotocol.fields.FieldFactory;
 import fixio.fixprotocol.fields.IntField;
 import fixio.fixprotocol.fields.StringField;
-import it.unimi.dsi.fastutil.ints.Int2ObjectArrayMap;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -33,19 +32,19 @@ public class FixMessageImpl implements FixMessage {
 
     private final FixMessageHeader header = new FixMessageHeader();
     private final FixMessageTrailer trailer = new FixMessageTrailer();
-    private final Int2ObjectArrayMap<FixMessageFragment> body = new Int2ObjectArrayMap<>();
+    private final List<FixMessageFragment> body = new ArrayList<>();
 
     public FixMessageImpl add(int tagNum, byte[] value) {
         return add(tagNum, value, 0, value.length);
     }
 
     public FixMessageImpl addBody(int tagNum, String value) {
-        body.put(tagNum, new StringField(tagNum, value));
+        body.add(new StringField(tagNum, value));
         return this;
     }
 
     public FixMessageImpl addBody(GroupField group) {
-        body.put(group.getTagNum(), group);
+        body.add(group);
         return this;
     }
 
@@ -75,7 +74,7 @@ public class FixMessageImpl implements FixMessage {
                 header.setMessageType(((StringField) field).getValue().intern());
                 break;
             default:
-                body.put(tagNum, field);
+                body.add(field);
                 break;
         }
         return this;
@@ -83,7 +82,7 @@ public class FixMessageImpl implements FixMessage {
 
     @Override
     public List<FixMessageFragment> getBody() {
-        return new ArrayList<>(body.values());
+        return body;
     }
 
     @Override
@@ -102,9 +101,16 @@ public class FixMessageImpl implements FixMessage {
     @SuppressWarnings("unchecked")
     @Override
     public <T> T getValue(FieldType fieldType) {
-        FixMessageFragment field = getFirst(fieldType.tag());
-        if (field != null)
+        return getValue(fieldType.tag());
+    }
+
+    @SuppressWarnings("unchecked")
+    @Override
+    public <T> T getValue(int tagNum) {
+        FixMessageFragment field = getFirst(tagNum);
+        if (field instanceof AbstractField) {
             return (T) field.getValue();
+        }
         return null;
     }
 
@@ -167,8 +173,12 @@ public class FixMessageImpl implements FixMessage {
         return trailer.getCheckSum();
     }
 
-    private FixMessageFragment getFirst(int tagNum) {
-        return body.get(tagNum);
+    public List<Group> getGroups(int tagNum) {
+        FixMessageFragment fragment = getFirst(tagNum);
+        if (fragment instanceof GroupField) {
+            return ((GroupField) fragment).getGroups();
+        }
+        return null;
     }
 
     @Override
