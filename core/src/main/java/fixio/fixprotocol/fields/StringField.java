@@ -17,6 +17,8 @@ package fixio.fixprotocol.fields;
 
 import fixio.Utils;
 
+import java.util.Arrays;
+
 public class StringField extends AbstractField<String> {
 
     private final byte[] value;
@@ -45,5 +47,18 @@ public class StringField extends AbstractField<String> {
     @Override
     public byte[] getBytes() {
         return value;
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        StringField that = (StringField) o;
+        return Arrays.equals(value, that.value);
+    }
+
+    @Override
+    public int hashCode() {
+        return Arrays.hashCode(value);
     }
 }

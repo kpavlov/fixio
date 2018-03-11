@@ -15,6 +15,8 @@
  */
 package fixio.fixprotocol.fields;
 
+import java.util.Objects;
+
 import static java.nio.charset.StandardCharsets.US_ASCII;
 
 public class FloatField extends AbstractField<FixedPointNumber> {
@@ -44,5 +46,18 @@ public class FloatField extends AbstractField<FixedPointNumber> {
 
     public float floatValue() {
         return value.floatValue();
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        FloatField that = (FloatField) o;
+        return Objects.equals(value, that.value);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(value);
     }
 }

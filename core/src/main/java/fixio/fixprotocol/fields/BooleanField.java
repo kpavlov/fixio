@@ -15,6 +15,8 @@
  */
 package fixio.fixprotocol.fields;
 
+import java.util.Objects;
+
 public class BooleanField extends AbstractField<Boolean> {
 
     private static final byte[] TRUE_BYTES = new byte[]{(byte) 'Y'};
@@ -39,5 +41,18 @@ public class BooleanField extends AbstractField<Boolean> {
 
     public boolean booleanValue() {
         return value;
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        BooleanField that = (BooleanField) o;
+        return value == that.value;
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(value);
     }
 }

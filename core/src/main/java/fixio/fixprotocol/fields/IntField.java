@@ -16,6 +16,7 @@
 package fixio.fixprotocol.fields;
 
 import java.text.ParseException;
+import java.util.Objects;
 
 import static java.nio.charset.StandardCharsets.US_ASCII;
 
@@ -66,5 +67,18 @@ public class IntField extends AbstractField<Integer> {
 
     public int intValue() {
         return value;
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        IntField intField = (IntField) o;
+        return value == intField.value;
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(value);
     }
 }

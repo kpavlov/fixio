@@ -15,6 +15,8 @@
  */
 package fixio.fixprotocol.fields;
 
+import java.util.Objects;
+
 public class CharField extends AbstractField<Character> {
 
     private final char value;
@@ -36,5 +38,18 @@ public class CharField extends AbstractField<Character> {
 
     public char charValue() {
         return value;
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        CharField charField = (CharField) o;
+        return value == charField.value;
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(value);
     }
 }
