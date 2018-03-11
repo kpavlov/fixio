@@ -15,10 +15,10 @@
  */
 package fixio.fixprotocol;
 
-import fixio.fixprotocol.fields.CharField;
 import fixio.fixprotocol.fields.FieldFactory;
 import fixio.fixprotocol.fields.FixedPointNumber;
-import it.unimi.dsi.fastutil.ints.Int2ObjectArrayMap;
+
+import java.util.List;
 
 /**
  * Helper class for managing {@link FieldListBuilder}.
@@ -30,82 +30,75 @@ final class FieldListBuilderHelper {
 
     // From Int
 
-    public static void add(Int2ObjectArrayMap<FixMessageFragment> map, DataType type, int tagNum, int value) {
+    static void add(List<FixMessageFragment> list, DataType type, int tagNum, int value) {
         assert (tagNum > 0) : "Tag must be positive.";
-        map.put(tagNum, FieldFactory.fromIntValue(type, tagNum, value));
+        list.add(FieldFactory.fromIntValue(type, tagNum, value));
     }
 
-    public static void add(Int2ObjectArrayMap<FixMessageFragment> map, int tagNum, int value) {
+    static void add(List<FixMessageFragment> list, int tagNum, int value) {
         assert (tagNum > 0) : "Tag must be positive.";
-        map.put(tagNum, FieldFactory.fromIntValue(tagNum, value));
+        list.add(FieldFactory.fromIntValue(tagNum, value));
     }
 
-    public static void add(Int2ObjectArrayMap<FixMessageFragment> map, FieldType fieldType, int value) {
+    static void add(List<FixMessageFragment> list, FieldType fieldType, int value) {
         assert (fieldType != null) : "Tag must be specified.";
-        map.put(fieldType.tag(), FieldFactory.fromIntValue(fieldType.type(), fieldType.tag(), value));
+        list.add(FieldFactory.fromIntValue(fieldType.type(), fieldType.tag(), value));
     }
 
     // From Long
 
-    public static void add(Int2ObjectArrayMap<FixMessageFragment> map, DataType type, int tagNum, long value) {
+    static void add(List<FixMessageFragment> list, DataType type, int tagNum, long value) {
         assert (tagNum > 0) : "Tag must be positive.";
-        map.put(tagNum, FieldFactory.fromLongValue(type, tagNum, value));
+        list.add(FieldFactory.fromLongValue(type, tagNum, value));
     }
 
-    public static void add(Int2ObjectArrayMap<FixMessageFragment> map, int tagNum, long value) {
+    static void add(List<FixMessageFragment> list, int tagNum, long value) {
         assert (tagNum > 0) : "Tag must be positive.";
-        map.put(tagNum, FieldFactory.fromLongValue(tagNum, value));
+        list.add(FieldFactory.fromLongValue(tagNum, value));
     }
 
-    public static void add(Int2ObjectArrayMap<FixMessageFragment> map, FieldType fieldType, long value) {
+    static void add(List<FixMessageFragment> list, FieldType fieldType, long value) {
         assert (fieldType != null) : "Tag must be specified.";
-        map.put(fieldType.tag(), FieldFactory.fromLongValue(fieldType.type(), fieldType.tag(), value));
+        list.add(FieldFactory.fromLongValue(fieldType.type(), fieldType.tag(), value));
     }
 
     // From String
 
-    public static void add(Int2ObjectArrayMap<FixMessageFragment> map, FieldType fieldType, String value) {
+    static void add(List<FixMessageFragment> list, FieldType fieldType, String value) {
         assert (fieldType != null) : "Tag must be specified.";
         assert (value != null) : "Value must be specified.";
-        map.put(fieldType.tag(), FieldFactory.fromStringValue(fieldType.type(), fieldType.tag(), value));
+        list.add(FieldFactory.fromStringValue(fieldType.type(), fieldType.tag(), value));
     }
 
-    public static void add(Int2ObjectArrayMap<FixMessageFragment> map, FieldType fieldType, char value) {
-        if (fieldType.type() != DataType.CHAR) {
-            throw new IllegalArgumentException("FieldType " + fieldType + " must be CHAR");
-        }
-        map.put(fieldType.tag(), new CharField(fieldType.tag(), value));
-    }
-
-    public static void add(Int2ObjectArrayMap<FixMessageFragment> map, int tagNum, String value) {
+    static void add(List<FixMessageFragment> list, int tagNum, String value) {
         assert (tagNum > 0) : "TagNum must be positive. Got " + tagNum;
         assert (value != null) : "Value must be specified.";
-        map.put(tagNum, FieldFactory.fromStringValue(tagNum, value));
+        list.add(FieldFactory.fromStringValue(tagNum, value));
     }
 
-    public static void add(Int2ObjectArrayMap<FixMessageFragment> map, DataType type, int tagNum, String value) {
+    static void add(List<FixMessageFragment> list, DataType type, int tagNum, String value) {
         assert (tagNum > 0) : "TagNum must be positive. Got " + tagNum;
         assert (value != null) : "Value must be specified.";
-        map.put(tagNum, FieldFactory.fromStringValue(type, tagNum, value));
+        list.add(FieldFactory.fromStringValue(type, tagNum, value));
     }
 
     // From FixedPointNumber
 
-    public static void add(Int2ObjectArrayMap<FixMessageFragment> map, FieldType fieldType, FixedPointNumber value) {
+    static void add(List<FixMessageFragment> list, FieldType fieldType, FixedPointNumber value) {
         assert (fieldType != null) : "Tag must be specified.";
         assert (value != null) : "Value must be specified.";
-        map.put(fieldType.tag(), FieldFactory.fromFixedPointValue(fieldType.type(), fieldType.tag(), value));
+        list.add(FieldFactory.fromFixedPointValue(fieldType.type(), fieldType.tag(), value));
     }
 
-    public static void add(Int2ObjectArrayMap<FixMessageFragment> map, int tagNum, FixedPointNumber value) {
+    static void add(List<FixMessageFragment> list, int tagNum, FixedPointNumber value) {
         assert (tagNum > 0) : "TagNum must be positive. Got " + tagNum;
         assert (value != null) : "Value must be specified.";
-        map.put(tagNum, FieldFactory.fromFixedPointValue(tagNum, value));
+        list.add(FieldFactory.fromFixedPointValue(tagNum, value));
     }
 
-    public static void add(Int2ObjectArrayMap<FixMessageFragment> map, DataType type, int tagNum, FixedPointNumber value) {
+    static void add(List<FixMessageFragment> list, DataType type, int tagNum, FixedPointNumber value) {
         assert (tagNum > 0) : "TagNum must be positive. Got " + tagNum;
         assert (value != null) : "Value must be specified.";
-        map.put(tagNum, FieldFactory.fromFixedPointValue(type, tagNum, value));
+        list.add(FieldFactory.fromFixedPointValue(type, tagNum, value));
     }
 }

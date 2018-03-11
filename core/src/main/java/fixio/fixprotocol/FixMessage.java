@@ -40,6 +40,9 @@ public interface FixMessage {
 
     String getString(int tagNum);
 
+    @SuppressWarnings("unchecked")
+    <T> T getValue(int tagNum);
+
     String getString(FieldType field);
 
     <T> T getValue(FieldType field);
@@ -49,4 +52,27 @@ public interface FixMessage {
     Character getChar(FieldType fieldType);
 
     String getMessageType();
+
+    default FixMessageFragment getFirst(int tagNum) {
+        final List<FixMessageFragment> body = getBody();
+        for (int i = 0; i < body.size(); i++) {
+            FixMessageFragment item = body.get(i);
+            if (item.getTagNum() == tagNum) {
+                return item;
+            }
+        }
+        return null;
+    }
+
+    default FixMessageFragment getLast(int tagNum) {
+        final List<FixMessageFragment> body = getBody();
+        for (int i = body.size() - 1; i >= 0; i--) {
+            FixMessageFragment item = body.get(i);
+            if (item.getTagNum() == tagNum) {
+                return item;
+            }
+        }
+        return null;
+    }
+
 }
