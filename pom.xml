@@ -20,7 +20,7 @@
     <groupId>com.github.kpavlov.fixio</groupId>
     <artifactId>fixio-parent</artifactId>
     <packaging>pom</packaging>
-    <version>1.2</version>
+    <version>1.3-SNAPSHOT</version>
 
     <name>fix.io</name>
     <description>FIX Protocol Support for Netty</description>
@@ -30,7 +30,7 @@
         <connection>scm:git:git@github.com:kpavlov/fixio.git</connection>
         <developerConnection>scm:git:git@github.com:kpavlov/fixio.git</developerConnection>
         <url>http://github.com/kpavlov/fixio/tree/master</url>
-        <tag>v1.2</tag>
+        <tag>HEAD</tag>
     </scm>
 
     <prerequisites>
