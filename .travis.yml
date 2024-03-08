@@ -1,6 +1,8 @@
 language: java
 jdk:
-  - openjdk8
+  - openjdk11
+  - openjdk17
+  - openjdk18
 
 after_success:
   - mvn javadoc:javadoc
