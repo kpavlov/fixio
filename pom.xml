@@ -34,16 +34,15 @@
     </scm>
 
     <prerequisites>
-        <maven>3.6</maven>
+        <maven>3.9</maven>
     </prerequisites>
 
     <properties>
         <autoVersionSubmodules>true</autoVersionSubmodules>
-        <java.version>1.8</java.version>
+        <java.version>17</java.version>
         <maven.compiler.debug>true</maven.compiler.debug>
         <maven.compiler.optimize>true</maven.compiler.optimize>
-        <maven.compiler.source>${java.version}</maven.compiler.source>
-        <maven.compiler.target>${java.version}</maven.compiler.target>
+        <maven.compiler.release>${java.version}</maven.compiler.release>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <!-- Version -->
         <fastutil.version>8.1.0</fastutil.version>
