@@ -1,4 +1,4 @@
-fixio - FIX Protocol Support for Netty [![Build Status](https://travis-ci.org/kpavlov/fixio.png?branch=master)](https://travis-ci.org/kpavlov/fixio) [![Codacy Badge](https://api.codacy.com/project/badge/Grade/7a6c7475813e44c5a96abe915ed60e73)](https://www.codacy.com/app/kpavlov/fixio?utm_source=github.com&amp;utm_medium=referral&amp;utm_content=kpavlov/fixio&amp;utm_campaign=Badge_Grade)
+fixio - FIX Protocol Support for Netty [![Java CI with Maven](https://github.com/kpavlov/fixio/actions/workflows/maven.yml/badge.svg)](https://github.com/kpavlov/fixio/actions/workflows/maven.yml) [![Codacy Badge](https://api.codacy.com/project/badge/Grade/7a6c7475813e44c5a96abe915ed60e73)](https://www.codacy.com/app/kpavlov/fixio?utm_source=github.com&amp;utm_medium=referral&amp;utm_content=kpavlov/fixio&amp;utm_campaign=Badge_Grade)
 =====
 
 # Overview #
