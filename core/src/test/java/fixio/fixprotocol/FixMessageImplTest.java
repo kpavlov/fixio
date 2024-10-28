@@ -19,7 +19,7 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
 import static org.apache.commons.lang3.RandomStringUtils.randomAscii;
-import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.assertj.core.api.Assertions.assertThat;
 
 class FixMessageImplTest {
 
@@ -44,10 +44,10 @@ class FixMessageImplTest {
 
         //FixMessageImpl fixMessage = builder.build();
 
-        assertEquals(beginString, fixMessage.getHeader().getBeginString(), "beginString");
-        assertEquals(msgType, fixMessage.getMessageType(), "msgType");
-        assertEquals(senderCompID, fixMessage.getHeader().getSenderCompID(), "senderCompID");
-        assertEquals(targetCompID, fixMessage.getHeader().getTargetCompID(), "targetCompID");
+        assertThat(fixMessage.getHeader().getBeginString()).as("beginString").isEqualTo(beginString);
+        assertThat(fixMessage.getMessageType()).as("msgType").isEqualTo(msgType);
+        assertThat(fixMessage.getHeader().getSenderCompID()).as("senderCompID").isEqualTo(senderCompID);
+        assertThat(fixMessage.getHeader().getTargetCompID()).as("targetCompID").isEqualTo(targetCompID);
     }
 
 

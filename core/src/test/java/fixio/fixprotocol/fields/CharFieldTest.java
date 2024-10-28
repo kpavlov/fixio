@@ -21,7 +21,7 @@ import org.junit.jupiter.api.Test;
 import java.util.Random;
 
 import static org.apache.commons.lang3.RandomStringUtils.randomAscii;
-import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.assertj.core.api.Assertions.assertThat;
 
 class CharFieldTest {
 
@@ -40,7 +40,7 @@ class CharFieldTest {
     @Test
     void getBytes() {
         byte[] bytes = charField.getBytes();
-        assertEquals(1, bytes.length);
-        assertEquals((byte) ch, bytes[0]);
+        assertThat(bytes.length).isEqualTo(1);
+        assertThat(bytes[0]).isEqualTo((byte) ch);
     }
 }

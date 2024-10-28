@@ -32,18 +32,16 @@ import static fixio.netty.pipeline.FixClock.systemUTC;
 import static java.nio.charset.StandardCharsets.US_ASCII;
 import static org.apache.commons.lang3.RandomStringUtils.randomAlphanumeric;
 import static org.apache.commons.lang3.RandomStringUtils.randomAscii;
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertFalse;
-import static org.junit.jupiter.api.Assertions.assertSame;
-import static org.junit.jupiter.api.Assertions.assertThrows;
-import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.within;
+import static org.assertj.core.api.AssertionsForClassTypes.assertThatExceptionOfType;
 
 class FieldFactoryTest {
 
     @Test
     void invalidTagField() {
         String value = randomAlphanumeric(5);
-        assertThrows(IllegalArgumentException.class, () ->
+        assertThatExceptionOfType(IllegalArgumentException.class).isThrownBy(() ->
                 FieldFactory.valueOf(0, value.getBytes(US_ASCII)));
     }
 
@@ -52,8 +50,8 @@ class FieldFactoryTest {
         String value = randomAscii(5);
         StringField field = FieldFactory.valueOf(FieldType.MsgType.tag(), value.getBytes(US_ASCII));
 
-        assertEquals(FieldType.MsgType.tag(), field.getTagNum(), "tagnum");
-        assertEquals(value, field.getValue(), "value");
+        assertThat(field.getTagNum()).as("tagnum").isEqualTo(FieldType.MsgType.tag());
+        assertThat(field.getValue()).as("value").isEqualTo(value);
     }
 
     @Test
@@ -62,8 +60,8 @@ class FieldFactoryTest {
         int tagNum = 100_000;
         StringField field = FieldFactory.valueOf(tagNum, value.getBytes(US_ASCII));
 
-        assertEquals(tagNum, field.getTagNum(), "tagnum");
-        assertEquals(value, field.getValue(), "value");
+        assertThat(field.getTagNum()).as("tagnum").isEqualTo(tagNum);
+        assertThat(field.getValue()).as("value").isEqualTo(value);
     }
 
     @Test
@@ -71,9 +69,9 @@ class FieldFactoryTest {
         char value = randomAscii(1).charAt(0);
         CharField field = FieldFactory.valueOf(FieldType.AdvSide.tag(), new byte[]{(byte) value});
 
-        assertEquals(FieldType.AdvSide.tag(), field.getTagNum(), "tagnum");
-        assertEquals(value, field.getValue().charValue(), "value");
-        assertEquals(value, field.charValue(), "value");
+        assertThat(field.getTagNum()).as("tagnum").isEqualTo(FieldType.AdvSide.tag());
+        assertThat(field.getValue().charValue()).as("value").isEqualTo(value);
+        assertThat(field.charValue()).as("value").isEqualTo(value);
     }
 
     @Test
@@ -81,9 +79,9 @@ class FieldFactoryTest {
         int value = new Random().nextInt(1000);
         IntField field = FieldFactory.valueOf(FieldType.EncryptMethod.tag(), String.valueOf(value).getBytes(US_ASCII));
 
-        assertEquals(FieldType.EncryptMethod.tag(), field.getTagNum(), "tagnum");
-        assertEquals(value, field.getValue().intValue(), "value");
-        assertEquals(value, field.intValue(), "value");
+        assertThat(field.getTagNum()).as("tagnum").isEqualTo(FieldType.EncryptMethod.tag());
+        assertThat(field.getValue().intValue()).as("value").isEqualTo(value);
+        assertThat(field.intValue()).as("value").isEqualTo(value);
     }
 
     @Test
@@ -92,9 +90,9 @@ class FieldFactoryTest {
 
         IntField field = FieldFactory.valueOf(FieldType.BodyLength.tag(), String.valueOf(value).getBytes(US_ASCII));
 
-        assertEquals(FieldType.BodyLength.tag(), field.getTagNum(), "tagnum");
-        assertEquals(value, field.getValue().intValue(), "value");
-        assertEquals(value, field.intValue(), "value");
+        assertThat(field.getTagNum()).as("tagnum").isEqualTo(FieldType.BodyLength.tag());
+        assertThat(field.getValue().intValue()).as("value").isEqualTo(value);
+        assertThat(field.intValue()).as("value").isEqualTo(value);
     }
 
     @Test
@@ -103,9 +101,9 @@ class FieldFactoryTest {
 
         IntField field = FieldFactory.valueOf(FieldType.RefSeqNum.tag(), String.valueOf(value).getBytes(US_ASCII));
 
-        assertEquals(FieldType.RefSeqNum.tag(), field.getTagNum(), "tagnum");
-        assertEquals(value, field.getValue().intValue(), "value");
-        assertEquals(value, field.intValue(), "value");
+        assertThat(field.getTagNum()).as("tagnum").isEqualTo(FieldType.RefSeqNum.tag());
+        assertThat(field.getValue().intValue()).as("value").isEqualTo(value);
+        assertThat(field.intValue()).as("value").isEqualTo(value);
     }
 
     @Test
@@ -114,9 +112,9 @@ class FieldFactoryTest {
 
         IntField field = FieldFactory.valueOf(FieldType.NoMDEntries.tag(), String.valueOf(value).getBytes(US_ASCII));
 
-        assertEquals(FieldType.NoMDEntries.tag(), field.getTagNum(), "tagnum");
-        assertEquals(value, field.getValue().intValue(), "value");
-        assertEquals(value, field.intValue(), "value");
+        assertThat(field.getTagNum()).as("tagnum").isEqualTo(FieldType.NoMDEntries.tag());
+        assertThat(field.getValue().intValue()).as("value").isEqualTo(value);
+        assertThat(field.intValue()).as("value").isEqualTo(value);
     }
 
     @Test
@@ -125,9 +123,9 @@ class FieldFactoryTest {
 
         FloatField field = FieldFactory.valueOf(FieldType.SettlCurrFxRate.tag(), value.toPlainString().getBytes(US_ASCII));
 
-        assertEquals(FieldType.SettlCurrFxRate.tag(), field.getTagNum(), "tagnum");
-        assertEquals(value.doubleValue(), field.getValue().doubleValue(), 0.0, "value");
-        assertEquals(value.floatValue(), field.floatValue(), 0.0, "value");
+        assertThat(field.getTagNum()).as("tagnum").isEqualTo(FieldType.SettlCurrFxRate.tag());
+        assertThat(field.getValue().doubleValue()).as("value").isCloseTo(value.doubleValue(), within(0.0));
+        assertThat(field.floatValue()).as("value").isCloseTo(value.floatValue(), within(0.0));
     }
 
     @Test
@@ -136,9 +134,9 @@ class FieldFactoryTest {
 
         FloatField field = FieldFactory.valueOf(FieldType.OrderQty.tag(), value.toPlainString().getBytes(US_ASCII));
 
-        assertEquals(FieldType.OrderQty.tag(), field.getTagNum(), "tagnum");
-        assertEquals(value.doubleValue(), field.getValue().doubleValue(), 0.0, "value");
-        assertEquals(value.floatValue(), field.floatValue(), 0.0, "value");
+        assertThat(field.getTagNum()).as("tagnum").isEqualTo(FieldType.OrderQty.tag());
+        assertThat(field.getValue().doubleValue()).as("value").isCloseTo(value.doubleValue(), within(0.0));
+        assertThat(field.floatValue()).as("value").isCloseTo(value.floatValue(), within(0.0));
     }
 
     @Test
@@ -147,9 +145,9 @@ class FieldFactoryTest {
 
         FloatField field = FieldFactory.valueOf(FieldType.MktBidPx.tag(), value.toPlainString().getBytes(US_ASCII));
 
-        assertEquals(FieldType.MktBidPx.tag(), field.getTagNum(), "tagnum");
-        assertEquals(value.doubleValue(), field.getValue().doubleValue(), 0.0, "value");
-        assertEquals(value.floatValue(), field.floatValue(), 0.0, "value");
+        assertThat(field.getTagNum()).as("tagnum").isEqualTo(FieldType.MktBidPx.tag());
+        assertThat(field.getValue().doubleValue()).as("value").isCloseTo(value.doubleValue(), within(0.0));
+        assertThat(field.floatValue()).as("value").isCloseTo(value.floatValue(), within(0.0));
     }
 
     @Test
@@ -157,9 +155,9 @@ class FieldFactoryTest {
         String value = "Y";
         BooleanField field = FieldFactory.valueOf(FieldType.PossDupFlag.tag(), value.getBytes(US_ASCII));
 
-        assertEquals(FieldType.PossDupFlag.tag(), field.getTagNum(), "tagnum");
-        assertSame(Boolean.TRUE, field.getValue(), "value");
-        assertTrue(field.booleanValue(), "value");
+        assertThat(field.getTagNum()).as("tagnum").isEqualTo(FieldType.PossDupFlag.tag());
+        assertThat(field.getValue()).as("value").isSameAs(Boolean.TRUE);
+        assertThat(field.booleanValue()).as("value").isTrue();
     }
 
     @Test
@@ -167,15 +165,15 @@ class FieldFactoryTest {
         String value = "N";
         BooleanField field = FieldFactory.valueOf(FieldType.PossDupFlag.tag(), value.getBytes(US_ASCII));
 
-        assertEquals(FieldType.PossDupFlag.tag(), field.getTagNum(), "tagnum");
-        assertSame(Boolean.FALSE, field.getValue(), "value");
-        assertFalse(field.booleanValue(), "value");
+        assertThat(field.getTagNum()).as("tagnum").isEqualTo(FieldType.PossDupFlag.tag());
+        assertThat(field.getValue()).as("value").isSameAs(Boolean.FALSE);
+        assertThat(field.booleanValue()).as("value").isFalse();
     }
 
     @ParameterizedTest
     @ValueSource(strings = {"XXX", "", "-"})
     void failValueOfIncorrectBoolean(String value) {
-        assertThrows(IllegalArgumentException.class, () ->
+        assertThatExceptionOfType(IllegalArgumentException.class).isThrownBy(() ->
                 FieldFactory.valueOf(FieldType.PossDupFlag.tag(), value.getBytes(US_ASCII)));
     }
 
@@ -184,8 +182,8 @@ class FieldFactoryTest {
         String value = "19980604-08:03:31.537";
         UTCTimestampField field = FieldFactory.valueOf(FieldType.OrigTime.tag(), value.getBytes(US_ASCII));
 
-        assertEquals(FieldType.OrigTime.tag(), field.getTagNum(), "tagnum");
-        assertEquals(ZonedDateTime.of(LocalDate.of(1998, 6, 4), LocalTime.of(8, 3, 31, (int) TimeUnit.MILLISECONDS.toNanos(537)), systemUTC().getZone()).toInstant().toEpochMilli(), field.getValue().toInstant().toEpochMilli(), "value");
+        assertThat(field.getTagNum()).as("tagnum").isEqualTo(FieldType.OrigTime.tag());
+        assertThat(field.getValue().toInstant().toEpochMilli()).as("value").isEqualTo(ZonedDateTime.of(LocalDate.of(1998, 6, 4), LocalTime.of(8, 3, 31, (int) TimeUnit.MILLISECONDS.toNanos(537)), systemUTC().getZone()).toInstant().toEpochMilli());
     }
 
     @Test
@@ -193,8 +191,8 @@ class FieldFactoryTest {
         String value = "19980604-08:03:31";
         UTCTimestampField field = FieldFactory.valueOf(FieldType.OrigTime.tag(), value.getBytes(US_ASCII));
 
-        assertEquals(FieldType.OrigTime.tag(), field.getTagNum(), "tagnum");
-        assertEquals(ZonedDateTime.of(LocalDate.of(1998, 6, 4), LocalTime.of(8, 3, 31), systemUTC().getZone()).toInstant().toEpochMilli(), field.getValue().toInstant().toEpochMilli(), "value");
+        assertThat(field.getTagNum()).as("tagnum").isEqualTo(FieldType.OrigTime.tag());
+        assertThat(field.getValue().toInstant().toEpochMilli()).as("value").isEqualTo(ZonedDateTime.of(LocalDate.of(1998, 6, 4), LocalTime.of(8, 3, 31), systemUTC().getZone()).toInstant().toEpochMilli());
     }
 
     @ParameterizedTest
@@ -204,8 +202,8 @@ class FieldFactoryTest {
         final int tag = FieldType.MaturityMonthYear.tag();
         StringField field = FieldFactory.fromStringValue(DataType.MONTHYEAR, tag, value);
 
-        assertEquals(tag, field.getTagNum(), "tagnum");
-        assertEquals(value, field.getValue(), "value");
+        assertThat(field.getTagNum()).as("tagnum").isEqualTo(tag);
+        assertThat(field.getValue()).as("value").isEqualTo(value);
     }
 
     @ParameterizedTest
@@ -215,8 +213,8 @@ class FieldFactoryTest {
         final int tag = FieldType.TradeOriginationDate.tag();
         StringField field = FieldFactory.fromStringValue(DataType.LOCALMKTDATE, tag, value);
 
-        assertEquals(tag, field.getTagNum(), "tagnum");
-        assertEquals(value, field.getValue(), "value");
+        assertThat(field.getTagNum()).as("tagnum").isEqualTo(tag);
+        assertThat(field.getValue()).as("value").isEqualTo(value);
     }
 
     @ParameterizedTest
@@ -226,9 +224,9 @@ class FieldFactoryTest {
         final int tag = FieldType.PossDupFlag.tag();
         BooleanField field = FieldFactory.fromStringValue(DataType.BOOLEAN, tag, value);
 
-        assertEquals(tag, field.getTagNum(), "tagnum");
-        assertSame(Boolean.TRUE, field.getValue(), "value");
-        assertTrue(field.booleanValue(), "value");
+        assertThat(field.getTagNum()).as("tagnum").isEqualTo(tag);
+        assertThat(field.getValue()).as("value").isSameAs(Boolean.TRUE);
+        assertThat(field.booleanValue()).as("value").isTrue();
     }
 
     @ParameterizedTest
@@ -238,8 +236,8 @@ class FieldFactoryTest {
         final int tag = FieldType.PossDupFlag.tag();
         BooleanField field = FieldFactory.fromStringValue(DataType.BOOLEAN, tag, value);
 
-        assertEquals(tag, field.getTagNum(), "tagnum");
-        assertSame(Boolean.FALSE, field.getValue(), "value");
-        assertFalse(field.booleanValue(), "value");
+        assertThat(field.getTagNum()).as("tagnum").isEqualTo(tag);
+        assertThat(field.getValue()).as("value").isSameAs(Boolean.FALSE);
+        assertThat(field.booleanValue()).as("value").isFalse();
     }
 }

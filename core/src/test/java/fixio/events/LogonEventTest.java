@@ -21,9 +21,7 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertNotEquals;
-import static org.junit.jupiter.api.Assertions.assertSame;
+import static org.assertj.core.api.Assertions.assertThat;
 
 @ExtendWith(MockitoExtension.class)
 class LogonEventTest {
@@ -35,18 +33,18 @@ class LogonEventTest {
 
     @Test
     void getSession() {
-        assertSame(session1, new LogonEvent(session1).getSession());
+        assertThat(new LogonEvent(session1).getSession()).isSameAs(session1);
     }
 
     @Test
     void equalsSameSession() {
-        assertEquals(new LogonEvent(session1), new LogonEvent(session1));
+        assertThat(new LogonEvent(session1)).isEqualTo(new LogonEvent(session1));
     }
 
     @Test
     void equalsSelf() {
         LogonEvent LogonEvent = new LogonEvent(session1);
-        assertEquals(LogonEvent, LogonEvent);
+        assertThat(LogonEvent).isEqualTo(LogonEvent);
     }
 
     @Test
@@ -54,19 +52,19 @@ class LogonEventTest {
         LogonEvent firstEvent = new LogonEvent(session1);
         LogonEvent secondEvent = new LogonEvent(session2);
 
-        assertNotEquals(firstEvent, secondEvent);
-        assertNotEquals(secondEvent, firstEvent);
+        assertThat(secondEvent).isNotEqualTo(firstEvent);
+        assertThat(firstEvent).isNotEqualTo(secondEvent);
     }
 
     @Test
     void hashCodeIsSameForSelf() {
         LogonEvent LogonEvent = new LogonEvent(session1);
-        assertEquals(LogonEvent.hashCode(), LogonEvent.hashCode());
+        assertThat(LogonEvent.hashCode()).isEqualTo(LogonEvent.hashCode());
     }
 
     @Test
     void hashCodeIsSameForSameSession() {
-        assertEquals(new LogonEvent(session1).hashCode(), new LogonEvent(session1).hashCode());
+        assertThat(new LogonEvent(session1).hashCode()).isEqualTo(new LogonEvent(session1).hashCode());
     }
 
     @Test
@@ -74,7 +72,7 @@ class LogonEventTest {
         LogonEvent firstEvent = new LogonEvent(session1);
         LogonEvent secondEvent = new LogonEvent(session2);
 
-        assertNotEquals(firstEvent.hashCode(), secondEvent.hashCode());
+        assertThat(secondEvent.hashCode()).isNotEqualTo(firstEvent.hashCode());
     }
 
 }

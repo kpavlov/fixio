@@ -43,9 +43,6 @@ import java.util.List;
 import java.util.Random;
 
 import static org.apache.commons.lang3.RandomStringUtils.randomAscii;
-import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.Mockito.same;
 import static org.mockito.Mockito.spy;
 import static org.mockito.Mockito.verify;
@@ -118,9 +115,9 @@ class ClientSessionHandlerTest {
 
         verify(fixApplication).beforeSendMessage(same(ctx), same(messageBuilder));
 
-        assertEquals(MessageTypes.LOGON, header.getMessageType(), "LOGON expected");
-        assertEquals(outMsgSeqNum, header.getMsgSeqNum());
-        assertTrue(header.getSendingTime().toInstant().toEpochMilli() > 0);
+        assertThat(header.getMessageType()).as("LOGON expected").isEqualTo(MessageTypes.LOGON);
+        assertThat(header.getMsgSeqNum()).isEqualTo(outMsgSeqNum);
+        assertThat(header.getSendingTime().toInstant().toEpochMilli() > 0).isTrue();
 
         assertThat(messageBuilder.getInt(FieldType.HeartBtInt)).as("HeartBtInt").isEqualTo(heartbeartInterval);
         assertThat(messageBuilder.getInt(FieldType.EncryptMethod)).as("EncryptMethod").isZero();
@@ -140,9 +137,9 @@ class ClientSessionHandlerTest {
 
         verify(fixApplication).beforeSendMessage(same(ctx), same(messageBuilder));
 
-        assertEquals(MessageTypes.LOGON, header.getMessageType(), "LOGON expected");
-        assertEquals(outMsgSeqNum, header.getMsgSeqNum());
-        assertTrue(header.getSendingTime().toInstant().toEpochMilli() > 0);
+        assertThat(header.getMessageType()).as("LOGON expected").isEqualTo(MessageTypes.LOGON);
+        assertThat(header.getMsgSeqNum()).isEqualTo(outMsgSeqNum);
+        assertThat(header.getSendingTime().toInstant().toEpochMilli() > 0).isTrue();
 
         assertThat(messageBuilder.getInt(FieldType.HeartBtInt)).as("HeartBtInt").isEqualTo(heartbeartInterval);
         assertThat(messageBuilder.getInt(FieldType.EncryptMethod)).as("EncryptMethod").isZero();
@@ -174,8 +171,8 @@ class ClientSessionHandlerTest {
         // emulate logon response from server
         handler.decode(ctx, logonResponseMsg, outgoingMessages);
 
-        assertEquals(1, outgoingMessages.size());
-        assertTrue(outgoingMessages.get(0) instanceof LogonEvent);
+        assertThat(outgoingMessages.size()).isEqualTo(1);
+        assertThat(outgoingMessages.get(0) instanceof LogonEvent).isTrue();
 
         verify(ctx).writeAndFlush(messageCaptor.capture());
 
@@ -206,7 +203,7 @@ class ClientSessionHandlerTest {
         // emulate logon response from server
         handler.decode(ctx, logonResponseMsg, outgoingMessages);
 
-        assertEquals(0, outgoingMessages.size());
+        assertThat(outgoingMessages.size()).isEqualTo(0);
 
         verify(channel).close();
     }

@@ -24,7 +24,7 @@ import org.junit.jupiter.api.Test;
 import java.util.Random;
 
 import static org.apache.commons.lang3.RandomStringUtils.randomAscii;
-import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.assertj.core.api.Assertions.assertThat;
 
 class FixSessionTest {
 
@@ -63,12 +63,12 @@ class FixSessionTest {
     void getSessionId() {
         SessionId sessionId = session.getId();
 
-        assertEquals(senderCompID, sessionId.getSenderCompID(), "senderCompID");
-        assertEquals(senderSubID, sessionId.getSenderSubID(), "senderSubID");
-        assertEquals(senderLocationID, sessionId.getSenderLocationID(), "senderLocationID");
-        assertEquals(targetCompID, sessionId.getTargetCompID(), "targetCompID");
-        assertEquals(targetSubID, sessionId.getTargetSubID(), "targetSubID");
-        assertEquals(targetLocationID, sessionId.getTargetLocationID(), "targetLocationID");
+        assertThat(sessionId.getSenderCompID()).as("senderCompID").isEqualTo(senderCompID);
+        assertThat(sessionId.getSenderSubID()).as("senderSubID").isEqualTo(senderSubID);
+        assertThat(sessionId.getSenderLocationID()).as("senderLocationID").isEqualTo(senderLocationID);
+        assertThat(sessionId.getTargetCompID()).as("targetCompID").isEqualTo(targetCompID);
+        assertThat(sessionId.getTargetSubID()).as("targetSubID").isEqualTo(targetSubID);
+        assertThat(sessionId.getTargetLocationID()).as("targetLocationID").isEqualTo(targetLocationID);
     }
 
     @Test
@@ -80,18 +80,18 @@ class FixSessionTest {
 
         session.prepareOutgoing(messageBuilder);
 
-        assertEquals(nextOutgoingMsgSeqNum + 1, session.getNextOutgoingMessageSeqNum());
+        assertThat(session.getNextOutgoingMessageSeqNum()).isEqualTo(nextOutgoingMsgSeqNum + 1);
 
         final FixMessageHeader header = messageBuilder.getHeader();
 
-        assertEquals(nextOutgoingMsgSeqNum, header.getMsgSeqNum(), "nextOutgoingMsgSeqNum");
-        assertEquals(beginString, header.getBeginString(), "beginString");
-        assertEquals(senderCompID, header.getSenderCompID(), "senderCompID");
-        assertEquals(senderSubID, header.getSenderSubID(), "senderSubID");
-        assertEquals(senderLocationID, header.getSenderLocationID(), "senderLocationID");
-        assertEquals(targetCompID, header.getTargetCompID(), "targetCompID");
-        assertEquals(targetSubID, header.getTargetSubID(), "targetSubID");
-        assertEquals(targetLocationID, header.getTargetLocationID(), "targetLocationID");
+        assertThat(header.getMsgSeqNum()).as("nextOutgoingMsgSeqNum").isEqualTo(nextOutgoingMsgSeqNum);
+        assertThat(header.getBeginString()).as("beginString").isEqualTo(beginString);
+        assertThat(header.getSenderCompID()).as("senderCompID").isEqualTo(senderCompID);
+        assertThat(header.getSenderSubID()).as("senderSubID").isEqualTo(senderSubID);
+        assertThat(header.getSenderLocationID()).as("senderLocationID").isEqualTo(senderLocationID);
+        assertThat(header.getTargetCompID()).as("targetCompID").isEqualTo(targetCompID);
+        assertThat(header.getTargetSubID()).as("targetSubID").isEqualTo(targetSubID);
+        assertThat(header.getTargetLocationID()).as("targetLocationID").isEqualTo(targetLocationID);
     }
 
 

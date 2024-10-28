@@ -44,7 +44,7 @@ import static fixio.fixprotocol.FieldType.UserRequestType;
 import static fixio.fixprotocol.FieldType.UserStatus;
 import static fixio.fixprotocol.FieldType.UserStatusText;
 import static fixio.fixprotocol.FieldType.Username;
-import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.assertj.core.api.Assertions.assertThat;
 
 class FixConversationIT {
 
@@ -108,9 +108,9 @@ class FixConversationIT {
 
         clientCloseFuture.sync();
 
-        assertEquals(2, conversation.size());
-        assertEquals(MessageTypes.USER_REQUEST, conversation.get(0).getMessageType());
-        assertEquals(MessageTypes.USER_RESPONSE, conversation.get(1).getMessageType());
+        assertThat(conversation.size()).isEqualTo(2);
+        assertThat(conversation.get(0).getMessageType()).isEqualTo(MessageTypes.USER_REQUEST);
+        assertThat(conversation.get(1).getMessageType()).isEqualTo(MessageTypes.USER_RESPONSE);
     }
 
     private static class ServerLogicHandler extends FixApplicationAdapter {

@@ -32,9 +32,7 @@ import java.util.List;
 
 import static fixio.fixprotocol.FieldType.TestReqID;
 import static org.apache.commons.lang3.RandomStringUtils.randomAscii;
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertFalse;
-import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.verifyNoInteractions;
@@ -60,18 +58,18 @@ class TestRequestHandlerTest {
 
     @Test
     void rejectNotSupportedObject() {
-        assertFalse(handler.acceptInboundMessage(new Object()));
+        assertThat(handler.acceptInboundMessage(new Object())).isFalse();
     }
 
     @Test
     void rejectNullObject() {
-        assertFalse(handler.acceptInboundMessage(null));
+        assertThat(handler.acceptInboundMessage(null)).isFalse();
     }
 
     @Test
     void acceptFixMessage() {
         when(fixMessage.getMessageType()).thenReturn(MessageTypes.TEST_REQUEST);
-        assertTrue(handler.acceptInboundMessage(fixMessage));
+        assertThat(handler.acceptInboundMessage(fixMessage)).isTrue();
     }
 
     @Test
@@ -82,7 +80,7 @@ class TestRequestHandlerTest {
         handler.decode(ctx, fixMessage, out);
 
         verifyNoInteractions(ctx);
-        assertTrue(out.isEmpty());
+        assertThat(out.isEmpty()).isTrue();
     }
 
     @Test
@@ -99,7 +97,7 @@ class TestRequestHandlerTest {
 
         final FixMessageBuilderImpl fixMessageBuilder = messageBuilderCaptor.getValue();
 
-        assertEquals(MessageTypes.HEARTBEAT, fixMessageBuilder.getMessageType());
-        assertEquals(fixMessageBuilder.getString(TestReqID), testReqId);
+        assertThat(fixMessageBuilder.getMessageType()).isEqualTo(MessageTypes.HEARTBEAT);
+        assertThat(testReqId).isEqualTo(fixMessageBuilder.getString(TestReqID));
     }
 }

@@ -39,7 +39,7 @@ public class FixMessageDecoderSmokeTest {
 
     @MethodSource("data")
     @ParameterizedTest(name = "msg: {0}")
-    public void shouldDecode(String message) {
+    void shouldDecode(String message) {
         initFixMessageDecoderSmokeTest(message);
         FixMessageImpl result = decodeOne(message, decoder);
         assertThat(result).isNotNull();

@@ -28,9 +28,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertFalse;
-import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.assertj.core.api.Assertions.assertThat;
 
 public class FixMessageDecoderChecksumTest {
 
@@ -75,11 +73,11 @@ public class FixMessageDecoderChecksumTest {
         initFixMessageDecoderChecksumTest(fixMessage, expectedChecksum, checksumValid);
         try {
             List<Object> result = decode(fixMessage);
-            assertTrue(checksumValid, "Checksum is not valid, exception expected");
+            assertThat(checksumValid).as("Checksum is not valid, exception expected").isTrue();
             final FixMessageImpl msg = (FixMessageImpl) result.get(0);
-            assertEquals(expectedChecksum, msg.getChecksum());
+            assertThat(msg.getChecksum()).isEqualTo(expectedChecksum);
         } catch (DecoderException e) {
-            assertFalse(checksumValid, "Checksum is valid, no exception expected, but got: " + e);
+            assertThat(checksumValid).as("Checksum is valid, no exception expected, but got: " + e).isFalse();
         }
     }
 

@@ -39,8 +39,8 @@ import java.time.ZonedDateTime;
 import java.util.Arrays;
 
 import static java.nio.charset.StandardCharsets.US_ASCII;
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.AssertionsForClassTypes.assertThatExceptionOfType;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
@@ -88,7 +88,7 @@ class FixMessageEncoderTest {
     @Test
     void failIfNoBeginStringCompID() {
         messageBuilder.getHeader().setBeginString(null);
-        assertThrows(IllegalArgumentException.class, () ->
+        assertThatExceptionOfType(IllegalArgumentException.class).isThrownBy(() ->
 
                 encoder.encode(ctx, messageBuilder, out));
     }
@@ -96,7 +96,7 @@ class FixMessageEncoderTest {
     @Test
     void failIfNoMsgType() {
         messageBuilder.getHeader().setMessageType(null);
-        assertThrows(IllegalArgumentException.class, () ->
+        assertThatExceptionOfType(IllegalArgumentException.class).isThrownBy(() ->
 
                 encoder.encode(ctx, messageBuilder, out));
     }
@@ -104,7 +104,7 @@ class FixMessageEncoderTest {
     @Test
     void failIfNoSenderCompID() {
         messageBuilder.getHeader().setSenderCompID(null);
-        assertThrows(IllegalArgumentException.class, () ->
+        assertThatExceptionOfType(IllegalArgumentException.class).isThrownBy(() ->
 
                 encoder.encode(ctx, messageBuilder, out));
     }
@@ -112,7 +112,7 @@ class FixMessageEncoderTest {
     @Test
     void failIfNoTargetCompID() {
         messageBuilder.getHeader().setTargetCompID(null);
-        assertThrows(IllegalArgumentException.class, () ->
+        assertThatExceptionOfType(IllegalArgumentException.class).isThrownBy(() ->
 
                 encoder.encode(ctx, messageBuilder, out));
     }
@@ -167,6 +167,6 @@ class FixMessageEncoderTest {
 
     private void assertResult(String expectedString) {
         final String string = new String(out.array(), out.arrayOffset(), out.readableBytes(), US_ASCII);
-        assertEquals(expectedString, string);
+        assertThat(string).isEqualTo(expectedString);
     }
 }

@@ -18,8 +18,7 @@ package fixio.netty.pipeline.client;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.assertj.core.api.Assertions.assertThat;
 
 class PropertyFixSessionSettingsProviderImplTest {
 
@@ -32,37 +31,37 @@ class PropertyFixSessionSettingsProviderImplTest {
 
     @Test
     void getHeartbeatInterval() {
-        assertEquals(40, provider.getHeartbeatInterval());
+        assertThat(provider.getHeartbeatInterval()).isEqualTo(40);
     }
 
     @Test
     void getBeginString() {
-        assertEquals("FIX.4.4", provider.getBeginString());
+        assertThat(provider.getBeginString()).isEqualTo("FIX.4.4");
     }
 
     @Test
     void getSenderCompID() {
-        assertEquals("Client.CompID", provider.getSenderCompID());
+        assertThat(provider.getSenderCompID()).isEqualTo("Client.CompID");
     }
 
     @Test
     void getSenderSubID() {
-        assertEquals("Client.SubID", provider.getSenderSubID());
+        assertThat(provider.getSenderSubID()).isEqualTo("Client.SubID");
     }
 
     @Test
     void getTargetCompID() {
-        assertEquals("Server.CompID", provider.getTargetCompID());
+        assertThat(provider.getTargetCompID()).isEqualTo("Server.CompID");
     }
 
     @Test
     void getTargetSubID() {
-        assertEquals("Server.SubID", provider.getTargetSubID());
+        assertThat(provider.getTargetSubID()).isEqualTo("Server.SubID");
     }
 
     @Test
     void isResetMsgSeqNum() {
-        assertTrue(provider.isResetMsgSeqNum());
+        assertThat(provider.isResetMsgSeqNum()).isTrue();
     }
 
 }

@@ -23,7 +23,7 @@ import org.junit.jupiter.params.provider.MethodSource;
 import java.nio.charset.StandardCharsets;
 import java.util.Arrays;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.assertj.core.api.Assertions.assertThat;
 
 public class FixMessageEncoderChecksumTest {
 
@@ -46,8 +46,8 @@ public class FixMessageEncoderChecksumTest {
 
     @MethodSource("data")
     @ParameterizedTest
-    public void calculateChecksum(String str, int offset, int expectedChecksum) {
+    void calculateChecksum(String str, int offset, int expectedChecksum) {
         initFixMessageEncoderChecksumTest(str, offset, expectedChecksum);
-        assertEquals(expectedChecksum, FixMessageEncoder.calculateChecksum(byteBuf, offset));
+        assertThat(FixMessageEncoder.calculateChecksum(byteBuf, offset)).isEqualTo(expectedChecksum);
     }
 }

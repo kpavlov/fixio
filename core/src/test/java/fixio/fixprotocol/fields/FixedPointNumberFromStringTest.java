@@ -23,7 +23,8 @@ import java.math.BigDecimal;
 import java.util.Arrays;
 
 import static java.nio.charset.StandardCharsets.US_ASCII;
-import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.within;
 
 public class FixedPointNumberFromStringTest {
 
@@ -63,38 +64,38 @@ public class FixedPointNumberFromStringTest {
 
     @MethodSource("data")
     @ParameterizedTest(name = "{index}: {0}")
-    public void scaledValue(String string, int offset, int length, long expectedScaledValue, int expectedScale, String expectedToString) {
+    void scaledValue(String string, int offset, int length, long expectedScaledValue, int expectedScale, String expectedToString) {
         initFixedPointNumberFromStringTest(string, offset, length, expectedScaledValue, expectedScale, expectedToString);
-        assertEquals(expectedScaledValue, value.getScaledValue());
+        assertThat(value.getScaledValue()).isEqualTo(expectedScaledValue);
     }
 
     @MethodSource("data")
     @ParameterizedTest(name = "{index}: {0}")
-    public void scale(String string, int offset, int length, long expectedScaledValue, int expectedScale, String expectedToString) {
+    void scale(String string, int offset, int length, long expectedScaledValue, int expectedScale, String expectedToString) {
         initFixedPointNumberFromStringTest(string, offset, length, expectedScaledValue, expectedScale, expectedToString);
-        assertEquals(expectedScale, value.getScale());
+        assertThat(value.getScale()).isEqualTo(expectedScale);
     }
 
     @MethodSource("data")
     @ParameterizedTest(name = "{index}: {0}")
-    public void doubleValue(String string, int offset, int length, long expectedScaledValue, int expectedScale, String expectedToString) {
+    void doubleValue(String string, int offset, int length, long expectedScaledValue, int expectedScale, String expectedToString) {
         initFixedPointNumberFromStringTest(string, offset, length, expectedScaledValue, expectedScale, expectedToString);
         double expectedDouble = new BigDecimal(string.substring(offset, offset + length)).doubleValue();
-        assertEquals(expectedDouble, value.doubleValue(), 0.0);
+        assertThat(value.doubleValue()).isCloseTo(expectedDouble, within(0.0));
     }
 
     @MethodSource("data")
     @ParameterizedTest(name = "{index}: {0}")
-    public void longValue(String string, int offset, int length, long expectedScaledValue, int expectedScale, String expectedToString) {
+    void longValue(String string, int offset, int length, long expectedScaledValue, int expectedScale, String expectedToString) {
         initFixedPointNumberFromStringTest(string, offset, length, expectedScaledValue, expectedScale, expectedToString);
         long expectedLong = new BigDecimal(string.substring(offset, offset + length)).longValue();
-        assertEquals(expectedLong, value.longValue());
+        assertThat(value.longValue()).isEqualTo(expectedLong);
     }
 
     @MethodSource("data")
     @ParameterizedTest(name = "{index}: {0}")
-    public void testToString(String string, int offset, int length, long expectedScaledValue, int expectedScale, String expectedToString) {
+    void testToString(String string, int offset, int length, long expectedScaledValue, int expectedScale, String expectedToString) {
         initFixedPointNumberFromStringTest(string, offset, length, expectedScaledValue, expectedScale, expectedToString);
-        assertEquals(expectedToString, value.toString());
+        assertThat(value.toString()).isEqualTo(expectedToString);
     }
 }

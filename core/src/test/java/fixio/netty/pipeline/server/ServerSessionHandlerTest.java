@@ -43,8 +43,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import static org.apache.commons.lang3.RandomStringUtils.randomAscii;
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Mockito.any;
 import static org.mockito.Mockito.atLeastOnce;
 import static org.mockito.Mockito.mock;
@@ -93,8 +92,8 @@ class ServerSessionHandlerTest {
 
         handler.decode(ctx, logonMsg, outgoingMessages);
 
-        assertEquals(1, outgoingMessages.size());
-        assertTrue(outgoingMessages.get(0) instanceof LogonEvent);
+        assertThat(outgoingMessages.size()).isEqualTo(1);
+        assertThat(outgoingMessages.get(0) instanceof LogonEvent).isTrue();
 
         verify(channel, atLeastOnce()).attr(AbstractSessionHandler.FIX_SESSION_KEY);
         verify(ctx).write(messageCaptor.capture());
@@ -124,8 +123,8 @@ class ServerSessionHandlerTest {
 
         handler.decode(ctx, logonMsg, outgoingMessages);
 
-        assertEquals(1, outgoingMessages.size());
-        assertTrue(outgoingMessages.get(0) instanceof LogonEvent);
+        assertThat(outgoingMessages.size()).isEqualTo(1);
+        assertThat(outgoingMessages.get(0) instanceof LogonEvent).isTrue();
 
         verify(channel, atLeastOnce()).attr(AbstractSessionHandler.FIX_SESSION_KEY);
         verify(ctx, times(2)).write(messageCaptor.capture());
@@ -146,7 +145,7 @@ class ServerSessionHandlerTest {
 
         handler.decode(ctx, logonMsg, outgoingMessages);
 
-        assertEquals(0, outgoingMessages.size());
+        assertThat(outgoingMessages.size()).isEqualTo(0);
 
         verify(channel, atLeastOnce()).attr(AbstractSessionHandler.FIX_SESSION_KEY);
         verify(ctx).writeAndFlush(messageCaptor.capture());

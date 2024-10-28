@@ -22,9 +22,7 @@ import fixio.fixprotocol.FixMessageBuilderImpl;
 import fixio.fixprotocol.FixMessageHeader;
 import fixio.fixprotocol.MessageTypes;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertNotNull;
-import static org.junit.jupiter.api.Assertions.assertNull;
+import static org.assertj.core.api.Assertions.assertThat;
 
 public final class FixMessageAsserts {
 
@@ -33,22 +31,22 @@ public final class FixMessageAsserts {
 
     public static void assertLogonAck(FixMessage logonAck) {
         FixMessageHeader header = logonAck.getHeader();
-        assertEquals(MessageTypes.LOGON, header.getMessageType(), "logon ack message type");
-        assertNull(logonAck.getString(FieldType.Username), "Username not expected in response.");
-        assertNull(logonAck.getString(FieldType.Password), "Password not expected in response");
-        assertNotNull(logonAck.getInt(FieldType.HeartBtInt), "Heartbeat interval");
-        assertEquals(1, header.getMsgSeqNum(), "message SeqNum");
+        assertThat(header.getMessageType()).as("logon ack message type").isEqualTo(MessageTypes.LOGON);
+        assertThat(logonAck.getString(FieldType.Username)).as("Username not expected in response.").isNull();
+        assertThat(logonAck.getString(FieldType.Password)).as("Password not expected in response").isNull();
+        assertThat(logonAck.getInt(FieldType.HeartBtInt)).as("Heartbeat interval").isNotNull();
+        assertThat(header.getMsgSeqNum()).as("message SeqNum").isEqualTo(1);
     }
 
     public static void assertLogout(FixMessageBuilder fixMessage) {
-        assertEquals(MessageTypes.LOGOUT, fixMessage.getHeader().getMessageType(), "Logout message type");
+        assertThat(fixMessage.getHeader().getMessageType()).as("Logout message type").isEqualTo(MessageTypes.LOGOUT);
     }
 
     public static void assertResendRequest(FixMessageBuilderImpl fixMessage, int beginSeqNum, int endSeqNum) {
-        assertEquals(MessageTypes.RESEND_REQUEST, fixMessage.getHeader().getMessageType(), "ResendRequest message type");
+        assertThat(fixMessage.getHeader().getMessageType()).as("ResendRequest message type").isEqualTo(MessageTypes.RESEND_REQUEST);
 
-        assertEquals((Integer) beginSeqNum, fixMessage.getInt(FieldType.BeginSeqNo), "BeginSeqNo");
-        assertEquals((Integer) endSeqNum, fixMessage.getInt(FieldType.EndSeqNo), "EndSeqNo");
+        assertThat(fixMessage.getInt(FieldType.BeginSeqNo)).as("BeginSeqNo").isEqualTo((Integer) beginSeqNum);
+        assertThat(fixMessage.getInt(FieldType.EndSeqNo)).as("EndSeqNo").isEqualTo((Integer) endSeqNum);
     }
 
 }

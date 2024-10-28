@@ -41,7 +41,7 @@ import java.util.List;
 import java.util.Random;
 
 import static org.apache.commons.lang3.RandomStringUtils.randomAscii;
-import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Mockito.any;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.never;
@@ -103,9 +103,9 @@ class AbstractSessionHandlerTest {
 
         FixMessage reject = rejectCaptor.getValue();
 
-        assertEquals(MessageTypes.REJECT, reject.getMessageType());
-        assertEquals(msgType, reject.getString(FieldType.RefMsgType.tag()));
-        assertEquals((Integer) originalMsgSeqNum, reject.getInt(FieldType.RefSeqNum.tag()));
+        assertThat(reject.getMessageType()).isEqualTo(MessageTypes.REJECT);
+        assertThat(reject.getString(FieldType.RefMsgType.tag())).isEqualTo(msgType);
+        assertThat(reject.getInt(FieldType.RefSeqNum.tag())).isEqualTo((Integer) originalMsgSeqNum);
     }
 
     @Test
@@ -157,10 +157,10 @@ class AbstractSessionHandlerTest {
 
         FixMessage businessReject = rejectCaptor.getValue();
 
-        assertEquals(MessageTypes.BUSINESS_MESSAGE_REJECT, businessReject.getMessageType());
-        assertEquals(rejectReason, businessReject.getInt(FieldType.BusinessRejectReason).intValue());
-        assertEquals(refSeqNum, businessReject.getInt(FieldType.RefSeqNum).intValue());
-        assertEquals(refMsgType, businessReject.getString(FieldType.RefMsgType));
-        assertEquals(rejectText, businessReject.getString(FieldType.Text));
+        assertThat(businessReject.getMessageType()).isEqualTo(MessageTypes.BUSINESS_MESSAGE_REJECT);
+        assertThat(businessReject.getInt(FieldType.BusinessRejectReason).intValue()).isEqualTo(rejectReason);
+        assertThat(businessReject.getInt(FieldType.RefSeqNum).intValue()).isEqualTo(refSeqNum);
+        assertThat(businessReject.getString(FieldType.RefMsgType)).isEqualTo(refMsgType);
+        assertThat(businessReject.getString(FieldType.Text)).isEqualTo(rejectText);
     }
 }

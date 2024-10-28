@@ -20,7 +20,7 @@ import org.junit.jupiter.api.Test;
 
 import java.util.Random;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.assertj.core.api.Assertions.assertThat;
 
 class BooleanFieldTest {
 
@@ -35,15 +35,15 @@ class BooleanFieldTest {
     void getBytesTrue() {
         BooleanField booleanField = new BooleanField(tag, true);
         byte[] bytes = booleanField.getBytes();
-        assertEquals(1, bytes.length);
-        assertEquals('Y', bytes[0]);
+        assertThat(bytes.length).isEqualTo(1);
+        assertThat(bytes[0]).isEqualTo('Y');
     }
 
     @Test
     void getBytesFalse() {
         BooleanField booleanField = new BooleanField(tag, false);
         byte[] bytes = booleanField.getBytes();
-        assertEquals(1, bytes.length);
-        assertEquals('N', bytes[0]);
+        assertThat(bytes.length).isEqualTo(1);
+        assertThat(bytes[0]).isEqualTo('N');
     }
 }

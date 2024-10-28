@@ -21,8 +21,8 @@ import java.text.ParseException;
 import java.util.Random;
 
 import static java.nio.charset.StandardCharsets.US_ASCII;
-import static org.junit.jupiter.api.Assertions.assertArrayEquals;
-import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.AssertionsForClassTypes.assertThatExceptionOfType;
 
 class IntFieldTest {
 
@@ -34,12 +34,12 @@ class IntFieldTest {
         IntField field = new IntField(tag, value);
         byte[] bytes = field.getBytes();
 
-        assertArrayEquals(String.valueOf(value).getBytes(US_ASCII), bytes);
+        assertThat(bytes).containsExactly(String.valueOf(value).getBytes(US_ASCII));
     }
 
     @Test
     void failParseNonInteger() {
-        assertThrows(ParseException.class, () -> {
+        assertThatExceptionOfType(ParseException.class).isThrownBy(() -> {
             new IntField(10, "12a345".getBytes(US_ASCII), 0, 6);
         });
     }

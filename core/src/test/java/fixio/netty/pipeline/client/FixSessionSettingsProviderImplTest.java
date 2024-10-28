@@ -21,7 +21,7 @@ import org.junit.jupiter.api.Test;
 import java.util.Random;
 
 import static org.apache.commons.lang3.RandomStringUtils.randomAscii;
-import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.assertj.core.api.Assertions.assertThat;
 
 class FixSessionSettingsProviderImplTest {
 
@@ -59,36 +59,36 @@ class FixSessionSettingsProviderImplTest {
 
     @Test
     void getSenderCompID() {
-        assertEquals(senderCompID, settingsProvider.getSenderCompID());
+        assertThat(settingsProvider.getSenderCompID()).isEqualTo(senderCompID);
     }
 
     @Test
     void getSenderSubID() {
-        assertEquals(senderSubID, settingsProvider.getSenderSubID());
+        assertThat(settingsProvider.getSenderSubID()).isEqualTo(senderSubID);
     }
 
     @Test
     void getTargetCompID() {
-        assertEquals(targetCompID, settingsProvider.getTargetCompID());
+        assertThat(settingsProvider.getTargetCompID()).isEqualTo(targetCompID);
     }
 
     @Test
     void getTargetSubID() {
-        assertEquals(targetSubID, settingsProvider.getTargetSubID());
+        assertThat(settingsProvider.getTargetSubID()).isEqualTo(targetSubID);
     }
 
     @Test
     void getBeginString() {
-        assertEquals(beginString, settingsProvider.getBeginString());
+        assertThat(settingsProvider.getBeginString()).isEqualTo(beginString);
     }
 
     @Test
     void isResetMsgSeqNum() {
-        assertEquals(resetMsgSeqNum, settingsProvider.isResetMsgSeqNum());
+        assertThat(settingsProvider.isResetMsgSeqNum()).isEqualTo(resetMsgSeqNum);
     }
 
     @Test
     void getHeartbeatInterval() {
-        assertEquals(heartbeatInterval, settingsProvider.getHeartbeatInterval());
+        assertThat(settingsProvider.getHeartbeatInterval()).isEqualTo(heartbeatInterval);
     }
 }

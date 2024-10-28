@@ -22,9 +22,7 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
 import static org.apache.commons.lang3.RandomStringUtils.randomAscii;
-import static org.junit.jupiter.api.Assertions.assertNotNull;
-import static org.junit.jupiter.api.Assertions.assertNull;
-import static org.junit.jupiter.api.Assertions.assertSame;
+import static org.assertj.core.api.Assertions.assertThat;
 
 class InMemorySessionRepositoryTest {
 
@@ -56,21 +54,21 @@ class InMemorySessionRepositoryTest {
 
         FixSession session = sessionRepository.getOrCreateSession(header);
 
-        assertNotNull(session);
+        assertThat(session).isNotNull();
 
         FixSession readSession = sessionRepository.getSession(header);
 
-        assertSame(session, readSession, "not same.");
+        assertThat(readSession).as("not same.").isSameAs(session);
 
-        assertSame(senderCompID, session.getSenderCompID());
-        assertSame(senderSubID, session.getSenderSubID());
-        assertSame(targetCompID, session.getTargetCompID());
-        assertSame(targetSubID, session.getTargetSubID());
+        assertThat(session.getSenderCompID()).isSameAs(senderCompID);
+        assertThat(session.getSenderSubID()).isSameAs(senderSubID);
+        assertThat(session.getTargetCompID()).isSameAs(targetCompID);
+        assertThat(session.getTargetSubID()).isSameAs(targetSubID);
 
         final SessionId sessionId = session.getId();
 
         sessionRepository.removeSession(sessionId);
 
-        assertNull(sessionRepository.getSession(header), "Session was not destroyed.");
+        assertThat(sessionRepository.getSession(header)).as("Session was not destroyed.").isNull();
     }
 }

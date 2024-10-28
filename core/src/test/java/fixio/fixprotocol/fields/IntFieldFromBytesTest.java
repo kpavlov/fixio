@@ -23,7 +23,7 @@ import java.util.Arrays;
 import java.util.Random;
 
 import static java.nio.charset.StandardCharsets.US_ASCII;
-import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.assertj.core.api.Assertions.assertThat;
 
 public class IntFieldFromBytesTest {
 
@@ -65,15 +65,15 @@ public class IntFieldFromBytesTest {
 
     @MethodSource("data")
     @ParameterizedTest(name = "{index}: {0}")
-    public void tagNum(String string, int offset, int length, int expectedValue) {
+    void tagNum(String string, int offset, int length, int expectedValue) {
         initIntFieldFromBytesTest(string, offset, length, expectedValue);
-        assertEquals(tagNum, intField.getTagNum());
+        assertThat(intField.getTagNum()).isEqualTo(tagNum);
     }
 
     @MethodSource("data")
     @ParameterizedTest(name = "{index}: {0}")
-    public void intValue(String string, int offset, int length, int expectedValue) {
+    void intValue(String string, int offset, int length, int expectedValue) {
         initIntFieldFromBytesTest(string, offset, length, expectedValue);
-        assertEquals(expectedValue, intField.intValue());
+        assertThat(intField.intValue()).isEqualTo(expectedValue);
     }
 }

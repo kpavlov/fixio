@@ -17,7 +17,7 @@ package fixio.netty.pipeline.client;
 
 import org.junit.jupiter.api.Test;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.assertj.core.api.Assertions.assertThat;
 
 
 class StatelessMessageSequenceProviderTest {
@@ -26,11 +26,11 @@ class StatelessMessageSequenceProviderTest {
 
     @Test
     void getMsgOutSeqNum() {
-        assertEquals(1, SEQUENCE_PROVIDER.getMsgInSeqNum());
+        assertThat(SEQUENCE_PROVIDER.getMsgInSeqNum()).isEqualTo(1);
     }
 
     @Test
     void getMsgInSeqNum() {
-        assertEquals(1, SEQUENCE_PROVIDER.getMsgOutSeqNum());
+        assertThat(SEQUENCE_PROVIDER.getMsgOutSeqNum()).isEqualTo(1);
     }
 }

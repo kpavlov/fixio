@@ -22,7 +22,7 @@ import java.util.Random;
 
 import static java.nio.charset.StandardCharsets.US_ASCII;
 import static org.apache.commons.lang3.RandomStringUtils.randomAscii;
-import static org.junit.jupiter.api.Assertions.assertArrayEquals;
+import static org.assertj.core.api.Assertions.assertThat;
 
 class StringFieldTest {
 
@@ -41,6 +41,6 @@ class StringFieldTest {
     void getBytes() {
         byte[] bytes = field.getBytes();
 
-        assertArrayEquals(value.getBytes(US_ASCII), bytes);
+        assertThat(bytes).containsExactly(value.getBytes(US_ASCII));
     }
 }

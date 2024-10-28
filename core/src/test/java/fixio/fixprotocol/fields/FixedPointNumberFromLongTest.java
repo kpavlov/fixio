@@ -21,7 +21,8 @@ import org.junit.jupiter.params.provider.MethodSource;
 
 import java.util.Arrays;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.within;
 
 public class FixedPointNumberFromLongTest {
 
@@ -53,36 +54,36 @@ public class FixedPointNumberFromLongTest {
 
     @MethodSource("data")
     @ParameterizedTest(name = "{index}: {0,number}")
-    public void scaledValue(long longValue, String expectedToString) {
+    void scaledValue(long longValue, String expectedToString) {
         initFixedPointNumberFromLongTest(longValue, expectedToString);
-        assertEquals(expectedScaledValue, value.getScaledValue());
+        assertThat(value.getScaledValue()).isEqualTo(expectedScaledValue);
     }
 
     @MethodSource("data")
     @ParameterizedTest(name = "{index}: {0,number}")
-    public void scale(long longValue, String expectedToString) {
+    void scale(long longValue, String expectedToString) {
         initFixedPointNumberFromLongTest(longValue, expectedToString);
-        assertEquals(expectedScale, value.getScale());
+        assertThat(value.getScale()).isEqualTo(expectedScale);
     }
 
     @MethodSource("data")
     @ParameterizedTest(name = "{index}: {0,number}")
-    public strictfp void doubleValue(long longValue, String expectedToString) {
+    strictfp void doubleValue(long longValue, String expectedToString) {
         initFixedPointNumberFromLongTest(longValue, expectedToString);
-        assertEquals(source, value.doubleValue(), 0.0);
+        assertThat(value.doubleValue()).isCloseTo(source, within(0.0));
     }
 
     @MethodSource("data")
     @ParameterizedTest(name = "{index}: {0,number}")
-    public void longValue(long longValue, String expectedToString) {
+    void longValue(long longValue, String expectedToString) {
         initFixedPointNumberFromLongTest(longValue, expectedToString);
-        assertEquals(source, value.longValue());
+        assertThat(value.longValue()).isEqualTo(source);
     }
 
     @MethodSource("data")
     @ParameterizedTest(name = "{index}: {0,number}")
-    public void testToString(long longValue, String expectedToString) {
+    void testToString(long longValue, String expectedToString) {
         initFixedPointNumberFromLongTest(longValue, expectedToString);
-        assertEquals(expectedToString, value.toString());
+        assertThat(value.toString()).isEqualTo(expectedToString);
     }
 }

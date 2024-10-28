@@ -21,8 +21,8 @@ import org.junit.jupiter.api.Test;
 import java.util.Random;
 
 import static java.nio.charset.StandardCharsets.US_ASCII;
-import static org.junit.jupiter.api.Assertions.assertArrayEquals;
-import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.within;
 
 class FloatFieldTest {
     private FixedPointNumber value;
@@ -43,7 +43,7 @@ class FloatFieldTest {
 
         byte[] expectedBytes = value.toString().getBytes(US_ASCII);
 
-        assertArrayEquals(expectedBytes, bytes);
+        assertThat(bytes).containsExactly(expectedBytes);
     }
 
     @Test
@@ -52,8 +52,8 @@ class FloatFieldTest {
         byte[] val = valueStr.getBytes();
         value = new FixedPointNumber(val, 0, val.length);
         field = new FloatField(tag, value);
-        assertEquals(203.03, field.getValue().doubleValue(), 0);
-        assertEquals(203.03, field.floatValue(), 0.01);
-        assertEquals(valueStr, field.getValue().toString());
+        assertThat(field.getValue().doubleValue()).as(0).isEqualTo(203.03);
+        assertThat(field.floatValue()).isCloseTo(203.03, within(0.01));
+        assertThat(field.getValue().toString()).isEqualTo(valueStr);
     }
 }

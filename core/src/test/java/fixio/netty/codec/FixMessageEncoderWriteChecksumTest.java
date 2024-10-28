@@ -22,7 +22,7 @@ import org.junit.jupiter.params.provider.MethodSource;
 
 import java.util.Arrays;
 
-import static org.junit.jupiter.api.Assertions.assertArrayEquals;
+import static org.assertj.core.api.Assertions.assertThat;
 
 public class FixMessageEncoderWriteChecksumTest {
 
@@ -51,9 +51,9 @@ public class FixMessageEncoderWriteChecksumTest {
 
     @MethodSource("data")
     @ParameterizedTest(name = "Value of {0}")
-    public void writeChecksum(int value, byte[] expectedBytes) {
+    void writeChecksum(int value, byte[] expectedBytes) {
         initFixMessageEncoderWriteChecksumTest(value, expectedBytes);
         FixMessageEncoder.writeChecksumField(byteBuf, value);
-        assertArrayEquals(expectedBytes, byteBuf.array());
+        assertThat(byteBuf.array()).containsExactly(expectedBytes);
     }
 }

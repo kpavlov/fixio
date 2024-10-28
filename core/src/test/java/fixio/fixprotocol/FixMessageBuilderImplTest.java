@@ -22,8 +22,7 @@ import java.util.List;
 import java.util.Random;
 
 import static org.apache.commons.lang3.RandomStringUtils.randomAscii;
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertSame;
+import static org.assertj.core.api.Assertions.assertThat;
 
 class FixMessageBuilderImplTest {
 
@@ -48,10 +47,10 @@ class FixMessageBuilderImplTest {
         fixMessage.getHeader().setSenderCompID(senderCompID);
         fixMessage.getHeader().setTargetCompID(targetCompID);
 
-        assertEquals(beginString, fixMessage.getHeader().getBeginString(), "beginString");
-        assertEquals(msgType, fixMessage.getMessageType(), "msgType");
-        assertEquals(senderCompID, fixMessage.getHeader().getSenderCompID(), "senderCompID");
-        assertEquals(targetCompID, fixMessage.getHeader().getTargetCompID(), "targetCompID");
+        assertThat(fixMessage.getHeader().getBeginString()).as("beginString").isEqualTo(beginString);
+        assertThat(fixMessage.getMessageType()).as("msgType").isEqualTo(msgType);
+        assertThat(fixMessage.getHeader().getSenderCompID()).as("senderCompID").isEqualTo(senderCompID);
+        assertThat(fixMessage.getHeader().getTargetCompID()).as("targetCompID").isEqualTo(targetCompID);
     }
 
     @Test
@@ -76,10 +75,10 @@ class FixMessageBuilderImplTest {
         // read
 
         List<Group> instruments = quoteRequest.getValue(FieldType.NoRelatedSym);
-        assertEquals(2, instruments.size());
+        assertThat(instruments.size()).isEqualTo(2);
 
-        assertSame(instrument1, instruments.get(0));
-        assertSame(instrument2, instruments.get(1));
+        assertThat(instruments.get(0)).isSameAs(instrument1);
+        assertThat(instruments.get(1)).isSameAs(instrument2);
     }
 
     @Test
@@ -88,9 +87,9 @@ class FixMessageBuilderImplTest {
         int tagNum = new Random().nextInt(100) + 100;
 
         FixMessageBuilderImpl messageBuilder = new FixMessageBuilderImpl();
-        assertSame(messageBuilder, messageBuilder.add(DataType.STRING, tagNum, value));
+        assertThat(messageBuilder.add(DataType.STRING, tagNum, value)).isSameAs(messageBuilder);
 
-        assertEquals(value, messageBuilder.getString(tagNum));
+        assertThat(messageBuilder.getString(tagNum)).isEqualTo(value);
     }
 
     @Test
@@ -99,9 +98,9 @@ class FixMessageBuilderImplTest {
         int tagNum = RANDOM.nextInt(100) + 100;
 
         FixMessageBuilderImpl messageBuilder = new FixMessageBuilderImpl();
-        assertSame(messageBuilder, messageBuilder.add(DataType.LENGTH, tagNum, value));
+        assertThat(messageBuilder.add(DataType.LENGTH, tagNum, value)).isSameAs(messageBuilder);
 
-        assertEquals((Integer) value, messageBuilder.getInt(tagNum));
+        assertThat(messageBuilder.getInt(tagNum)).isEqualTo((Integer) value);
     }
 
     @Test
@@ -110,8 +109,8 @@ class FixMessageBuilderImplTest {
         FieldType tag = FieldType.MsgSeqNum;
 
         FixMessageBuilderImpl messageBuilder = new FixMessageBuilderImpl();
-        assertSame(messageBuilder, messageBuilder.add(tag, value));
+        assertThat(messageBuilder.add(tag, value)).isSameAs(messageBuilder);
 
-        assertEquals((Integer) value, messageBuilder.getInt(tag));
+        assertThat(messageBuilder.getInt(tag)).isEqualTo((Integer) value);
     }
 }

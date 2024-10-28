@@ -28,11 +28,10 @@ import java.time.LocalTime;
 import java.time.ZonedDateTime;
 
 import static fixio.fixprotocol.FixConst.DEFAULT_ZONE_ID;
-import static fixio.netty.codec.DecodingTestHelper.decode;
 import static fixio.netty.codec.DecodingTestHelper.decodeOne;
 import static org.apache.commons.lang3.RandomStringUtils.randomAlphanumeric;
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.fail;
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.fail;
 
 class FixMessageDecoderTest {
 
@@ -44,23 +43,23 @@ class FixMessageDecoderTest {
     }
 
     @Test
-    void testDecode() {
+    void decode() {
         FixMessageImpl fixMessage = decodeOne("8=FIX.4.1\u00019=90\u000135=0\u000149=INVMGR\u000156=BRKR\u000134=240\u000152=19980604-08:03:31\u000110=129\u0001", decoder);
 
         FixMessageHeader header = fixMessage.getHeader();
 
-        assertEquals("FIX.4.1", fixMessage.getHeader().getBeginString());
-        assertEquals(MessageTypes.HEARTBEAT, fixMessage.getMessageType());
-        assertEquals("INVMGR", header.getSenderCompID());
-        assertEquals("BRKR", header.getTargetCompID());
-        assertEquals(240, header.getMsgSeqNum());
-        assertEquals(129, fixMessage.getChecksum());
+        assertThat(fixMessage.getHeader().getBeginString()).isEqualTo("FIX.4.1");
+        assertThat(fixMessage.getMessageType()).isEqualTo(MessageTypes.HEARTBEAT);
+        assertThat(header.getSenderCompID()).isEqualTo("INVMGR");
+        assertThat(header.getTargetCompID()).isEqualTo("BRKR");
+        assertThat(header.getMsgSeqNum()).isEqualTo(240);
+        assertThat(fixMessage.getChecksum()).isEqualTo(129);
 
         final ZonedDateTime value = fixMessage.getValue(FieldType.SendingTime);
 
         ZonedDateTime expected = ZonedDateTime.of(LocalDate.of(1998, 6, 4),
                 LocalTime.of(8, 3, 31, 0), DEFAULT_ZONE_ID);
-        assertEquals(expected, value);
+        assertThat(value).isEqualTo(expected);
     }
 
     @Test
@@ -71,7 +70,7 @@ class FixMessageDecoderTest {
             decode("100=" + random + "\u00018=FIX.4.2...", decoder);
             fail("DecoderException is expected");
         } catch (DecoderException e) {
-            assertEquals("BeginString tag expected, but got: 100=" + random.substring(0, 10) + "...", e.getMessage());
+            assertThat(e.getMessage()).isEqualTo("BeginString tag expected, but got: 100=" + random.substring(0, 10) + "...");
         }
     }
 }

@@ -20,8 +20,7 @@ import org.junit.jupiter.api.Test;
 import java.time.LocalDate;
 import java.util.Random;
 
-import static org.junit.jupiter.api.Assertions.assertArrayEquals;
-import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.assertj.core.api.Assertions.assertThat;
 
 class UTCDateOnlyFieldTest {
 
@@ -31,14 +30,14 @@ class UTCDateOnlyFieldTest {
 
     @Test
     void parse() throws Exception {
-        assertEquals(testDate, UTCDateOnlyField.parse((DATE_STR.getBytes())));
+        assertThat(UTCDateOnlyField.parse((DATE_STR.getBytes()))).isEqualTo(testDate);
     }
 
     @Test
     void create() throws Exception {
         int tag = new Random().nextInt();
         UTCDateOnlyField field = new UTCDateOnlyField(tag, DATE_STR.getBytes());
-        assertEquals(testDate, field.getValue());
+        assertThat(field.getValue()).isEqualTo(testDate);
     }
 
     @Test
@@ -46,6 +45,6 @@ class UTCDateOnlyFieldTest {
         int tag = new Random().nextInt();
         byte[] bytes = DATE_STR.getBytes();
         UTCDateOnlyField field = new UTCDateOnlyField(tag, bytes);
-        assertArrayEquals(bytes, field.getBytes());
+        assertThat(field.getBytes()).containsExactly(bytes);
     }
 }
