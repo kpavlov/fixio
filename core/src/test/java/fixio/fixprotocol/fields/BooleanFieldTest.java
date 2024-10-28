@@ -35,15 +35,15 @@ class BooleanFieldTest {
     void getBytesTrue() {
         BooleanField booleanField = new BooleanField(tag, true);
         byte[] bytes = booleanField.getBytes();
-        assertThat(bytes.length).isEqualTo(1);
-        assertThat(bytes[0]).isEqualTo('Y');
+        assertThat(bytes).hasSize(1);
+        assertThat(bytes[0]).isEqualTo((byte) 'Y');
     }
 
     @Test
     void getBytesFalse() {
         BooleanField booleanField = new BooleanField(tag, false);
         byte[] bytes = booleanField.getBytes();
-        assertThat(bytes.length).isEqualTo(1);
-        assertThat(bytes[0]).isEqualTo('N');
+        assertThat(bytes).hasSize(1);
+        assertThat(bytes[0]).isEqualTo((byte) 'N');
     }
 }
