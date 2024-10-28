@@ -66,7 +66,7 @@ THE POSSIBILITY OF SUCH DAMAGE.
     </dependencies>
 
     <properties>
-        <jmh.version>1.20</jmh.version>
+        <jmh.version>1.37</jmh.version>
         <uberjar.name>benchmarks</uberjar.name>
         <maven.test.skip>true</maven.test.skip>
     </properties>
