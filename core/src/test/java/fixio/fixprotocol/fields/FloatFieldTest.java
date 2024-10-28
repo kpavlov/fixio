@@ -15,6 +15,7 @@
  */
 package fixio.fixprotocol.fields;
 
+import org.assertj.core.data.Percentage;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
@@ -22,7 +23,6 @@ import java.util.Random;
 
 import static java.nio.charset.StandardCharsets.US_ASCII;
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.assertj.core.api.Assertions.within;
 
 class FloatFieldTest {
     private FixedPointNumber value;
@@ -52,8 +52,8 @@ class FloatFieldTest {
         byte[] val = valueStr.getBytes();
         value = new FixedPointNumber(val, 0, val.length);
         field = new FloatField(tag, value);
-        assertThat(field.getValue().doubleValue()).as(0).isEqualTo(203.03);
-        assertThat(field.floatValue()).isCloseTo(203.03, within(0.01));
-        assertThat(field.getValue().toString()).isEqualTo(valueStr);
+        assertThat(field.getValue().doubleValue()).isEqualTo(203.03);
+        assertThat(field.floatValue()).isCloseTo(203.03f, Percentage.withPercentage(1));
+        assertThat(field.getValue()).hasToString(valueStr);
     }
 }
