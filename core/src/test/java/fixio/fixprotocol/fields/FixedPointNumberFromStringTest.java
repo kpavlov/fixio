@@ -15,7 +15,6 @@
  */
 package fixio.fixprotocol.fields;
 
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.MethodSource;
 
@@ -28,24 +27,9 @@ import static org.assertj.core.api.Assertions.within;
 
 public class FixedPointNumberFromStringTest {
 
-    private String string;
-    private int offset;
-    private int length;
-    private long expectedScaledValue;
-    private int expectedScale;
-    private String expectedToString;
 
     private FixedPointNumber value;
 
-    public void initFixedPointNumberFromStringTest(String string, int offset, int length,
-                                          long expectedScaledValue, int expectedScale, String expectedToString) {
-        this.string = string;
-        this.offset = offset;
-        this.length = length;
-        this.expectedScaledValue = expectedScaledValue;
-        this.expectedScale = expectedScale;
-        this.expectedToString = expectedToString;
-    }
 
     public static Iterable<Object[]> data() {
         return Arrays.asList(new Object[][]{
@@ -57,29 +41,25 @@ public class FixedPointNumberFromStringTest {
         });
     }
 
-    @BeforeEach
-    void setUp() {
-        value = new FixedPointNumber(string.getBytes(US_ASCII), offset, length);
-    }
 
     @MethodSource("data")
     @ParameterizedTest(name = "{index}: {0}")
     void scaledValue(String string, int offset, int length, long expectedScaledValue, int expectedScale, String expectedToString) {
-        initFixedPointNumberFromStringTest(string, offset, length, expectedScaledValue, expectedScale, expectedToString);
+        value = new FixedPointNumber(string.getBytes(US_ASCII), offset, length);
         assertThat(value.getScaledValue()).isEqualTo(expectedScaledValue);
     }
 
     @MethodSource("data")
     @ParameterizedTest(name = "{index}: {0}")
     void scale(String string, int offset, int length, long expectedScaledValue, int expectedScale, String expectedToString) {
-        initFixedPointNumberFromStringTest(string, offset, length, expectedScaledValue, expectedScale, expectedToString);
-        assertThat(value.getScale()).isEqualTo(expectedScale);
+        value = new FixedPointNumber(string.getBytes(US_ASCII), offset, length);
+        assertThat(value.getScale()).isEqualTo((byte) expectedScale);
     }
 
     @MethodSource("data")
     @ParameterizedTest(name = "{index}: {0}")
     void doubleValue(String string, int offset, int length, long expectedScaledValue, int expectedScale, String expectedToString) {
-        initFixedPointNumberFromStringTest(string, offset, length, expectedScaledValue, expectedScale, expectedToString);
+        value = new FixedPointNumber(string.getBytes(US_ASCII), offset, length);
         double expectedDouble = new BigDecimal(string.substring(offset, offset + length)).doubleValue();
         assertThat(value.doubleValue()).isCloseTo(expectedDouble, within(0.0));
     }
@@ -87,7 +67,7 @@ public class FixedPointNumberFromStringTest {
     @MethodSource("data")
     @ParameterizedTest(name = "{index}: {0}")
     void longValue(String string, int offset, int length, long expectedScaledValue, int expectedScale, String expectedToString) {
-        initFixedPointNumberFromStringTest(string, offset, length, expectedScaledValue, expectedScale, expectedToString);
+        value = new FixedPointNumber(string.getBytes(US_ASCII), offset, length);
         long expectedLong = new BigDecimal(string.substring(offset, offset + length)).longValue();
         assertThat(value.longValue()).isEqualTo(expectedLong);
     }
@@ -95,7 +75,7 @@ public class FixedPointNumberFromStringTest {
     @MethodSource("data")
     @ParameterizedTest(name = "{index}: {0}")
     void testToString(String string, int offset, int length, long expectedScaledValue, int expectedScale, String expectedToString) {
-        initFixedPointNumberFromStringTest(string, offset, length, expectedScaledValue, expectedScale, expectedToString);
+        value = new FixedPointNumber(string.getBytes(US_ASCII), offset, length);
         assertThat(value.toString()).isEqualTo(expectedToString);
     }
 }
