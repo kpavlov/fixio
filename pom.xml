@@ -51,6 +51,7 @@
         <fastutil.version>8.5.15</fastutil.version>
         <netty.version>4.1.114.Final</netty.version>
         <slf4j.version>2.0.16</slf4j.version>
+        <junit.version>5.11.3</junit.version>
     </properties>
 
     <modules>
@@ -153,6 +154,28 @@
                     <tagNameFormat>v@{project.version}</tagNameFormat>
                 </configuration>
             </plugin>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-dependency-plugin</artifactId>
+                <executions>
+                    <execution>
+                        <id>detect-unused-dependencies</id>
+                        <goals>
+                            <goal>analyze-only</goal>
+                        </goals>
+                        <configuration>
+                            <ignoredUsedUndeclaredDependencies>true</ignoredUsedUndeclaredDependencies>
+                            <failOnWarning>false</failOnWarning><!-- todo: fix dependencies and set to true -->
+                        </configuration>
+                    </execution>
+                    <execution>
+                        <id>analyze-all</id>
+                        <goals>
+                            <goal>analyze-only</goal>
+                        </goals>
+                    </execution>
+                </executions>
+            </plugin>
         </plugins>
 
         <pluginManagement>
@@ -217,6 +240,13 @@
 
     <dependencyManagement>
         <dependencies>
+            <dependency>
+                <groupId>org.junit</groupId>
+                <artifactId>junit-bom</artifactId>
+                <version>${junit.version}</version>
+                <type>pom</type>
+                <scope>import</scope>
+            </dependency>
             <dependency>
                 <groupId>org.mockito</groupId>
                 <artifactId>mockito-core</artifactId>
