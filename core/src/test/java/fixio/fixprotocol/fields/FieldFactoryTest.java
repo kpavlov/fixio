@@ -17,6 +17,7 @@ package fixio.fixprotocol.fields;
 
 import fixio.fixprotocol.DataType;
 import fixio.fixprotocol.FieldType;
+import org.assertj.core.data.Offset;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.ValueSource;
@@ -125,7 +126,7 @@ class FieldFactoryTest {
 
         assertThat(field.getTagNum()).as("tagnum").isEqualTo(FieldType.SettlCurrFxRate.tag());
         assertThat(field.getValue().doubleValue()).as("value").isCloseTo(value.doubleValue(), within(0.0));
-        assertThat(field.floatValue()).as("value").isCloseTo(value.floatValue(), within(0.0));
+        assertThat(field.floatValue()).as("value").isCloseTo(value.floatValue(), Offset.offset(0.0f));
     }
 
     @Test
@@ -136,7 +137,7 @@ class FieldFactoryTest {
 
         assertThat(field.getTagNum()).as("tagnum").isEqualTo(FieldType.OrderQty.tag());
         assertThat(field.getValue().doubleValue()).as("value").isCloseTo(value.doubleValue(), within(0.0));
-        assertThat(field.floatValue()).as("value").isCloseTo(value.floatValue(), within(0.0));
+        assertThat(field.floatValue()).as("value").isCloseTo(value.floatValue(), within(0.0f));
     }
 
     @Test
@@ -147,7 +148,7 @@ class FieldFactoryTest {
 
         assertThat(field.getTagNum()).as("tagnum").isEqualTo(FieldType.MktBidPx.tag());
         assertThat(field.getValue().doubleValue()).as("value").isCloseTo(value.doubleValue(), within(0.0));
-        assertThat(field.floatValue()).as("value").isCloseTo(value.floatValue(), within(0.0));
+        assertThat(field.floatValue()).as("value").isCloseTo(value.floatValue(), within(0.0f));
     }
 
     @Test
