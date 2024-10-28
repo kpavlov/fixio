@@ -47,7 +47,7 @@
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <!-- Version -->
         <mockito.version>3.1.0</mockito.version>
-        <assertj.version>3.13.2</assertj.version>
+        <assertj.version>3.26.3</assertj.version>
         <fastutil.version>8.5.15</fastutil.version>
         <netty.version>4.1.114.Final</netty.version>
         <slf4j.version>1.7.36</slf4j.version>
