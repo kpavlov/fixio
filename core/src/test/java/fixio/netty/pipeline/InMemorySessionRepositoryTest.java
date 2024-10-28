@@ -18,15 +18,15 @@ package fixio.netty.pipeline;
 import fixio.fixprotocol.FixMessageHeader;
 import fixio.fixprotocol.session.FixSession;
 import fixio.fixprotocol.session.SessionId;
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 
 import static org.apache.commons.lang3.RandomStringUtils.randomAscii;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertNull;
-import static org.junit.Assert.assertSame;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertNull;
+import static org.junit.jupiter.api.Assertions.assertSame;
 
-public class InMemorySessionRepositoryTest {
+class InMemorySessionRepositoryTest {
 
     private SessionRepository sessionRepository;
     private String senderCompID;
@@ -35,8 +35,8 @@ public class InMemorySessionRepositoryTest {
     private String targetSubID;
     private FixMessageHeader header;
 
-    @Before
-    public void setUp() {
+    @BeforeEach
+    void setUp() {
         senderCompID = randomAscii(2);
         senderSubID = randomAscii(3);
         targetCompID = randomAscii(4);
@@ -52,7 +52,7 @@ public class InMemorySessionRepositoryTest {
     }
 
     @Test
-    public void testNormalLifecycle() {
+    void normalLifecycle() {
 
         FixSession session = sessionRepository.getOrCreateSession(header);
 
@@ -60,7 +60,7 @@ public class InMemorySessionRepositoryTest {
 
         FixSession readSession = sessionRepository.getSession(header);
 
-        assertSame("not same.", session, readSession);
+        assertSame(session, readSession, "not same.");
 
         assertSame(senderCompID, session.getSenderCompID());
         assertSame(senderSubID, session.getSenderSubID());
@@ -71,6 +71,6 @@ public class InMemorySessionRepositoryTest {
 
         sessionRepository.removeSession(sessionId);
 
-        assertNull("Session was not destroyed.", sessionRepository.getSession(header));
+        assertNull(sessionRepository.getSession(header), "Session was not destroyed.");
     }
 }

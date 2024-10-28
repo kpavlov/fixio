@@ -20,8 +20,8 @@ import fixio.fixprotocol.FixMessageHeader;
 import fixio.fixprotocol.FixMessageImpl;
 import fixio.fixprotocol.MessageTypes;
 import io.netty.handler.codec.DecoderException;
-import org.junit.BeforeClass;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.Test;
 
 import java.time.LocalDate;
 import java.time.LocalTime;
@@ -31,20 +31,20 @@ import static fixio.fixprotocol.FixConst.DEFAULT_ZONE_ID;
 import static fixio.netty.codec.DecodingTestHelper.decode;
 import static fixio.netty.codec.DecodingTestHelper.decodeOne;
 import static org.apache.commons.lang3.RandomStringUtils.randomAlphanumeric;
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.fail;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.fail;
 
-public class FixMessageDecoderTest {
+class FixMessageDecoderTest {
 
     private static FixMessageDecoder decoder;
 
-    @BeforeClass
-    public static void setUp() {
+    @BeforeAll
+    static void setUp() {
         decoder = new FixMessageDecoder();
     }
 
     @Test
-    public void testDecode() {
+    void testDecode() {
         FixMessageImpl fixMessage = decodeOne("8=FIX.4.1\u00019=90\u000135=0\u000149=INVMGR\u000156=BRKR\u000134=240\u000152=19980604-08:03:31\u000110=129\u0001", decoder);
 
         FixMessageHeader header = fixMessage.getHeader();
@@ -64,7 +64,7 @@ public class FixMessageDecoderTest {
     }
 
     @Test
-    public void testNoBeginTag() {
+    void noBeginTag() {
         String random = randomAlphanumeric(50);
 
         try {

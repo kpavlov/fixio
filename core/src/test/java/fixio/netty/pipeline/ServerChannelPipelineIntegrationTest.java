@@ -30,27 +30,27 @@ import io.netty.channel.EventLoopGroup;
 import io.netty.channel.local.LocalAddress;
 import io.netty.channel.local.LocalServerChannel;
 import io.netty.channel.nio.NioEventLoopGroup;
-import org.junit.After;
-import org.junit.Before;
-import org.junit.Test;
-import org.junit.runner.RunWith;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
-import org.mockito.junit.MockitoJUnitRunner;
+import org.mockito.junit.jupiter.MockitoExtension;
 
 import static org.apache.commons.lang3.RandomStringUtils.randomAscii;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.when;
 
-@RunWith(MockitoJUnitRunner.class)
-public class ServerChannelPipelineIntegrationTest {
+@ExtendWith(MockitoExtension.class)
+class ServerChannelPipelineIntegrationTest {
 
     @Mock
     private FixAuthenticator authenticator;
     private LocalServerChannel serverChannel;
     private ChannelPipeline pipeline;
 
-    @Before
-    public void setUp() throws Exception {
+    @BeforeEach
+    void setUp() throws Exception {
         ServerBootstrap b = new ServerBootstrap();
 
         LocalAddress address = LocalAddress.ANY;
@@ -77,13 +77,13 @@ public class ServerChannelPipelineIntegrationTest {
         when(authenticator.authenticate(any(FixMessage.class))).thenReturn(true);
     }
 
-    @After
-    public void tearDown() throws InterruptedException {
+    @AfterEach
+    void tearDown() throws InterruptedException {
         serverChannel.close().sync();
     }
 
     @Test
-    public void processLogonSuccess() {
+    void processLogonSuccess() {
         final FixMessageBuilderImpl logon = new FixMessageBuilderImpl(MessageTypes.LOGON);
         final FixMessageHeader header = logon.getHeader();
         header.setSenderCompID(randomAscii(3));
@@ -94,7 +94,7 @@ public class ServerChannelPipelineIntegrationTest {
     }
 
     @Test
-    public void processHeartbeat() {
+    void processHeartbeat() {
         final FixMessageBuilderImpl testRequest = new FixMessageBuilderImpl(MessageTypes.TEST_REQUEST);
         final FixMessageHeader header = testRequest.getHeader();
         header.setSenderCompID(randomAscii(3));

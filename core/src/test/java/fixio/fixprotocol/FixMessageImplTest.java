@@ -15,23 +15,23 @@
  */
 package fixio.fixprotocol;
 
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 
 import static org.apache.commons.lang3.RandomStringUtils.randomAscii;
-import static org.junit.Assert.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
-public class FixMessageImplTest {
+class FixMessageImplTest {
 
     private FixMessageImpl fixMessage;
 
-    @Before
-    public void setUp() {
+    @BeforeEach
+    void setUp() {
         fixMessage = new FixMessageImpl();
     }
 
     @Test
-    public void testHeaderFields() {
+    void headerFields() {
         String beginString = randomAscii(2);
         String senderCompID = randomAscii(3);
         String targetCompID = randomAscii(4);
@@ -44,10 +44,10 @@ public class FixMessageImplTest {
 
         //FixMessageImpl fixMessage = builder.build();
 
-        assertEquals("beginString", beginString, fixMessage.getHeader().getBeginString());
-        assertEquals("msgType", msgType, fixMessage.getMessageType());
-        assertEquals("senderCompID", senderCompID, fixMessage.getHeader().getSenderCompID());
-        assertEquals("targetCompID", targetCompID, fixMessage.getHeader().getTargetCompID());
+        assertEquals(beginString, fixMessage.getHeader().getBeginString(), "beginString");
+        assertEquals(msgType, fixMessage.getMessageType(), "msgType");
+        assertEquals(senderCompID, fixMessage.getHeader().getSenderCompID(), "senderCompID");
+        assertEquals(targetCompID, fixMessage.getHeader().getTargetCompID(), "targetCompID");
     }
 
 

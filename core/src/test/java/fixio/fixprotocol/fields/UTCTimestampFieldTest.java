@@ -16,7 +16,7 @@
 package fixio.fixprotocol.fields;
 
 import fixio.netty.pipeline.FixClock;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 import java.time.LocalDate;
 import java.time.LocalTime;
@@ -24,8 +24,8 @@ import java.time.ZonedDateTime;
 import java.time.temporal.ChronoField;
 import java.util.Random;
 
-import static org.junit.Assert.assertArrayEquals;
-import static org.junit.Assert.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertArrayEquals;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
 public class UTCTimestampFieldTest {
     public static final int MILLIS = 537;
@@ -45,34 +45,34 @@ public class UTCTimestampFieldTest {
     private final ZonedDateTime testDateWithNanos  = testDate.plusNanos(NANOS);
 
     @Test
-    public void testParseNoMillis() throws Exception {
+    void parseNoMillis() throws Exception {
         assertEquals(testDate, UTCTimestampField.parse(TIMESTAMP_NO_MILLIS.getBytes()));
     }
 
     @Test
-    public void testParseWithMillis() throws Exception {
+    void parseWithMillis() throws Exception {
         assertEquals(testDateWithMillis, UTCTimestampField.parse((TIMESTAMP_WITH_MILLIS.getBytes())));
     }
 
     @Test
-    public void testParseWithMicros() throws Exception {
+    void parseWithMicros() throws Exception {
         assertEquals(testDateWithMicros, UTCTimestampField.parse((TIMESTAMP_WITH_MICROS.getBytes())));
     }
 
     @Test
-    public void testParseWithNanos() throws Exception {
+    void parseWithNanos() throws Exception {
         assertEquals(testDateWithNanos, UTCTimestampField.parse((TIMESTAMP_WITH_NANOS.getBytes())));
     }
 
     @Test
-    public void testParseWithPicos() throws Exception {
+    void parseWithPicos() throws Exception {
         // pico are not supported, expect last 3 digits to be truncated
         assertEquals(testDateWithNanos, UTCTimestampField.parse((TIMESTAMP_WITH_PICOS.getBytes())));
     }
 
     /// testCreate ////////////////
     @Test
-    public void testCreateNoMillis() throws Exception {
+    void createNoMillis() throws Exception {
         int tag = new Random().nextInt();
         byte[] bytes = TIMESTAMP_NO_MILLIS.getBytes();
         UTCTimestampField field = new UTCTimestampField(tag, bytes, 0, bytes.length);
@@ -80,7 +80,7 @@ public class UTCTimestampFieldTest {
     }
 
     @Test
-    public void testCreateWithMillis() throws Exception {
+    void createWithMillis() throws Exception {
         int tag = new Random().nextInt();
         byte[] bytes = TIMESTAMP_WITH_MILLIS.getBytes();
         UTCTimestampField field = new UTCTimestampField(tag, bytes, 0, bytes.length);
@@ -88,7 +88,7 @@ public class UTCTimestampFieldTest {
     }
 
     @Test
-    public void testCreateWithMicros() throws Exception {
+    void createWithMicros() throws Exception {
         int tag = new Random().nextInt();
         byte[] bytes = TIMESTAMP_WITH_MICROS.getBytes();
         UTCTimestampField field = new UTCTimestampField(tag, bytes, 0, bytes.length);
@@ -96,7 +96,7 @@ public class UTCTimestampFieldTest {
     }
 
     @Test
-    public void testCreateWithNanos() throws Exception {
+    void createWithNanos() throws Exception {
         int tag = new Random().nextInt();
         byte[] bytes = TIMESTAMP_WITH_NANOS.getBytes();
         UTCTimestampField field = new UTCTimestampField(tag, bytes, 0, bytes.length);
@@ -104,7 +104,7 @@ public class UTCTimestampFieldTest {
     }
 
     @Test
-    public void testCreateWithPicos() throws Exception {
+    void createWithPicos() throws Exception {
         int tag = new Random().nextInt();
         byte[] bytes = TIMESTAMP_WITH_PICOS.getBytes();
         UTCTimestampField field = new UTCTimestampField(tag, bytes, 0, bytes.length);
@@ -114,7 +114,7 @@ public class UTCTimestampFieldTest {
 
     /// testGetBytes ////////////////
     @Test
-    public void testGetBytesNoMillis() throws Exception {
+    void getBytesNoMillis() throws Exception {
         int tag = new Random().nextInt();
         byte[] bytes = TIMESTAMP_NO_MILLIS.getBytes();
         UTCTimestampField field = new UTCTimestampField(tag, bytes, 0, bytes.length);
@@ -122,7 +122,7 @@ public class UTCTimestampFieldTest {
     }
 
     @Test
-    public void testGetBytesWithMillis() throws Exception {
+    void getBytesWithMillis() throws Exception {
         int tag = new Random().nextInt();
         byte[] bytes = TIMESTAMP_WITH_MILLIS.getBytes();
         UTCTimestampField field = new UTCTimestampField(tag, bytes, 0, bytes.length);
@@ -130,7 +130,7 @@ public class UTCTimestampFieldTest {
     }
 
     @Test
-    public void testGetBytesMicros() throws Exception {
+    void getBytesMicros() throws Exception {
         int tag = new Random().nextInt();
         byte[] bytes = TIMESTAMP_WITH_MICROS.getBytes();
         UTCTimestampField field = new UTCTimestampField(tag, bytes, 0, bytes.length);
@@ -138,7 +138,7 @@ public class UTCTimestampFieldTest {
     }
 
     @Test
-    public void testGetBytesNanos() throws Exception {
+    void getBytesNanos() throws Exception {
         int tag = new Random().nextInt();
         byte[] bytes = TIMESTAMP_WITH_NANOS.getBytes();
         UTCTimestampField field = new UTCTimestampField(tag, bytes, 0, bytes.length);
@@ -146,7 +146,7 @@ public class UTCTimestampFieldTest {
     }
 
     @Test
-    public void testGetBytesPicos() throws Exception {
+    void getBytesPicos() throws Exception {
         int tag = new Random().nextInt();
         byte[] bytes = TIMESTAMP_WITH_PICOS.getBytes();
         UTCTimestampField field = new UTCTimestampField(tag, bytes, 0, bytes.length);

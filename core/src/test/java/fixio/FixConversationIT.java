@@ -28,23 +28,25 @@ import fixio.netty.pipeline.client.PropertyFixSessionSettingsProviderImpl;
 import fixio.netty.pipeline.server.AcceptAllAuthenticator;
 import io.netty.channel.ChannelFuture;
 import io.netty.channel.ChannelHandlerContext;
-import org.junit.After;
-import org.junit.AfterClass;
-import org.junit.Before;
-import org.junit.BeforeClass;
-import org.junit.Test;
+import org.junit.jupiter.api.AfterAll;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.Timeout;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.concurrent.TimeUnit;
 
 import static fixio.fixprotocol.FieldType.UserRequestID;
 import static fixio.fixprotocol.FieldType.UserRequestType;
 import static fixio.fixprotocol.FieldType.UserStatus;
 import static fixio.fixprotocol.FieldType.UserStatusText;
 import static fixio.fixprotocol.FieldType.Username;
-import static org.junit.Assert.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
-public class FixConversationIT {
+class FixConversationIT {
 
     private static final int TEST_TIMEOUT = 5000;
     private static final int PORT = 10453;
@@ -53,8 +55,8 @@ public class FixConversationIT {
     private FixClient client;
     private ChannelFuture clientCloseFuture;
 
-    @BeforeClass
-    public static void beforeClass() throws InterruptedException {
+    @BeforeAll
+    static void beforeClass() throws InterruptedException {
         server = new FixServer(PORT,
                 new ServerLogicHandler(),
                 new AcceptAllAuthenticator(),
@@ -62,8 +64,8 @@ public class FixConversationIT {
         server.start();
     }
 
-    @AfterClass
-    public static void afterClass() {
+    @AfterAll
+    static void afterClass() {
         server.stop();
     }
 
@@ -84,8 +86,8 @@ public class FixConversationIT {
         return userRequest;
     }
 
-    @Before
-    public void beforeMethod() throws InterruptedException {
+    @BeforeEach
+    void beforeMethod() throws InterruptedException {
         client = new FixClient(new ClientApp(), new InMemorySessionRepository());
         final PropertyFixSessionSettingsProviderImpl settingsProvider = new PropertyFixSessionSettingsProviderImpl("/fixClient.properties");
         final PropertyAuthenticationProvider authenticationProvider = new PropertyAuthenticationProvider(settingsProvider.getProperties());
@@ -95,13 +97,14 @@ public class FixConversationIT {
         conversation.clear();
     }
 
-    @After
-    public void afterMethod() throws InterruptedException {
+    @AfterEach
+    void afterMethod() throws InterruptedException {
         client.disconnect();
     }
 
-    @Test(timeout = TEST_TIMEOUT)
-    public void testBusinessMessage() throws InterruptedException {
+    @Test
+    @Timeout(value = TEST_TIMEOUT, unit = TimeUnit.MILLISECONDS)
+    void businessMessage() throws InterruptedException {
 
         clientCloseFuture.sync();
 

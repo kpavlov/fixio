@@ -15,32 +15,29 @@
  */
 package fixio.fixprotocol.fields;
 
-import org.junit.Before;
-import org.junit.Test;
-import org.junit.runner.RunWith;
-import org.junit.runners.Parameterized;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.MethodSource;
 
 import java.util.Arrays;
 
-import static org.junit.Assert.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
-@RunWith(Parameterized.class)
 public class FixedPointNumberFromLongTest {
 
-    private final long source;
-    private final long expectedScaledValue;
-    private final int expectedScale;
-    private final String expectedToString;
+    private long source;
+    private long expectedScaledValue;
+    private int expectedScale;
+    private String expectedToString;
     private FixedPointNumber value;
 
-    public FixedPointNumberFromLongTest(long longValue, String expectedToString) {
+    public void initFixedPointNumberFromLongTest(long longValue, String expectedToString) {
         this.source = longValue;
         this.expectedScaledValue = longValue;
         this.expectedScale = 0;
         this.expectedToString = expectedToString;
     }
 
-    @Parameterized.Parameters(name = "{index}: {0,number}")
     public static Iterable<Object[]> data() {
         return Arrays.asList(new Object[][]{
                 {0L, "0"},
@@ -49,33 +46,43 @@ public class FixedPointNumberFromLongTest {
         });
     }
 
-    @Before
-    public void setUp() {
+    @BeforeEach
+    void setUp() {
         value = new FixedPointNumber(source, expectedScale);
     }
 
-    @Test
-    public void testScaledValue() {
+    @MethodSource("data")
+    @ParameterizedTest(name = "{index}: {0,number}")
+    public void scaledValue(long longValue, String expectedToString) {
+        initFixedPointNumberFromLongTest(longValue, expectedToString);
         assertEquals(expectedScaledValue, value.getScaledValue());
     }
 
-    @Test
-    public void testScale() {
+    @MethodSource("data")
+    @ParameterizedTest(name = "{index}: {0,number}")
+    public void scale(long longValue, String expectedToString) {
+        initFixedPointNumberFromLongTest(longValue, expectedToString);
         assertEquals(expectedScale, value.getScale());
     }
 
-    @Test
-    public strictfp void testDoubleValue() {
+    @MethodSource("data")
+    @ParameterizedTest(name = "{index}: {0,number}")
+    public strictfp void doubleValue(long longValue, String expectedToString) {
+        initFixedPointNumberFromLongTest(longValue, expectedToString);
         assertEquals(source, value.doubleValue(), 0.0);
     }
 
-    @Test
-    public void testLongValue() {
+    @MethodSource("data")
+    @ParameterizedTest(name = "{index}: {0,number}")
+    public void longValue(long longValue, String expectedToString) {
+        initFixedPointNumberFromLongTest(longValue, expectedToString);
         assertEquals(source, value.longValue());
     }
 
-    @Test
-    public void testToString() {
+    @MethodSource("data")
+    @ParameterizedTest(name = "{index}: {0,number}")
+    public void testToString(long longValue, String expectedToString) {
+        initFixedPointNumberFromLongTest(longValue, expectedToString);
         assertEquals(expectedToString, value.toString());
     }
 }

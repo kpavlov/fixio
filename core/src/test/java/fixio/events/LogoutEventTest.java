@@ -16,17 +16,17 @@
 package fixio.events;
 
 import fixio.fixprotocol.session.FixSession;
-import org.junit.Test;
-import org.junit.runner.RunWith;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
-import org.mockito.junit.MockitoJUnitRunner;
+import org.mockito.junit.jupiter.MockitoExtension;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotEquals;
-import static org.junit.Assert.assertSame;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotEquals;
+import static org.junit.jupiter.api.Assertions.assertSame;
 
-@RunWith(MockitoJUnitRunner.class)
-public class LogoutEventTest {
+@ExtendWith(MockitoExtension.class)
+class LogoutEventTest {
 
     @Mock
     private FixSession session1;
@@ -34,23 +34,23 @@ public class LogoutEventTest {
     private FixSession session2;
 
     @Test
-    public void testGetSession() {
+    void getSession() {
         assertSame(session1, new LogoutEvent(session1).getSession());
     }
 
     @Test
-    public void testEqualsSameSession() {
+    void equalsSameSession() {
         assertEquals(new LogoutEvent(session1), new LogoutEvent(session1));
     }
 
     @Test
-    public void testEqualsSelf() {
+    void equalsSelf() {
         LogoutEvent logoutEvent = new LogoutEvent(session1);
         assertEquals(logoutEvent, logoutEvent);
     }
 
     @Test
-    public void testNotEqualsDifferentSession() {
+    void notEqualsDifferentSession() {
         LogoutEvent firstEvent = new LogoutEvent(session1);
         LogoutEvent secondEvent = new LogoutEvent(session2);
 
@@ -59,18 +59,18 @@ public class LogoutEventTest {
     }
 
     @Test
-    public void testHashCodeIsSameForSelf() {
+    void hashCodeIsSameForSelf() {
         LogoutEvent logoutEvent = new LogoutEvent(session1);
         assertEquals(logoutEvent.hashCode(), logoutEvent.hashCode());
     }
 
     @Test
-    public void testHashCodeIsSameForSameSession() {
+    void hashCodeIsSameForSameSession() {
         assertEquals(new LogoutEvent(session1).hashCode(), new LogoutEvent(session1).hashCode());
     }
 
     @Test
-    public void testHashCodeIsDifferentForSameSessionDifferentSession() {
+    void hashCodeIsDifferentForSameSessionDifferentSession() {
         LogoutEvent firstEvent = new LogoutEvent(session1);
         LogoutEvent secondEvent = new LogoutEvent(session2);
 

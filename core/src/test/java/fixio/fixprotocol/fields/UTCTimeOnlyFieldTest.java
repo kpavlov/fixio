@@ -15,7 +15,7 @@
  */
 package fixio.fixprotocol.fields;
 
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 import java.time.LocalDate;
 import java.time.LocalTime;
@@ -24,8 +24,8 @@ import java.time.ZonedDateTime;
 import java.time.temporal.ChronoField;
 import java.util.Random;
 
-import static org.junit.Assert.assertArrayEquals;
-import static org.junit.Assert.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertArrayEquals;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
 public class UTCTimeOnlyFieldTest {
 
@@ -44,91 +44,91 @@ public class UTCTimeOnlyFieldTest {
             LocalTime.of(8, 3, 31, 0), ZoneId.of("UTC"));
 
     @Test
-    public void testParseNoMillis() throws Exception {
+    void parseNoMillis() throws Exception {
         assertEquals(testDate.toLocalTime(), UTCTimeOnlyField.parse(TIMESTAMP_NO_MILLIS.getBytes()));
     }
 
     @Test
-    public void testParseWithMillis() throws Exception {
+    void parseWithMillis() throws Exception {
         assertEquals(testDate.plus(MILLIS, ChronoField.MILLI_OF_DAY.getBaseUnit()).toLocalTime(), UTCTimeOnlyField.parse((TIMESTAMP_WITH_MILLIS.getBytes())));
     }
 
     @Test
-    public void testParseWithMicros() throws Exception {
+    void parseWithMicros() throws Exception {
         assertEquals(testDate.plus(MICROS, ChronoField.MICRO_OF_DAY.getBaseUnit()).toLocalTime(), UTCTimeOnlyField.parse((TIMESTAMP_WITH_MICROS.getBytes())));
     }
 
     @Test
-    public void testParseWithNanos() throws Exception {
+    void parseWithNanos() throws Exception {
         assertEquals(testDate.plus(NANOS, ChronoField.NANO_OF_DAY.getBaseUnit()).toLocalTime(), UTCTimeOnlyField.parse((TIMESTAMP_WITH_NANOS.getBytes())));
     }
 
     @Test
-    public void testParseWithPicos() throws Exception {
+    void parseWithPicos() throws Exception {
         assertEquals(testDate.plus(NANOS, ChronoField.NANO_OF_DAY.getBaseUnit()).toLocalTime(), UTCTimeOnlyField.parse((TIMESTAMP_WITH_PICOS.getBytes())));
     }
 
     @Test
-    public void testParseLastMillisecond() throws Exception {
+    void parseLastMillisecond() throws Exception {
         LocalTime expected = LocalTime.of(23, 59, 59).plus(999, ChronoField.MILLI_OF_DAY.getBaseUnit());
         assertEquals(expected, UTCTimeOnlyField.parse(("23:59:59.999".getBytes())));
     }
 
     @Test
-    public void testParseLastMicrosecond() throws Exception {
+    void parseLastMicrosecond() throws Exception {
         LocalTime expected = LocalTime.of(23, 59, 59).plus(999999, ChronoField.MICRO_OF_DAY.getBaseUnit());
         assertEquals(expected, UTCTimeOnlyField.parse(("23:59:59.999999".getBytes())));
     }
 
     @Test
-    public void testParseLastNanosecond() throws Exception {
+    void parseLastNanosecond() throws Exception {
         LocalTime expected = LocalTime.of(23, 59, 59, 999999999);
         assertEquals(expected.toNanoOfDay(), UTCTimeOnlyField.parse(("23:59:59.999999999".getBytes())).toNanoOfDay());
     }
 
     @Test
-    public void testParseLastPicosecond() throws Exception {
+    void parseLastPicosecond() throws Exception {
         LocalTime expected = LocalTime.of(23, 59, 59, 999999999);
         assertEquals(expected.toNanoOfDay(), UTCTimeOnlyField.parse(("23:59:59.999999999999".getBytes())).toNanoOfDay());
     }
 
     @Test
-    public void testCreateNoMillis() throws Exception {
+    void createNoMillis() throws Exception {
         int tag = new Random().nextInt();
         UTCTimeOnlyField field = new UTCTimeOnlyField(tag, TIMESTAMP_NO_MILLIS.getBytes());
         assertEquals(testDate.toLocalTime(), field.getValue());
     }
 
     @Test
-    public void testCreateWithMillis() throws Exception {
+    void createWithMillis() throws Exception {
         int tag = new Random().nextInt();
         UTCTimeOnlyField field = new UTCTimeOnlyField(tag, TIMESTAMP_WITH_MILLIS.getBytes());
         assertEquals(testDate.plus(MILLIS, ChronoField.MILLI_OF_DAY.getBaseUnit()).toLocalTime(), field.getValue());
     }
 
     @Test
-    public void testCreateWithMicros() throws Exception {
+    void createWithMicros() throws Exception {
         int tag = new Random().nextInt();
         UTCTimeOnlyField field = new UTCTimeOnlyField(tag, TIMESTAMP_WITH_MICROS.getBytes());
         assertEquals(testDate.plus(MICROS, ChronoField.MICRO_OF_DAY.getBaseUnit()).toLocalTime(), field.getValue());
     }
 
     @Test
-    public void testCreateWithNanos() throws Exception {
+    void createWithNanos() throws Exception {
         int tag = new Random().nextInt();
         UTCTimeOnlyField field = new UTCTimeOnlyField(tag, TIMESTAMP_WITH_NANOS.getBytes());
         assertEquals(testDate.plus(NANOS, ChronoField.NANO_OF_DAY.getBaseUnit()).toLocalTime(), field.getValue());
     }
 
     @Test
-    public void testCreateWithPicos() throws Exception {
+    void createWithPicos() throws Exception {
         int tag = new Random().nextInt();
         UTCTimeOnlyField field = new UTCTimeOnlyField(tag, TIMESTAMP_WITH_PICOS.getBytes());
         assertEquals(testDate.plus(NANOS, ChronoField.NANO_OF_DAY.getBaseUnit()).toLocalTime(), field.getValue());
     }
 
     @Test
-    public void testGetBytesNoMillis() throws Exception {
+    void getBytesNoMillis() throws Exception {
         int tag = new Random().nextInt();
         byte[] bytes = TIMESTAMP_NO_MILLIS.getBytes();
         UTCTimeOnlyField field = new UTCTimeOnlyField(tag, bytes);
@@ -136,7 +136,7 @@ public class UTCTimeOnlyFieldTest {
     }
 
     @Test
-    public void testGetBytesWithMillis() throws Exception {
+    void getBytesWithMillis() throws Exception {
         int tag = new Random().nextInt();
         byte[] bytes = TIMESTAMP_WITH_MILLIS.getBytes();
         UTCTimeOnlyField field = new UTCTimeOnlyField(tag, bytes);
@@ -144,7 +144,7 @@ public class UTCTimeOnlyFieldTest {
     }
 
     @Test
-    public void testGetBytesWithMicros() throws Exception {
+    void getBytesWithMicros() throws Exception {
         int tag = new Random().nextInt();
         byte[] bytes = TIMESTAMP_WITH_MICROS.getBytes();
         UTCTimeOnlyField field = new UTCTimeOnlyField(tag, bytes);
@@ -152,7 +152,7 @@ public class UTCTimeOnlyFieldTest {
     }
 
     @Test
-    public void testGetBytesWithNanos() throws Exception {
+    void getBytesWithNanos() throws Exception {
         int tag = new Random().nextInt();
         byte[] bytes = TIMESTAMP_WITH_NANOS.getBytes();
         UTCTimeOnlyField field = new UTCTimeOnlyField(tag, bytes);
@@ -160,7 +160,7 @@ public class UTCTimeOnlyFieldTest {
     }
 
     @Test
-    public void testGetBytesWithPicos() throws Exception {
+    void getBytesWithPicos() throws Exception {
         int tag = new Random().nextInt();
         byte[] bytes = TIMESTAMP_WITH_PICOS.getBytes();
         UTCTimeOnlyField field = new UTCTimeOnlyField(tag, bytes);

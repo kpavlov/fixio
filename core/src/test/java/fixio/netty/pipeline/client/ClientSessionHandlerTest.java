@@ -29,12 +29,13 @@ import fixio.netty.pipeline.FixMessageAsserts;
 import io.netty.channel.Channel;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.util.Attribute;
-import org.junit.Before;
-import org.junit.Test;
-import org.junit.runner.RunWith;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.ArgumentCaptor;
 import org.mockito.Captor;
 import org.mockito.Mock;
+import org.mockito.junit.jupiter.MockitoExtension;
 
 import java.net.PasswordAuthentication;
 import java.util.ArrayList;
@@ -42,19 +43,17 @@ import java.util.List;
 import java.util.Random;
 
 import static org.apache.commons.lang3.RandomStringUtils.randomAscii;
-import static org.hamcrest.CoreMatchers.is;
-import static org.hamcrest.CoreMatchers.nullValue;
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertThat;
-import static org.junit.Assert.assertTrue;
+import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.Mockito.same;
 import static org.mockito.Mockito.spy;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 
-@RunWith(org.mockito.junit.MockitoJUnitRunner.class)
-public class ClientSessionHandlerTest {
+@ExtendWith(MockitoExtension.class)
+class ClientSessionHandlerTest {
 
     private static final Random RANDOM = new Random();
 
@@ -77,8 +76,8 @@ public class ClientSessionHandlerTest {
     private String userName;
     private String password;
 
-    @Before
-    public void setUp() {
+    @BeforeEach
+    void setUp() {
         outMsgSeqNum = RANDOM.nextInt();
         userName = randomAscii(10);
         password = randomAscii(9);
@@ -107,7 +106,7 @@ public class ClientSessionHandlerTest {
     }
 
     @Test
-    public void testChannelActiveNoAuthentication() throws Exception {
+    void channelActiveNoAuthentication() throws Exception {
         when(authenticationProvider.getPasswordAuthentication()).thenReturn(null);
 
         handler.channelActive(ctx);
@@ -119,18 +118,18 @@ public class ClientSessionHandlerTest {
 
         verify(fixApplication).beforeSendMessage(same(ctx), same(messageBuilder));
 
-        assertEquals("LOGON expected", MessageTypes.LOGON, header.getMessageType());
+        assertEquals(MessageTypes.LOGON, header.getMessageType(), "LOGON expected");
         assertEquals(outMsgSeqNum, header.getMsgSeqNum());
         assertTrue(header.getSendingTime().toInstant().toEpochMilli() > 0);
 
-        assertThat("HeartBtInt", messageBuilder.getInt(FieldType.HeartBtInt), is(heartbeartInterval));
-        assertThat("EncryptMethod", messageBuilder.getInt(FieldType.EncryptMethod), is(0));
-        assertThat("Username", messageBuilder.getString(FieldType.Username), nullValue());
-        assertThat("Password", messageBuilder.getString(FieldType.Password), nullValue());
+        assertThat(messageBuilder.getInt(FieldType.HeartBtInt)).as("HeartBtInt").isEqualTo(heartbeartInterval);
+        assertThat(messageBuilder.getInt(FieldType.EncryptMethod)).as("EncryptMethod").isZero();
+        assertThat(messageBuilder.getString(FieldType.Username)).as("Username").isNull();
+        assertThat(messageBuilder.getString(FieldType.Password)).as("Password").isNull();
     }
 
     @Test
-    public void testChannelActiveWithAuthentication() throws Exception {
+    void channelActiveWithAuthentication() throws Exception {
 
         handler.channelActive(ctx);
 
@@ -141,18 +140,19 @@ public class ClientSessionHandlerTest {
 
         verify(fixApplication).beforeSendMessage(same(ctx), same(messageBuilder));
 
-        assertEquals("LOGON expected", MessageTypes.LOGON, header.getMessageType());
+        assertEquals(MessageTypes.LOGON, header.getMessageType(), "LOGON expected");
         assertEquals(outMsgSeqNum, header.getMsgSeqNum());
         assertTrue(header.getSendingTime().toInstant().toEpochMilli() > 0);
 
-        assertThat("HeartBtInt", messageBuilder.getInt(FieldType.HeartBtInt), is(heartbeartInterval));
-        assertThat("EncryptMethod", messageBuilder.getInt(FieldType.EncryptMethod), is(0));
-        assertThat("Username", messageBuilder.getString(FieldType.Username), is(userName));
-        assertThat("Password", messageBuilder.getString(FieldType.Password), is(password));
+        assertThat(messageBuilder.getInt(FieldType.HeartBtInt)).as("HeartBtInt").isEqualTo(heartbeartInterval);
+        assertThat(messageBuilder.getInt(FieldType.EncryptMethod)).as("EncryptMethod").isZero();
+        assertThat(messageBuilder.getString(FieldType.Username)).as("Username").isNull();
+        assertThat(messageBuilder.getString(FieldType.Password)).as("Password").isNull();
+
     }
 
     @Test
-    public void testSequenceTooHigh() throws Exception {
+    void sequenceTooHigh() throws Exception {
         FixMessage logonResponseMsg = new FixMessageBuilderImpl(MessageTypes.LOGON);
         FixMessageHeader header = logonResponseMsg.getHeader();
         header.setMsgSeqNum(3);
@@ -184,7 +184,7 @@ public class ClientSessionHandlerTest {
     }
 
     @Test
-    public void testSequenceTooLow() throws Exception {
+    void sequenceTooLow() throws Exception {
         FixMessage logonResponseMsg = new FixMessageBuilderImpl(MessageTypes.LOGON);
         FixMessageHeader header = logonResponseMsg.getHeader();
         header.setMsgSeqNum(3);

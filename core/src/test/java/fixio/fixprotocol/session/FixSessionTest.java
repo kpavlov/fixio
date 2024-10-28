@@ -18,15 +18,15 @@ package fixio.fixprotocol.session;
 import fixio.fixprotocol.FixMessageBuilder;
 import fixio.fixprotocol.FixMessageBuilderImpl;
 import fixio.fixprotocol.FixMessageHeader;
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 
 import java.util.Random;
 
 import static org.apache.commons.lang3.RandomStringUtils.randomAscii;
-import static org.junit.Assert.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
-public class FixSessionTest {
+class FixSessionTest {
 
     private FixSession session;
     private String beginString;
@@ -37,8 +37,8 @@ public class FixSessionTest {
     private String targetSubID;
     private String targetLocationID;
 
-    @Before
-    public void setUp() {
+    @BeforeEach
+    void setUp() {
 
         beginString = randomAscii(2);
         senderCompID = randomAscii(3);
@@ -60,19 +60,19 @@ public class FixSessionTest {
     }
 
     @Test
-    public void testGetSessionId() {
+    void getSessionId() {
         SessionId sessionId = session.getId();
 
-        assertEquals("senderCompID", senderCompID, sessionId.getSenderCompID());
-        assertEquals("senderSubID", senderSubID, sessionId.getSenderSubID());
-        assertEquals("senderLocationID", senderLocationID, sessionId.getSenderLocationID());
-        assertEquals("targetCompID", targetCompID, sessionId.getTargetCompID());
-        assertEquals("targetSubID", targetSubID, sessionId.getTargetSubID());
-        assertEquals("targetLocationID", targetLocationID, sessionId.getTargetLocationID());
+        assertEquals(senderCompID, sessionId.getSenderCompID(), "senderCompID");
+        assertEquals(senderSubID, sessionId.getSenderSubID(), "senderSubID");
+        assertEquals(senderLocationID, sessionId.getSenderLocationID(), "senderLocationID");
+        assertEquals(targetCompID, sessionId.getTargetCompID(), "targetCompID");
+        assertEquals(targetSubID, sessionId.getTargetSubID(), "targetSubID");
+        assertEquals(targetLocationID, sessionId.getTargetLocationID(), "targetLocationID");
     }
 
     @Test
-    public void testPrepareOutgoing() {
+    void prepareOutgoing() {
         int nextOutgoingMsgSeqNum = new Random().nextInt(100) + 100;
         session.setNextOutgoingMessageSeqNum(nextOutgoingMsgSeqNum);
 
@@ -84,14 +84,14 @@ public class FixSessionTest {
 
         final FixMessageHeader header = messageBuilder.getHeader();
 
-        assertEquals("nextOutgoingMsgSeqNum", nextOutgoingMsgSeqNum, header.getMsgSeqNum());
-        assertEquals("beginString", beginString, header.getBeginString());
-        assertEquals("senderCompID", senderCompID, header.getSenderCompID());
-        assertEquals("senderSubID", senderSubID, header.getSenderSubID());
-        assertEquals("senderLocationID", senderLocationID, header.getSenderLocationID());
-        assertEquals("targetCompID", targetCompID, header.getTargetCompID());
-        assertEquals("targetSubID", targetSubID, header.getTargetSubID());
-        assertEquals("targetLocationID", targetLocationID, header.getTargetLocationID());
+        assertEquals(nextOutgoingMsgSeqNum, header.getMsgSeqNum(), "nextOutgoingMsgSeqNum");
+        assertEquals(beginString, header.getBeginString(), "beginString");
+        assertEquals(senderCompID, header.getSenderCompID(), "senderCompID");
+        assertEquals(senderSubID, header.getSenderSubID(), "senderSubID");
+        assertEquals(senderLocationID, header.getSenderLocationID(), "senderLocationID");
+        assertEquals(targetCompID, header.getTargetCompID(), "targetCompID");
+        assertEquals(targetSubID, header.getTargetSubID(), "targetSubID");
+        assertEquals(targetLocationID, header.getTargetLocationID(), "targetLocationID");
     }
 
 

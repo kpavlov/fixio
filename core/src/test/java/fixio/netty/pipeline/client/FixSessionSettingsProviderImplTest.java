@@ -15,15 +15,15 @@
  */
 package fixio.netty.pipeline.client;
 
-import org.junit.BeforeClass;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.Test;
 
 import java.util.Random;
 
 import static org.apache.commons.lang3.RandomStringUtils.randomAscii;
-import static org.junit.Assert.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
-public class FixSessionSettingsProviderImplTest {
+class FixSessionSettingsProviderImplTest {
 
     private static FixSessionSettingsProviderImpl settingsProvider;
 
@@ -35,8 +35,8 @@ public class FixSessionSettingsProviderImplTest {
     private static boolean resetMsgSeqNum;
     private static int heartbeatInterval;
 
-    @BeforeClass
-    public static void setUp() {
+    @BeforeAll
+    static void setUp() {
         beginString = randomAscii(5);
         senderCompID = randomAscii(5);
         senderSubID = randomAscii(5);
@@ -58,37 +58,37 @@ public class FixSessionSettingsProviderImplTest {
     }
 
     @Test
-    public void testGetSenderCompID() {
+    void getSenderCompID() {
         assertEquals(senderCompID, settingsProvider.getSenderCompID());
     }
 
     @Test
-    public void testGetSenderSubID() {
+    void getSenderSubID() {
         assertEquals(senderSubID, settingsProvider.getSenderSubID());
     }
 
     @Test
-    public void testGetTargetCompID() {
+    void getTargetCompID() {
         assertEquals(targetCompID, settingsProvider.getTargetCompID());
     }
 
     @Test
-    public void testGetTargetSubID() {
+    void getTargetSubID() {
         assertEquals(targetSubID, settingsProvider.getTargetSubID());
     }
 
     @Test
-    public void testGetBeginString() {
+    void getBeginString() {
         assertEquals(beginString, settingsProvider.getBeginString());
     }
 
     @Test
-    public void testIsResetMsgSeqNum() {
+    void isResetMsgSeqNum() {
         assertEquals(resetMsgSeqNum, settingsProvider.isResetMsgSeqNum());
     }
 
     @Test
-    public void testGetHeartbeatInterval() {
+    void getHeartbeatInterval() {
         assertEquals(heartbeatInterval, settingsProvider.getHeartbeatInterval());
     }
 }

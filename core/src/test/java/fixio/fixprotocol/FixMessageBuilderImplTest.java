@@ -15,29 +15,29 @@
  */
 package fixio.fixprotocol;
 
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 
 import java.util.List;
 import java.util.Random;
 
 import static org.apache.commons.lang3.RandomStringUtils.randomAscii;
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertSame;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertSame;
 
-public class FixMessageBuilderImplTest {
+class FixMessageBuilderImplTest {
 
     private static final Random RANDOM = new Random();
 
     private FixMessageBuilderImpl fixMessage;
 
-    @Before
-    public void setUp() {
+    @BeforeEach
+    void setUp() {
         fixMessage = new FixMessageBuilderImpl();
     }
 
     @Test
-    public void testHeaderFields() {
+    void headerFields() {
         String beginString = randomAscii(2);
         String senderCompID = randomAscii(3);
         String targetCompID = randomAscii(4);
@@ -48,14 +48,14 @@ public class FixMessageBuilderImplTest {
         fixMessage.getHeader().setSenderCompID(senderCompID);
         fixMessage.getHeader().setTargetCompID(targetCompID);
 
-        assertEquals("beginString", beginString, fixMessage.getHeader().getBeginString());
-        assertEquals("msgType", msgType, fixMessage.getMessageType());
-        assertEquals("senderCompID", senderCompID, fixMessage.getHeader().getSenderCompID());
-        assertEquals("targetCompID", targetCompID, fixMessage.getHeader().getTargetCompID());
+        assertEquals(beginString, fixMessage.getHeader().getBeginString(), "beginString");
+        assertEquals(msgType, fixMessage.getMessageType(), "msgType");
+        assertEquals(senderCompID, fixMessage.getHeader().getSenderCompID(), "senderCompID");
+        assertEquals(targetCompID, fixMessage.getHeader().getTargetCompID(), "targetCompID");
     }
 
     @Test
-    public void testWithGroups() {
+    void withGroups() {
         String clientOrderId = randomAscii(4);
         String quoteRequestId = randomAscii(3);
 
@@ -83,7 +83,7 @@ public class FixMessageBuilderImplTest {
     }
 
     @Test
-    public void testAddStringByTypeAndTag() {
+    void addStringByTypeAndTag() {
         String value = randomAscii(3);
         int tagNum = new Random().nextInt(100) + 100;
 
@@ -94,7 +94,7 @@ public class FixMessageBuilderImplTest {
     }
 
     @Test
-    public void testAddIntByTypeAndTag() {
+    void addIntByTypeAndTag() {
         int value = RANDOM.nextInt(1000);
         int tagNum = RANDOM.nextInt(100) + 100;
 
@@ -105,7 +105,7 @@ public class FixMessageBuilderImplTest {
     }
 
     @Test
-    public void testAddIntByTag() {
+    void addIntByTag() {
         int value = RANDOM.nextInt(1000);
         FieldType tag = FieldType.MsgSeqNum;
 

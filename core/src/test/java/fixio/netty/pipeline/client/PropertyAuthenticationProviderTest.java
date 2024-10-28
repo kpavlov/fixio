@@ -1,28 +1,25 @@
 package fixio.netty.pipeline.client;
 
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 
 import java.net.PasswordAuthentication;
 import java.util.Properties;
 
 import static org.apache.commons.lang3.RandomStringUtils.randomAscii;
-import static org.hamcrest.CoreMatchers.is;
-import static org.hamcrest.CoreMatchers.notNullValue;
-import static org.hamcrest.CoreMatchers.nullValue;
-import static org.junit.Assert.assertThat;
+import static org.assertj.core.api.Assertions.assertThat;
 
-public class PropertyAuthenticationProviderTest {
+class PropertyAuthenticationProviderTest {
 
     private Properties properties;
 
-    @Before
-    public void beforeMethod() {
+    @BeforeEach
+    void beforeMethod() {
         properties = new Properties();
     }
 
     @Test
-    public void testGetPasswordAuthentication() {
+    void getPasswordAuthentication() {
         String username = randomAscii(10);
         String password = randomAscii(20);
         properties.setProperty("Username", username);
@@ -31,14 +28,14 @@ public class PropertyAuthenticationProviderTest {
         final PropertyAuthenticationProvider authenticationProvider = new PropertyAuthenticationProvider(properties);
 
         final PasswordAuthentication authentication = authenticationProvider.getPasswordAuthentication();
-        assertThat(authentication, notNullValue());
-        assertThat(authentication.getUserName(), is(username));
-        assertThat(authentication.getPassword(), is(password.toCharArray()));
+        assertThat(authentication).isNotNull();
+        assertThat(authentication.getUserName()).isEqualTo(username);
+        assertThat(authentication.getPassword()).isEqualTo(password.toCharArray());
     }
 
     @Test
-    public void testNoAuthentication() {
+    void noAuthentication() {
         final PropertyAuthenticationProvider authenticationProvider = new PropertyAuthenticationProvider(properties);
-        assertThat(authenticationProvider.getPasswordAuthentication(), nullValue());
+        assertThat(authenticationProvider.getPasswordAuthentication()).isNull();
     }
 }

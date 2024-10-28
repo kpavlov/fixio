@@ -15,22 +15,22 @@
  */
 package fixio.fixprotocol.fields;
 
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 
 import java.util.Random;
 
 import static java.nio.charset.StandardCharsets.US_ASCII;
-import static org.junit.Assert.assertArrayEquals;
-import static org.junit.Assert.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertArrayEquals;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
-public class FloatFieldTest {
+class FloatFieldTest {
     private FixedPointNumber value;
     private int tag;
     private FloatField field;
 
-    @Before
-    public void setUp() {
+    @BeforeEach
+    void setUp() {
         value = new FixedPointNumber(new Random().nextDouble(), 13);
         tag = new Random().nextInt();
 
@@ -38,7 +38,7 @@ public class FloatFieldTest {
     }
 
     @Test
-    public void testGetBytes() {
+    void getBytes() {
         byte[] bytes = field.getBytes();
 
         byte[] expectedBytes = value.toString().getBytes(US_ASCII);
@@ -47,7 +47,7 @@ public class FloatFieldTest {
     }
 
     @Test
-    public void testGetDouble() {
+    void getDouble() {
         String valueStr = "203.03";
         byte[] val = valueStr.getBytes();
         value = new FixedPointNumber(val, 0, val.length);

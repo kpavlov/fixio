@@ -15,34 +15,34 @@
  */
 package fixio.fixprotocol.fields;
 
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 import java.time.LocalDate;
 import java.util.Random;
 
-import static org.junit.Assert.assertArrayEquals;
-import static org.junit.Assert.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertArrayEquals;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
-public class UTCDateOnlyFieldTest {
+class UTCDateOnlyFieldTest {
 
     private static final String DATE_STR = "19980604";
 
     private final LocalDate testDate = LocalDate.of(1998, 6, 4);
 
     @Test
-    public void testParse() throws Exception {
+    void parse() throws Exception {
         assertEquals(testDate, UTCDateOnlyField.parse((DATE_STR.getBytes())));
     }
 
     @Test
-    public void testCreate() throws Exception {
+    void create() throws Exception {
         int tag = new Random().nextInt();
         UTCDateOnlyField field = new UTCDateOnlyField(tag, DATE_STR.getBytes());
         assertEquals(testDate, field.getValue());
     }
 
     @Test
-    public void testGetBytes() throws Exception {
+    void getBytes() throws Exception {
         int tag = new Random().nextInt();
         byte[] bytes = DATE_STR.getBytes();
         UTCDateOnlyField field = new UTCDateOnlyField(tag, bytes);

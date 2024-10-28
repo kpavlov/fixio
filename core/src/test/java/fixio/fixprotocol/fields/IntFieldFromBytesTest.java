@@ -15,35 +15,32 @@
  */
 package fixio.fixprotocol.fields;
 
-import org.junit.Before;
-import org.junit.Test;
-import org.junit.runner.RunWith;
-import org.junit.runners.Parameterized;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.MethodSource;
 
 import java.util.Arrays;
 import java.util.Random;
 
 import static java.nio.charset.StandardCharsets.US_ASCII;
-import static org.junit.Assert.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
-@RunWith(Parameterized.class)
 public class IntFieldFromBytesTest {
 
-    private final String string;
-    private final int offset;
-    private final int length;
-    private final int expectedValue;
+    private String string;
+    private int offset;
+    private int length;
+    private int expectedValue;
     private IntField intField;
     private int tagNum;
 
-    public IntFieldFromBytesTest(String string, int offset, int length, int expectedValue) {
+    public void initIntFieldFromBytesTest(String string, int offset, int length, int expectedValue) {
         this.string = string;
         this.offset = offset;
         this.length = length;
         this.expectedValue = expectedValue;
     }
 
-    @Parameterized.Parameters(name = "{index}: {0}")
     public static Iterable<Object[]> data() {
         return Arrays.asList(new Object[][]{
                 {"1234567890", 0, 10, 1234567890},
@@ -60,19 +57,23 @@ public class IntFieldFromBytesTest {
         });
     }
 
-    @Before
-    public void setUp() throws Exception {
+    @BeforeEach
+    void setUp() throws Exception {
         tagNum = new Random().nextInt(1000) + 1;
         intField = new IntField(tagNum, string.getBytes(US_ASCII), offset, length);
     }
 
-    @Test
-    public void testTagNum() {
+    @MethodSource("data")
+    @ParameterizedTest(name = "{index}: {0}")
+    public void tagNum(String string, int offset, int length, int expectedValue) {
+        initIntFieldFromBytesTest(string, offset, length, expectedValue);
         assertEquals(tagNum, intField.getTagNum());
     }
 
-    @Test
-    public void testIntValue() {
+    @MethodSource("data")
+    @ParameterizedTest(name = "{index}: {0}")
+    public void intValue(String string, int offset, int length, int expectedValue) {
+        initIntFieldFromBytesTest(string, offset, length, expectedValue);
         assertEquals(expectedValue, intField.intValue());
     }
 }

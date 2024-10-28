@@ -18,13 +18,16 @@ package fixio;
 import fixio.handlers.FixApplication;
 import fixio.netty.pipeline.SessionRepository;
 import fixio.netty.pipeline.server.FixAuthenticator;
-import org.junit.Before;
-import org.junit.Test;
-import org.junit.runner.RunWith;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
+import org.mockito.junit.jupiter.MockitoExtension;
 
-@RunWith(org.mockito.junit.MockitoJUnitRunner.class)
-public class FixServerTest {
+import static org.junit.jupiter.api.Assertions.assertThrows;
+
+@ExtendWith(MockitoExtension.class)
+class FixServerTest {
 
     private FixServer server;
     @Mock
@@ -34,19 +37,20 @@ public class FixServerTest {
     @Mock
     private SessionRepository sessionRepository;
 
-    @Before
-    public void setUp() {
+    @BeforeEach
+    void setUp() {
         server = new FixServer(10100, fixApplication, fixAuthenticator, sessionRepository);
     }
 
     @Test
-    public void testStartStop() throws Exception {
+    void startStop() throws Exception {
         server.start();
         server.stop();
     }
 
-    @Test(expected = IllegalStateException.class)
-    public void testStopBeforeStart() {
-        server.stop();
+    @Test
+    void stopBeforeStart() {
+        assertThrows(IllegalStateException.class, () ->
+                server.stop());
     }
 }

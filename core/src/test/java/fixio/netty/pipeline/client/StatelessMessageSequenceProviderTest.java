@@ -15,22 +15,22 @@
  */
 package fixio.netty.pipeline.client;
 
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
-import static org.junit.Assert.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
 
-public class StatelessMessageSequenceProviderTest {
+class StatelessMessageSequenceProviderTest {
 
     private static final StatelessMessageSequenceProvider SEQUENCE_PROVIDER = StatelessMessageSequenceProvider.getInstance();
 
     @Test
-    public void testGetMsgOutSeqNum() {
+    void getMsgOutSeqNum() {
         assertEquals(1, SEQUENCE_PROVIDER.getMsgInSeqNum());
     }
 
     @Test
-    public void testGetMsgInSeqNum() {
+    void getMsgInSeqNum() {
         assertEquals(1, SEQUENCE_PROVIDER.getMsgOutSeqNum());
     }
 }
