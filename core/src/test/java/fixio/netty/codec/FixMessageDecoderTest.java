@@ -19,13 +19,17 @@ import fixio.fixprotocol.FieldType;
 import fixio.fixprotocol.FixMessageHeader;
 import fixio.fixprotocol.FixMessageImpl;
 import fixio.fixprotocol.MessageTypes;
+import io.netty.buffer.Unpooled;
 import io.netty.handler.codec.DecoderException;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 
+import java.nio.charset.StandardCharsets;
 import java.time.LocalDate;
 import java.time.LocalTime;
 import java.time.ZonedDateTime;
+import java.util.ArrayList;
+import java.util.List;
 
 import static fixio.fixprotocol.FixConst.DEFAULT_ZONE_ID;
 import static fixio.netty.codec.DecodingTestHelper.decodeOne;
@@ -43,7 +47,7 @@ class FixMessageDecoderTest {
     }
 
     @Test
-    void decode() {
+    void shouldDecode() {
         FixMessageImpl fixMessage = decodeOne("8=FIX.4.1\u00019=90\u000135=0\u000149=INVMGR\u000156=BRKR\u000134=240\u000152=19980604-08:03:31\u000110=129\u0001", decoder);
 
         FixMessageHeader header = fixMessage.getHeader();
@@ -67,10 +71,20 @@ class FixMessageDecoderTest {
         String random = randomAlphanumeric(50);
 
         try {
-            decode("100=" + random + "\u00018=FIX.4.2...", decoder);
+            decode("100=" + random + "\u00018=FIX.4.2...");
             fail("DecoderException is expected");
         } catch (DecoderException e) {
             assertThat(e.getMessage()).isEqualTo("BeginString tag expected, but got: 100=" + random.substring(0, 10) + "...");
         }
+    }
+
+    private List<Object> decode(String message) {
+        String[] tags = message.split("\u0001");
+
+        List<Object> result = new ArrayList<>();
+        for (String tag : tags) {
+            decoder.decode(null, Unpooled.wrappedBuffer(tag.getBytes(StandardCharsets.US_ASCII)), result);
+        }
+        return result;
     }
 }
