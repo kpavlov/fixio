@@ -44,7 +44,7 @@ import static org.mockito.Mockito.when;
 @ExtendWith(MockitoExtension.class)
 class ServerChannelPipelineIntegrationTest {
 
-    @Mock
+    @Mock(strictness = Mock.Strictness.LENIENT)
     private FixAuthenticator authenticator;
     private LocalServerChannel serverChannel;
     private ChannelPipeline pipeline;

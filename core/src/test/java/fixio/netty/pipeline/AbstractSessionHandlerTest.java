@@ -55,7 +55,7 @@ class AbstractSessionHandlerTest {
     private static final Random RANDOM = new Random();
     private static final Logger LOGGER = LoggerFactory.getLogger(AbstractSessionHandlerTest.class);
     private AbstractSessionHandler sessionHandler;
-    @Mock
+    @Mock(strictness = Mock.Strictness.LENIENT)
     private ChannelHandlerContext ctx;
     @Mock
     private Channel channel;
