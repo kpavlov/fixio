@@ -49,9 +49,9 @@ class FixMessageEncoderTest {
 
     private static FixMessageEncoder encoder;
     private final ZonedDateTime timestamp = ZonedDateTime.ofInstant(Instant.ofEpochMilli(123456789), ZoneId.of("UTC"));
-    @Mock
+    @Mock(strictness = Mock.Strictness.LENIENT)
     private ChannelHandlerContext ctx;
-    @Mock
+    @Mock(strictness = Mock.Strictness.LENIENT)
     private ByteBufAllocator byteBufAllocator;
     private FixMessageBuilder messageBuilder;
     private ByteBuf out;
@@ -86,7 +86,7 @@ class FixMessageEncoderTest {
     }
 
     @Test
-    void failIfNoBeginStringCompID() {
+    void testFailIfNoBeginStringCompID() {
         messageBuilder.getHeader().setBeginString(null);
         assertThatExceptionOfType(IllegalArgumentException.class).isThrownBy(() ->
 
@@ -94,7 +94,7 @@ class FixMessageEncoderTest {
     }
 
     @Test
-    void failIfNoMsgType() {
+    void testFailIfNoMsgType() {
         messageBuilder.getHeader().setMessageType(null);
         assertThatExceptionOfType(IllegalArgumentException.class).isThrownBy(() ->
 
@@ -102,7 +102,7 @@ class FixMessageEncoderTest {
     }
 
     @Test
-    void failIfNoSenderCompID() {
+    void testFailIfNoSenderCompID() {
         messageBuilder.getHeader().setSenderCompID(null);
         assertThatExceptionOfType(IllegalArgumentException.class).isThrownBy(() ->
 
@@ -110,7 +110,7 @@ class FixMessageEncoderTest {
     }
 
     @Test
-    void failIfNoTargetCompID() {
+    void testFailIfNoTargetCompID() {
         messageBuilder.getHeader().setTargetCompID(null);
         assertThatExceptionOfType(IllegalArgumentException.class).isThrownBy(() ->
 
@@ -118,7 +118,7 @@ class FixMessageEncoderTest {
     }
 
     @Test
-    void encode() throws Exception {
+    void encode() {
 
         encoder.encode(ctx, messageBuilder, out);
 
@@ -130,7 +130,7 @@ class FixMessageEncoderTest {
     }
 
     @Test
-    void encodeWithCustomHeader() throws Exception {
+    void encodeWithCustomHeader() {
         messageBuilder.getHeader().setCustomFields(Arrays.asList(
                 FieldFactory.fromIntValue(1128, 9),
                 FieldFactory.fromStringValue(1129, "1.0")
@@ -146,7 +146,7 @@ class FixMessageEncoderTest {
     }
 
     @Test
-    void encodeWithGroup() throws Exception {
+    void encodeWithGroup() {
 
         Group group1 = messageBuilder.newGroup(1002, 2);
         group1.add(1003, "g1-1");
