@@ -19,6 +19,7 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.MethodSource;
 
+import java.text.ParseException;
 import java.util.Arrays;
 import java.util.Random;
 
@@ -27,19 +28,8 @@ import static org.assertj.core.api.Assertions.assertThat;
 
 public class IntFieldFromBytesTest {
 
-    private String string;
-    private int offset;
-    private int length;
-    private int expectedValue;
     private IntField intField;
     private int tagNum;
-
-    public void initIntFieldFromBytesTest(String string, int offset, int length, int expectedValue) {
-        this.string = string;
-        this.offset = offset;
-        this.length = length;
-        this.expectedValue = expectedValue;
-    }
 
     public static Iterable<Object[]> data() {
         return Arrays.asList(new Object[][]{
@@ -58,22 +48,21 @@ public class IntFieldFromBytesTest {
     }
 
     @BeforeEach
-    void setUp() throws Exception {
+    void setUp() {
         tagNum = new Random().nextInt(1000) + 1;
-        intField = new IntField(tagNum, string.getBytes(US_ASCII), offset, length);
     }
 
     @MethodSource("data")
     @ParameterizedTest(name = "{index}: {0}")
-    void tagNum(String string, int offset, int length, int expectedValue) {
-        initIntFieldFromBytesTest(string, offset, length, expectedValue);
+    void tagNum(String string, int offset, int length, int expectedValue) throws ParseException {
+        intField = new IntField(tagNum, string.getBytes(US_ASCII), offset, length);
         assertThat(intField.getTagNum()).isEqualTo(tagNum);
     }
 
     @MethodSource("data")
     @ParameterizedTest(name = "{index}: {0}")
-    void intValue(String string, int offset, int length, int expectedValue) {
-        initIntFieldFromBytesTest(string, offset, length, expectedValue);
+    void intValue(String string, int offset, int length, int expectedValue) throws ParseException {
+        intField = new IntField(tagNum, string.getBytes(US_ASCII), offset, length);
         assertThat(intField.intValue()).isEqualTo(expectedValue);
     }
 }
