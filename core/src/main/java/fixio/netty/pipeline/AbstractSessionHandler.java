@@ -17,12 +17,7 @@
 package fixio.netty.pipeline;
 
 import fixio.events.LogoutEvent;
-import fixio.fixprotocol.FieldType;
-import fixio.fixprotocol.FixMessage;
-import fixio.fixprotocol.FixMessageBuilder;
-import fixio.fixprotocol.FixMessageBuilderImpl;
-import fixio.fixprotocol.FixMessageHeader;
-import fixio.fixprotocol.MessageTypes;
+import fixio.fixprotocol.*;
 import fixio.fixprotocol.session.FixSession;
 import fixio.handlers.FixApplication;
 import fixio.validator.BusinessRejectException;
@@ -141,8 +136,8 @@ public abstract class AbstractSessionHandler extends MessageToMessageCodec<FixMe
 
     @Override
     public void exceptionCaught(ChannelHandlerContext ctx, Throwable cause) throws Exception {
-        if (cause instanceof BusinessRejectException) {
-            FixMessageBuilderImpl businessMessageReject = createBusinessReject((BusinessRejectException) cause);
+        if (cause instanceof BusinessRejectException exception) {
+            FixMessageBuilderImpl businessMessageReject = createBusinessReject(exception);
             ctx.channel().writeAndFlush(businessMessageReject);
         } else {
             super.exceptionCaught(ctx, cause);

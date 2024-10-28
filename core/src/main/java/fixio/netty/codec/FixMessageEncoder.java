@@ -16,12 +16,7 @@
 
 package fixio.netty.codec;
 
-import fixio.fixprotocol.FixConst;
-import fixio.fixprotocol.FixMessageBuilder;
-import fixio.fixprotocol.FixMessageFragment;
-import fixio.fixprotocol.FixMessageHeader;
-import fixio.fixprotocol.Group;
-import fixio.fixprotocol.GroupField;
+import fixio.fixprotocol.*;
 import fixio.fixprotocol.fields.AbstractField;
 import fixio.fixprotocol.fields.DateTimeFormatterWrapper;
 import io.netty.buffer.ByteBuf;
@@ -137,10 +132,9 @@ public class FixMessageEncoder extends MessageToByteEncoder<FixMessageBuilder> {
 
     private static void encodeMessageFragment(ByteBuf payloadBuf,
                                               FixMessageFragment messageFragment) {
-        if (messageFragment instanceof AbstractField) {
-            writeField(messageFragment.getTagNum(), (AbstractField) messageFragment, payloadBuf);
-        } else if (messageFragment instanceof GroupField) {
-            GroupField groupField = (GroupField) messageFragment;
+        if (messageFragment instanceof AbstractField field) {
+            writeField(messageFragment.getTagNum(), field, payloadBuf);
+        } else if (messageFragment instanceof GroupField groupField) {
             writeField(groupField.getTagNum(), Integer.toString(groupField.getGroupCount()), payloadBuf);
             for (Group c : groupField.getValue()) {
                 List<FixMessageFragment> contents = c.getContents();

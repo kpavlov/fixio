@@ -36,8 +36,8 @@ import static fixio.fixprotocol.FieldType.TestReqID;
 public class TestRequestHandler extends MessageToMessageDecoder<FixMessage> {
 
     public boolean acceptInboundMessage(Object msg) {
-        return (msg instanceof FixMessage
-                && MessageTypes.TEST_REQUEST.equals(((FixMessage) msg).getMessageType()));
+        return (msg instanceof FixMessage fm
+                && MessageTypes.TEST_REQUEST.equals(fm.getMessageType()));
     }
 
     @Override
