@@ -10,7 +10,6 @@ import java.io.IOException;
 import java.net.URISyntaxException;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.nio.file.Paths;
 import java.util.Objects;
 
 import static fixio.netty.codec.DecodingTestHelper.decodeOne;
@@ -28,7 +27,7 @@ public class FixMessageDecoderSmokeTest {
 
     @Parameterized.Parameters(name = "msg: {0}")
     public static Object[] data() throws IOException, URISyntaxException {
-        Path path = Paths.get(Objects.requireNonNull(FixMessageDecoderSmokeTest.class.getClassLoader()
+        Path path = Path.of(Objects.requireNonNull(FixMessageDecoderSmokeTest.class.getClassLoader()
                 .getResource("example-messages.txt")).toURI());
 
         return Files.lines(path)

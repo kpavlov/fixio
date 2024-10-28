@@ -37,12 +37,12 @@ public class FixApplicationAdapter extends MessageToMessageDecoder<Object> imple
     @Override
     protected void decode(ChannelHandlerContext ctx, Object msg, List<Object> out) throws Exception {
         try {
-            if (msg instanceof FixMessage) {
-                onMessage(ctx, (FixMessage) msg, out);
-            } else if (msg instanceof LogonEvent) {
-                onLogon(ctx, (LogonEvent) msg);
-            } else if (msg instanceof LogoutEvent) {
-                onLogout(ctx, (LogoutEvent) msg);
+            if (msg instanceof FixMessage message) {
+                onMessage(ctx, message, out);
+            } else if (msg instanceof LogonEvent event) {
+                onLogon(ctx, event);
+            } else if (msg instanceof LogoutEvent event) {
+                onLogout(ctx, event);
             }
         } finally {
             ReferenceCountUtil.release(msg);

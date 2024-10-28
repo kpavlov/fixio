@@ -16,11 +16,7 @@
 
 package fixio.fixprotocol;
 
-import fixio.fixprotocol.fields.AbstractField;
-import fixio.fixprotocol.fields.CharField;
-import fixio.fixprotocol.fields.FieldFactory;
-import fixio.fixprotocol.fields.IntField;
-import fixio.fixprotocol.fields.StringField;
+import fixio.fixprotocol.fields.*;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -91,8 +87,8 @@ public class FixMessageImpl implements FixMessage {
         if (item == null) {
             return null;
         }
-        if (item instanceof StringField) {
-            return ((StringField) item).getValue();
+        if (item instanceof StringField stringField) {
+            return stringField.getValue();
         } else {
             throw new IllegalArgumentException("Tag " + tagNum + " is not a Field.");
         }
@@ -130,8 +126,8 @@ public class FixMessageImpl implements FixMessage {
         if (field == null) {
             return null;
         }
-        if (field instanceof CharField) {
-            return ((CharField) field).getValue();
+        if (field instanceof CharField charField) {
+            return charField.getValue();
         } else {
             throw new IllegalArgumentException("Tag " + tagNum + " is not a Field.");
         }
@@ -140,8 +136,8 @@ public class FixMessageImpl implements FixMessage {
     @Override
     public Integer getInt(int tagNum) {
         FixMessageFragment field = getFirst(tagNum);
-        if (field instanceof IntField) {
-            return ((IntField) field).getValue();
+        if (field instanceof IntField intField) {
+            return intField.getValue();
         }
         return null;
     }
@@ -175,8 +171,8 @@ public class FixMessageImpl implements FixMessage {
 
     public List<Group> getGroups(int tagNum) {
         FixMessageFragment fragment = getFirst(tagNum);
-        if (fragment instanceof GroupField) {
-            return ((GroupField) fragment).getGroups();
+        if (fragment instanceof GroupField groupField) {
+            return groupField.getGroups();
         }
         return null;
     }
