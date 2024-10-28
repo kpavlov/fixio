@@ -15,53 +15,53 @@
  */
 package fixio.netty.pipeline.client;
 
-import org.junit.BeforeClass;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.Test;
 
-import static org.junit.Assert.assertEquals;
+import static org.assertj.core.api.Assertions.assertThat;
 
-public class PropertyFixSessionSettingsProviderImplTest {
+class PropertyFixSessionSettingsProviderImplTest {
 
     private static PropertyFixSessionSettingsProviderImpl provider;
 
-    @BeforeClass
-    public static void beforeClass() {
+    @BeforeAll
+    static void beforeClass() {
         provider = new PropertyFixSessionSettingsProviderImpl("/fixClient.properties");
     }
 
     @Test
-    public void testGetHeartbeatInterval() {
-        assertEquals(40, provider.getHeartbeatInterval());
+    void getHeartbeatInterval() {
+        assertThat(provider.getHeartbeatInterval()).isEqualTo(40);
     }
 
     @Test
-    public void testGetBeginString() {
-        assertEquals("FIX.4.4", provider.getBeginString());
+    void getBeginString() {
+        assertThat(provider.getBeginString()).isEqualTo("FIX.4.4");
     }
 
     @Test
-    public void testGetSenderCompID() {
-        assertEquals("Client.CompID", provider.getSenderCompID());
+    void getSenderCompID() {
+        assertThat(provider.getSenderCompID()).isEqualTo("Client.CompID");
     }
 
     @Test
-    public void testGetSenderSubID() {
-        assertEquals("Client.SubID", provider.getSenderSubID());
+    void getSenderSubID() {
+        assertThat(provider.getSenderSubID()).isEqualTo("Client.SubID");
     }
 
     @Test
-    public void testGetTargetCompID() {
-        assertEquals("Server.CompID", provider.getTargetCompID());
+    void getTargetCompID() {
+        assertThat(provider.getTargetCompID()).isEqualTo("Server.CompID");
     }
 
     @Test
-    public void testGetTargetSubID() {
-        assertEquals("Server.SubID", provider.getTargetSubID());
+    void getTargetSubID() {
+        assertThat(provider.getTargetSubID()).isEqualTo("Server.SubID");
     }
 
     @Test
-    public void testIsResetMsgSeqNum() {
-        assertEquals(true, provider.isResetMsgSeqNum());
+    void isResetMsgSeqNum() {
+        assertThat(provider.isResetMsgSeqNum()).isTrue();
     }
 
 }

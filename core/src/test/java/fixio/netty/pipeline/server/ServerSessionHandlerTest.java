@@ -31,20 +31,19 @@ import io.netty.channel.ChannelFuture;
 import io.netty.channel.ChannelFutureListener;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.util.Attribute;
-import org.junit.Before;
-import org.junit.Test;
-import org.junit.runner.RunWith;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.ArgumentCaptor;
 import org.mockito.Captor;
 import org.mockito.Mock;
-import org.mockito.junit.MockitoJUnitRunner;
+import org.mockito.junit.jupiter.MockitoExtension;
 
 import java.util.ArrayList;
 import java.util.List;
 
 import static org.apache.commons.lang3.RandomStringUtils.randomAscii;
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertTrue;
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Mockito.any;
 import static org.mockito.Mockito.atLeastOnce;
 import static org.mockito.Mockito.mock;
@@ -54,8 +53,8 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.verifyNoMoreInteractions;
 import static org.mockito.Mockito.when;
 
-@RunWith(MockitoJUnitRunner.class)
-public class ServerSessionHandlerTest {
+@ExtendWith(MockitoExtension.class)
+class ServerSessionHandlerTest {
 
     private ServerSessionHandler handler;
     @Mock
@@ -71,8 +70,8 @@ public class ServerSessionHandlerTest {
     private FixMessage logonMsg;
     private List<Object> outgoingMessages;
 
-    @Before
-    public void setUp() {
+    @BeforeEach
+    void setUp() {
         handler = new ServerSessionHandler(fixApplication, authenticator, new InMemorySessionRepository());
         outgoingMessages = new ArrayList<>();
 
@@ -88,13 +87,13 @@ public class ServerSessionHandlerTest {
     }
 
     @Test
-    public void testLogonSuccess() throws Exception {
+    void logonSuccess() throws Exception {
         when(authenticator.authenticate(same(logonMsg))).thenReturn(true);
 
         handler.decode(ctx, logonMsg, outgoingMessages);
 
-        assertEquals(1, outgoingMessages.size());
-        assertTrue(outgoingMessages.get(0) instanceof LogonEvent);
+        assertThat(outgoingMessages.size()).isEqualTo(1);
+        assertThat(outgoingMessages.get(0) instanceof LogonEvent).isTrue();
 
         verify(channel, atLeastOnce()).attr(AbstractSessionHandler.FIX_SESSION_KEY);
         verify(ctx).write(messageCaptor.capture());
@@ -107,7 +106,7 @@ public class ServerSessionHandlerTest {
     }
 
     @Test
-    public void testAuthenticationFailed() throws Exception {
+    void authenticationFailed() throws Exception {
         when(authenticator.authenticate(same(logonMsg))).thenReturn(false);
 
         handler.decode(ctx, logonMsg, outgoingMessages);
@@ -118,14 +117,14 @@ public class ServerSessionHandlerTest {
     }
 
     @Test
-    public void testSequenceTooHigh() throws Exception {
+    void sequenceTooHigh() throws Exception {
         when(authenticator.authenticate(same(logonMsg))).thenReturn(true);
         logonMsg.getHeader().setMsgSeqNum(3);
 
         handler.decode(ctx, logonMsg, outgoingMessages);
 
-        assertEquals(1, outgoingMessages.size());
-        assertTrue(outgoingMessages.get(0) instanceof LogonEvent);
+        assertThat(outgoingMessages.size()).isEqualTo(1);
+        assertThat(outgoingMessages.get(0) instanceof LogonEvent).isTrue();
 
         verify(channel, atLeastOnce()).attr(AbstractSessionHandler.FIX_SESSION_KEY);
         verify(ctx, times(2)).write(messageCaptor.capture());
@@ -138,7 +137,7 @@ public class ServerSessionHandlerTest {
     }
 
     @Test
-    public void testSequenceNumberTooLow() throws Exception {
+    void sequenceNumberTooLow() throws Exception {
         when(authenticator.authenticate(same(logonMsg))).thenReturn(true);
         logonMsg.getHeader().setMsgSeqNum(0);
         ChannelFuture channelFeature = mock(ChannelFuture.class);
@@ -146,7 +145,7 @@ public class ServerSessionHandlerTest {
 
         handler.decode(ctx, logonMsg, outgoingMessages);
 
-        assertEquals(0, outgoingMessages.size());
+        assertThat(outgoingMessages.size()).isEqualTo(0);
 
         verify(channel, atLeastOnce()).attr(AbstractSessionHandler.FIX_SESSION_KEY);
         verify(ctx).writeAndFlush(messageCaptor.capture());

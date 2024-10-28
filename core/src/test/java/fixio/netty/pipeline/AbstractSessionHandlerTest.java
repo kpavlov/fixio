@@ -27,12 +27,13 @@ import fixio.validator.BusinessRejectException;
 import io.netty.channel.Channel;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.util.Attribute;
-import org.junit.Before;
-import org.junit.Test;
-import org.junit.runner.RunWith;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.ArgumentCaptor;
 import org.mockito.Captor;
 import org.mockito.Mock;
+import org.mockito.junit.jupiter.MockitoExtension;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -40,7 +41,7 @@ import java.util.List;
 import java.util.Random;
 
 import static org.apache.commons.lang3.RandomStringUtils.randomAscii;
-import static org.junit.Assert.assertEquals;
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Mockito.any;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.never;
@@ -48,13 +49,13 @@ import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
-@RunWith(org.mockito.junit.MockitoJUnitRunner.class)
-public class AbstractSessionHandlerTest {
+@ExtendWith(MockitoExtension.class)
+class AbstractSessionHandlerTest {
 
     private static final Random RANDOM = new Random();
     private static final Logger LOGGER = LoggerFactory.getLogger(AbstractSessionHandlerTest.class);
     private AbstractSessionHandler sessionHandler;
-    @Mock
+    @Mock(strictness = Mock.Strictness.LENIENT)
     private ChannelHandlerContext ctx;
     @Mock
     private Channel channel;
@@ -69,8 +70,8 @@ public class AbstractSessionHandlerTest {
     @Mock
     private SessionRepository sessionRepository;
 
-    @Before
-    public void setUp() {
+    @BeforeEach
+    void setUp() {
         when(ctx.channel()).thenReturn(channel);
         sessionHandler = new AbstractSessionHandler(fixApplication, FixClock.systemUTC(), sessionRepository) {
             @Override
@@ -89,7 +90,7 @@ public class AbstractSessionHandlerTest {
     }
 
     @Test
-    public void testSendReject() {
+    void sendReject() {
         String msgType = randomAscii(3);
         FixMessage originalMsg = mock(FixMessage.class);
         int originalMsgSeqNum = RANDOM.nextInt();
@@ -102,13 +103,13 @@ public class AbstractSessionHandlerTest {
 
         FixMessage reject = rejectCaptor.getValue();
 
-        assertEquals(MessageTypes.REJECT, reject.getMessageType());
-        assertEquals(msgType, reject.getString(FieldType.RefMsgType.tag()));
-        assertEquals((Integer) originalMsgSeqNum, reject.getInt(FieldType.RefSeqNum.tag()));
+        assertThat(reject.getMessageType()).isEqualTo(MessageTypes.REJECT);
+        assertThat(reject.getString(FieldType.RefMsgType.tag())).isEqualTo(msgType);
+        assertThat(reject.getInt(FieldType.RefSeqNum.tag())).isEqualTo((Integer) originalMsgSeqNum);
     }
 
     @Test
-    public void testChannelInactiveSessionExists() throws Exception {
+    void channelInactiveSessionExists() throws Exception {
         when(channel.attr(AbstractSessionHandler.FIX_SESSION_KEY)).thenReturn(sessionAttr);
         when(sessionAttr.getAndSet(null)).thenReturn(fixSession);
         SessionId sessionId = mock(SessionId.class);
@@ -122,7 +123,7 @@ public class AbstractSessionHandlerTest {
     }
 
     @Test
-    public void testChannelInactiveNoKeyAttr() throws Exception {
+    void channelInactiveNoKeyAttr() throws Exception {
         when(channel.attr(AbstractSessionHandler.FIX_SESSION_KEY)).thenReturn(null);
 
         sessionHandler.channelInactive(ctx);
@@ -131,7 +132,7 @@ public class AbstractSessionHandlerTest {
     }
 
     @Test
-    public void testChannelInactiveSessionNotExists() throws Exception {
+    void channelInactiveSessionNotExists() throws Exception {
         when(channel.attr(AbstractSessionHandler.FIX_SESSION_KEY)).thenReturn(sessionAttr);
         when(sessionAttr.getAndSet(null)).thenReturn(null);
 
@@ -141,7 +142,7 @@ public class AbstractSessionHandlerTest {
     }
 
     @Test
-    public void testHandleBusinessRejectException() throws Exception {
+    void handleBusinessRejectException() throws Exception {
         int refSeqNum = RANDOM.nextInt(100) + 1;
         String refMsgType = randomAscii(2);
         int rejectReason = RANDOM.nextInt(5) + 1;
@@ -156,10 +157,10 @@ public class AbstractSessionHandlerTest {
 
         FixMessage businessReject = rejectCaptor.getValue();
 
-        assertEquals(MessageTypes.BUSINESS_MESSAGE_REJECT, businessReject.getMessageType());
-        assertEquals(rejectReason, businessReject.getInt(FieldType.BusinessRejectReason).intValue());
-        assertEquals(refSeqNum, businessReject.getInt(FieldType.RefSeqNum).intValue());
-        assertEquals(refMsgType, businessReject.getString(FieldType.RefMsgType));
-        assertEquals(rejectText, businessReject.getString(FieldType.Text));
+        assertThat(businessReject.getMessageType()).isEqualTo(MessageTypes.BUSINESS_MESSAGE_REJECT);
+        assertThat(businessReject.getInt(FieldType.BusinessRejectReason).intValue()).isEqualTo(rejectReason);
+        assertThat(businessReject.getInt(FieldType.RefSeqNum).intValue()).isEqualTo(refSeqNum);
+        assertThat(businessReject.getString(FieldType.RefMsgType)).isEqualTo(refMsgType);
+        assertThat(businessReject.getString(FieldType.Text)).isEqualTo(rejectText);
     }
 }

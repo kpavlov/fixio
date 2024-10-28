@@ -18,15 +18,15 @@ package fixio.fixprotocol.session;
 import fixio.fixprotocol.FixMessageBuilder;
 import fixio.fixprotocol.FixMessageBuilderImpl;
 import fixio.fixprotocol.FixMessageHeader;
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 
 import java.util.Random;
 
 import static org.apache.commons.lang3.RandomStringUtils.randomAscii;
-import static org.junit.Assert.assertEquals;
+import static org.assertj.core.api.Assertions.assertThat;
 
-public class FixSessionTest {
+class FixSessionTest {
 
     private FixSession session;
     private String beginString;
@@ -37,8 +37,8 @@ public class FixSessionTest {
     private String targetSubID;
     private String targetLocationID;
 
-    @Before
-    public void setUp() {
+    @BeforeEach
+    void setUp() {
 
         beginString = randomAscii(2);
         senderCompID = randomAscii(3);
@@ -60,19 +60,19 @@ public class FixSessionTest {
     }
 
     @Test
-    public void testGetSessionId() {
+    void getSessionId() {
         SessionId sessionId = session.getId();
 
-        assertEquals("senderCompID", senderCompID, sessionId.getSenderCompID());
-        assertEquals("senderSubID", senderSubID, sessionId.getSenderSubID());
-        assertEquals("senderLocationID", senderLocationID, sessionId.getSenderLocationID());
-        assertEquals("targetCompID", targetCompID, sessionId.getTargetCompID());
-        assertEquals("targetSubID", targetSubID, sessionId.getTargetSubID());
-        assertEquals("targetLocationID", targetLocationID, sessionId.getTargetLocationID());
+        assertThat(sessionId.getSenderCompID()).as("senderCompID").isEqualTo(senderCompID);
+        assertThat(sessionId.getSenderSubID()).as("senderSubID").isEqualTo(senderSubID);
+        assertThat(sessionId.getSenderLocationID()).as("senderLocationID").isEqualTo(senderLocationID);
+        assertThat(sessionId.getTargetCompID()).as("targetCompID").isEqualTo(targetCompID);
+        assertThat(sessionId.getTargetSubID()).as("targetSubID").isEqualTo(targetSubID);
+        assertThat(sessionId.getTargetLocationID()).as("targetLocationID").isEqualTo(targetLocationID);
     }
 
     @Test
-    public void testPrepareOutgoing() {
+    void prepareOutgoing() {
         int nextOutgoingMsgSeqNum = new Random().nextInt(100) + 100;
         session.setNextOutgoingMessageSeqNum(nextOutgoingMsgSeqNum);
 
@@ -80,18 +80,18 @@ public class FixSessionTest {
 
         session.prepareOutgoing(messageBuilder);
 
-        assertEquals(nextOutgoingMsgSeqNum + 1, session.getNextOutgoingMessageSeqNum());
+        assertThat(session.getNextOutgoingMessageSeqNum()).isEqualTo(nextOutgoingMsgSeqNum + 1);
 
         final FixMessageHeader header = messageBuilder.getHeader();
 
-        assertEquals("nextOutgoingMsgSeqNum", nextOutgoingMsgSeqNum, header.getMsgSeqNum());
-        assertEquals("beginString", beginString, header.getBeginString());
-        assertEquals("senderCompID", senderCompID, header.getSenderCompID());
-        assertEquals("senderSubID", senderSubID, header.getSenderSubID());
-        assertEquals("senderLocationID", senderLocationID, header.getSenderLocationID());
-        assertEquals("targetCompID", targetCompID, header.getTargetCompID());
-        assertEquals("targetSubID", targetSubID, header.getTargetSubID());
-        assertEquals("targetLocationID", targetLocationID, header.getTargetLocationID());
+        assertThat(header.getMsgSeqNum()).as("nextOutgoingMsgSeqNum").isEqualTo(nextOutgoingMsgSeqNum);
+        assertThat(header.getBeginString()).as("beginString").isEqualTo(beginString);
+        assertThat(header.getSenderCompID()).as("senderCompID").isEqualTo(senderCompID);
+        assertThat(header.getSenderSubID()).as("senderSubID").isEqualTo(senderSubID);
+        assertThat(header.getSenderLocationID()).as("senderLocationID").isEqualTo(senderLocationID);
+        assertThat(header.getTargetCompID()).as("targetCompID").isEqualTo(targetCompID);
+        assertThat(header.getTargetSubID()).as("targetSubID").isEqualTo(targetSubID);
+        assertThat(header.getTargetLocationID()).as("targetLocationID").isEqualTo(targetLocationID);
     }
 
 

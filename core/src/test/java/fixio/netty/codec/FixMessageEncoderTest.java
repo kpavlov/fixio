@@ -26,12 +26,12 @@ import io.netty.buffer.ByteBuf;
 import io.netty.buffer.ByteBufAllocator;
 import io.netty.buffer.Unpooled;
 import io.netty.channel.ChannelHandlerContext;
-import org.junit.Before;
-import org.junit.BeforeClass;
-import org.junit.Test;
-import org.junit.runner.RunWith;
+import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
-import org.mockito.junit.MockitoJUnitRunner;
+import org.mockito.junit.jupiter.MockitoExtension;
 
 import java.time.Instant;
 import java.time.ZoneId;
@@ -39,29 +39,30 @@ import java.time.ZonedDateTime;
 import java.util.Arrays;
 
 import static java.nio.charset.StandardCharsets.US_ASCII;
-import static org.junit.Assert.assertEquals;
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.AssertionsForClassTypes.assertThatExceptionOfType;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
-@RunWith(MockitoJUnitRunner.class)
-public class FixMessageEncoderTest {
+@ExtendWith(MockitoExtension.class)
+class FixMessageEncoderTest {
 
     private static FixMessageEncoder encoder;
     private final ZonedDateTime timestamp = ZonedDateTime.ofInstant(Instant.ofEpochMilli(123456789), ZoneId.of("UTC"));
-    @Mock
+    @Mock(strictness = Mock.Strictness.LENIENT)
     private ChannelHandlerContext ctx;
-    @Mock
+    @Mock(strictness = Mock.Strictness.LENIENT)
     private ByteBufAllocator byteBufAllocator;
     private FixMessageBuilder messageBuilder;
     private ByteBuf out;
 
-    @BeforeClass
-    public static void beforeClass() {
+    @BeforeAll
+    static void beforeClass() {
         encoder = new FixMessageEncoder();
     }
 
-    @Before
-    public void setUp() {
+    @BeforeEach
+    void setUp() {
         when(ctx.alloc()).thenReturn(byteBufAllocator);
         when(byteBufAllocator.buffer()).thenReturn(Unpooled.buffer(), Unpooled.buffer());
 
@@ -84,36 +85,40 @@ public class FixMessageEncoderTest {
         out = Unpooled.buffer();
     }
 
-    @Test(expected = IllegalArgumentException.class)
-    public void testFailIfNoBeginStringCompID() throws Exception {
+    @Test
+    void testFailIfNoBeginStringCompID() {
         messageBuilder.getHeader().setBeginString(null);
+        assertThatExceptionOfType(IllegalArgumentException.class).isThrownBy(() ->
 
-        encoder.encode(ctx, messageBuilder, out);
-    }
-
-    @Test(expected = IllegalArgumentException.class)
-    public void testFailIfNoMsgType() throws Exception {
-        messageBuilder.getHeader().setMessageType(null);
-
-        encoder.encode(ctx, messageBuilder, out);
-    }
-
-    @Test(expected = IllegalArgumentException.class)
-    public void testFailIfNoSenderCompID() throws Exception {
-        messageBuilder.getHeader().setSenderCompID(null);
-
-        encoder.encode(ctx, messageBuilder, out);
-    }
-
-    @Test(expected = IllegalArgumentException.class)
-    public void testFailIfNoTargetCompID() throws Exception {
-        messageBuilder.getHeader().setTargetCompID(null);
-
-        encoder.encode(ctx, messageBuilder, out);
+                encoder.encode(ctx, messageBuilder, out));
     }
 
     @Test
-    public void testEncode() throws Exception {
+    void testFailIfNoMsgType() {
+        messageBuilder.getHeader().setMessageType(null);
+        assertThatExceptionOfType(IllegalArgumentException.class).isThrownBy(() ->
+
+                encoder.encode(ctx, messageBuilder, out));
+    }
+
+    @Test
+    void testFailIfNoSenderCompID() {
+        messageBuilder.getHeader().setSenderCompID(null);
+        assertThatExceptionOfType(IllegalArgumentException.class).isThrownBy(() ->
+
+                encoder.encode(ctx, messageBuilder, out));
+    }
+
+    @Test
+    void testFailIfNoTargetCompID() {
+        messageBuilder.getHeader().setTargetCompID(null);
+        assertThatExceptionOfType(IllegalArgumentException.class).isThrownBy(() ->
+
+                encoder.encode(ctx, messageBuilder, out));
+    }
+
+    @Test
+    void encode() {
 
         encoder.encode(ctx, messageBuilder, out);
 
@@ -125,7 +130,7 @@ public class FixMessageEncoderTest {
     }
 
     @Test
-    public void testEncodeWithCustomHeader() throws Exception {
+    void encodeWithCustomHeader() {
         messageBuilder.getHeader().setCustomFields(Arrays.asList(
                 FieldFactory.fromIntValue(1128, 9),
                 FieldFactory.fromStringValue(1129, "1.0")
@@ -141,7 +146,7 @@ public class FixMessageEncoderTest {
     }
 
     @Test
-    public void testEncodeWithGroup() throws Exception {
+    void encodeWithGroup() {
 
         Group group1 = messageBuilder.newGroup(1002, 2);
         group1.add(1003, "g1-1");
@@ -162,6 +167,6 @@ public class FixMessageEncoderTest {
 
     private void assertResult(String expectedString) {
         final String string = new String(out.array(), out.arrayOffset(), out.readableBytes(), US_ASCII);
-        assertEquals(expectedString, string);
+        assertThat(string).isEqualTo(expectedString);
     }
 }

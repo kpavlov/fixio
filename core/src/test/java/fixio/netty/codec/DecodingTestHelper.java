@@ -13,7 +13,7 @@ public class DecodingTestHelper {
         return source.replace('|', '\u0001');
     }
 
-    public static List<Object> decode(String message, FixMessageDecoder decoder)  {
+    public static List<Object> decode(String message, FixMessageDecoder decoder) {
         String[] tags = normalizeMessage(message).split("\u0001");
 
         List<Object> result = new ArrayList<>();

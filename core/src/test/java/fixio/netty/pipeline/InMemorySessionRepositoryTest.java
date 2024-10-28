@@ -18,15 +18,13 @@ package fixio.netty.pipeline;
 import fixio.fixprotocol.FixMessageHeader;
 import fixio.fixprotocol.session.FixSession;
 import fixio.fixprotocol.session.SessionId;
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 
 import static org.apache.commons.lang3.RandomStringUtils.randomAscii;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertNull;
-import static org.junit.Assert.assertSame;
+import static org.assertj.core.api.Assertions.assertThat;
 
-public class InMemorySessionRepositoryTest {
+class InMemorySessionRepositoryTest {
 
     private SessionRepository sessionRepository;
     private String senderCompID;
@@ -35,8 +33,8 @@ public class InMemorySessionRepositoryTest {
     private String targetSubID;
     private FixMessageHeader header;
 
-    @Before
-    public void setUp() {
+    @BeforeEach
+    void setUp() {
         senderCompID = randomAscii(2);
         senderSubID = randomAscii(3);
         targetCompID = randomAscii(4);
@@ -52,25 +50,25 @@ public class InMemorySessionRepositoryTest {
     }
 
     @Test
-    public void testNormalLifecycle() {
+    void normalLifecycle() {
 
         FixSession session = sessionRepository.getOrCreateSession(header);
 
-        assertNotNull(session);
+        assertThat(session).isNotNull();
 
         FixSession readSession = sessionRepository.getSession(header);
 
-        assertSame("not same.", session, readSession);
+        assertThat(readSession).as("not same.").isSameAs(session);
 
-        assertSame(senderCompID, session.getSenderCompID());
-        assertSame(senderSubID, session.getSenderSubID());
-        assertSame(targetCompID, session.getTargetCompID());
-        assertSame(targetSubID, session.getTargetSubID());
+        assertThat(session.getSenderCompID()).isSameAs(senderCompID);
+        assertThat(session.getSenderSubID()).isSameAs(senderSubID);
+        assertThat(session.getTargetCompID()).isSameAs(targetCompID);
+        assertThat(session.getTargetSubID()).isSameAs(targetSubID);
 
         final SessionId sessionId = session.getId();
 
         sessionRepository.removeSession(sessionId);
 
-        assertNull("Session was not destroyed.", sessionRepository.getSession(header));
+        assertThat(sessionRepository.getSession(header)).as("Session was not destroyed.").isNull();
     }
 }

@@ -15,29 +15,32 @@
  */
 package fixio.fixprotocol.fields;
 
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 import java.text.ParseException;
 import java.util.Random;
 
 import static java.nio.charset.StandardCharsets.US_ASCII;
-import static org.junit.Assert.assertArrayEquals;
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.AssertionsForClassTypes.assertThatExceptionOfType;
 
-public class IntFieldTest {
+class IntFieldTest {
 
     @Test
-    public void testGetBytes() {
+    void getBytes() {
         int value = new Random().nextInt();
         int tag = new Random().nextInt();
 
         IntField field = new IntField(tag, value);
         byte[] bytes = field.getBytes();
 
-        assertArrayEquals(String.valueOf(value).getBytes(US_ASCII), bytes);
+        assertThat(bytes).containsExactly(String.valueOf(value).getBytes(US_ASCII));
     }
 
-    @Test(expected = ParseException.class)
-    public void testFailParseNonInteger() throws ParseException {
-        new IntField(10, "12a345".getBytes(US_ASCII), 0, 6);
+    @Test
+    void failParseNonInteger() {
+        assertThatExceptionOfType(ParseException.class).isThrownBy(() -> {
+            new IntField(10, "12a345".getBytes(US_ASCII), 0, 6);
+        });
     }
 }

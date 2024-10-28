@@ -19,29 +19,27 @@ import fixio.fixprotocol.FixMessageBuilderImpl;
 import fixio.fixprotocol.MessageTypes;
 import io.netty.channel.Channel;
 import io.netty.channel.ChannelHandlerContext;
-import org.junit.Before;
-import org.junit.Test;
-import org.junit.runner.RunWith;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.ArgumentCaptor;
 import org.mockito.Captor;
 import org.mockito.Mock;
-import org.mockito.junit.MockitoJUnitRunner;
+import org.mockito.junit.jupiter.MockitoExtension;
 
 import java.util.ArrayList;
 import java.util.List;
 
 import static fixio.fixprotocol.FieldType.TestReqID;
 import static org.apache.commons.lang3.RandomStringUtils.randomAscii;
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertTrue;
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.verifyZeroInteractions;
+import static org.mockito.Mockito.verifyNoInteractions;
 import static org.mockito.Mockito.when;
 
-@RunWith(MockitoJUnitRunner.class)
-public class TestRequestHandlerTest {
+@ExtendWith(MockitoExtension.class)
+class TestRequestHandlerTest {
 
     private TestRequestHandler handler;
     @Mock
@@ -53,40 +51,40 @@ public class TestRequestHandlerTest {
     @Captor
     private ArgumentCaptor<FixMessageBuilderImpl> messageBuilderCaptor;
 
-    @Before
-    public void setUp() {
+    @BeforeEach
+    void setUp() {
         handler = new TestRequestHandler();
     }
 
     @Test
-    public void testRejectNotSupportedObject() {
-        assertFalse(handler.acceptInboundMessage(new Object()));
+    void rejectNotSupportedObject() {
+        assertThat(handler.acceptInboundMessage(new Object())).isFalse();
     }
 
     @Test
-    public void testRejectNullObject() {
-        assertFalse(handler.acceptInboundMessage(null));
+    void rejectNullObject() {
+        assertThat(handler.acceptInboundMessage(null)).isFalse();
     }
 
     @Test
-    public void testAcceptFixMessage() {
+    void acceptFixMessage() {
         when(fixMessage.getMessageType()).thenReturn(MessageTypes.TEST_REQUEST);
-        assertTrue(handler.acceptInboundMessage(fixMessage));
+        assertThat(handler.acceptInboundMessage(fixMessage)).isTrue();
     }
 
     @Test
-    public void testSkipOtherMessage() throws Exception {
+    void skipOtherMessage() throws Exception {
         when(fixMessage.getMessageType()).thenReturn(MessageTypes.HEARTBEAT);
 
         ArrayList<Object> out = new ArrayList<>();
         handler.decode(ctx, fixMessage, out);
 
-        verifyZeroInteractions(ctx);
-        assertTrue(out.isEmpty());
+        verifyNoInteractions(ctx);
+        assertThat(out.isEmpty()).isTrue();
     }
 
     @Test
-    public void testHandleTestRequest() throws Exception {
+    void handleTestRequest() throws Exception {
         String testReqId = randomAscii(10);
         when(ctx.channel()).thenReturn(channel);
         when(fixMessage.getMessageType()).thenReturn(MessageTypes.TEST_REQUEST);
@@ -99,7 +97,7 @@ public class TestRequestHandlerTest {
 
         final FixMessageBuilderImpl fixMessageBuilder = messageBuilderCaptor.getValue();
 
-        assertEquals(MessageTypes.HEARTBEAT, fixMessageBuilder.getMessageType());
-        assertEquals(fixMessageBuilder.getString(TestReqID), testReqId);
+        assertThat(fixMessageBuilder.getMessageType()).isEqualTo(MessageTypes.HEARTBEAT);
+        assertThat(testReqId).isEqualTo(fixMessageBuilder.getString(TestReqID));
     }
 }

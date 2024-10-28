@@ -17,28 +17,25 @@ package fixio.netty.codec;
 
 import io.netty.buffer.ByteBuf;
 import io.netty.buffer.Unpooled;
-import org.junit.Test;
-import org.junit.runner.RunWith;
-import org.junit.runners.Parameterized;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.MethodSource;
 
 import java.util.Arrays;
 
-import static org.junit.Assert.assertArrayEquals;
+import static org.assertj.core.api.Assertions.assertThat;
 
-@RunWith(Parameterized.class)
 public class FixMessageEncoderWriteChecksumTest {
 
-    private final ByteBuf byteBuf;
-    private final int value;
-    private final byte[] expectedBytes;
+    private ByteBuf byteBuf;
+    private int value;
+    private byte[] expectedBytes;
 
-    public FixMessageEncoderWriteChecksumTest(int value, byte[] expectedBytes) {
+    public void initFixMessageEncoderWriteChecksumTest(int value, byte[] expectedBytes) {
         this.byteBuf = Unpooled.buffer(7);
         this.value = value;
         this.expectedBytes = expectedBytes;
     }
 
-    @Parameterized.Parameters(name = "Value of {0}")
     public static Iterable<Object[]> data() {
         return Arrays.asList(new Object[][]{
                 {0, new byte[]{'1', '0', '=', '0', '0', '0', 1}},
@@ -52,9 +49,11 @@ public class FixMessageEncoderWriteChecksumTest {
         });
     }
 
-    @Test
-    public void testWriteChecksum() {
+    @MethodSource("data")
+    @ParameterizedTest(name = "Value of {0}")
+    void writeChecksum(int value, byte[] expectedBytes) {
+        initFixMessageEncoderWriteChecksumTest(value, expectedBytes);
         FixMessageEncoder.writeChecksumField(byteBuf, value);
-        assertArrayEquals(expectedBytes, byteBuf.array());
+        assertThat(byteBuf.array()).containsExactly(expectedBytes);
     }
 }

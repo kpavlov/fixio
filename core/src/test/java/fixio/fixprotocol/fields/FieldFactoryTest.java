@@ -17,10 +17,10 @@ package fixio.fixprotocol.fields;
 
 import fixio.fixprotocol.DataType;
 import fixio.fixprotocol.FieldType;
-import junitparams.JUnitParamsRunner;
-import junitparams.Parameters;
-import org.junit.Test;
-import org.junit.runner.RunWith;
+import org.assertj.core.data.Offset;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.ValueSource;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
@@ -33,208 +33,212 @@ import static fixio.netty.pipeline.FixClock.systemUTC;
 import static java.nio.charset.StandardCharsets.US_ASCII;
 import static org.apache.commons.lang3.RandomStringUtils.randomAlphanumeric;
 import static org.apache.commons.lang3.RandomStringUtils.randomAscii;
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertSame;
-import static org.junit.Assert.assertTrue;
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.within;
+import static org.assertj.core.api.AssertionsForClassTypes.assertThatExceptionOfType;
 
-@RunWith(JUnitParamsRunner.class)
-public class FieldFactoryTest {
+class FieldFactoryTest {
 
-    @Test(expected = IllegalArgumentException.class)
-    public void testInvalidTagField() {
+    @Test
+    void invalidTagField() {
         String value = randomAlphanumeric(5);
-        FieldFactory.valueOf(0, value.getBytes(US_ASCII));
+        assertThatExceptionOfType(IllegalArgumentException.class).isThrownBy(() ->
+                FieldFactory.valueOf(0, value.getBytes(US_ASCII)));
     }
 
     @Test
-    public void testValueOfString() {
+    void valueOfString() {
         String value = randomAscii(5);
         StringField field = FieldFactory.valueOf(FieldType.MsgType.tag(), value.getBytes(US_ASCII));
 
-        assertEquals("tagnum", FieldType.MsgType.tag(), field.getTagNum());
-        assertEquals("value", value, field.getValue());
+        assertThat(field.getTagNum()).as("tagnum").isEqualTo(FieldType.MsgType.tag());
+        assertThat(field.getValue()).as("value").isEqualTo(value);
     }
 
     @Test
-    public void testBigTagNumber() {
+    void bigTagNumber() {
         String value = randomAscii(5);
         int tagNum = 100_000;
         StringField field = FieldFactory.valueOf(tagNum, value.getBytes(US_ASCII));
 
-        assertEquals("tagnum", tagNum, field.getTagNum());
-        assertEquals("value", value, field.getValue());
+        assertThat(field.getTagNum()).as("tagnum").isEqualTo(tagNum);
+        assertThat(field.getValue()).as("value").isEqualTo(value);
     }
 
     @Test
-    public void testValueOfChar() {
+    void valueOfChar() {
         char value = randomAscii(1).charAt(0);
         CharField field = FieldFactory.valueOf(FieldType.AdvSide.tag(), new byte[]{(byte) value});
 
-        assertEquals("tagnum", FieldType.AdvSide.tag(), field.getTagNum());
-        assertEquals("value", value, field.getValue().charValue());
-        assertEquals("value", value, field.charValue());
+        assertThat(field.getTagNum()).as("tagnum").isEqualTo(FieldType.AdvSide.tag());
+        assertThat(field.getValue().charValue()).as("value").isEqualTo(value);
+        assertThat(field.charValue()).as("value").isEqualTo(value);
     }
 
     @Test
-    public void testValueOfInt() {
+    void valueOfInt() {
         int value = new Random().nextInt(1000);
         IntField field = FieldFactory.valueOf(FieldType.EncryptMethod.tag(), String.valueOf(value).getBytes(US_ASCII));
 
-        assertEquals("tagnum", FieldType.EncryptMethod.tag(), field.getTagNum());
-        assertEquals("value", value, field.getValue().intValue());
-        assertEquals("value", value, field.intValue());
+        assertThat(field.getTagNum()).as("tagnum").isEqualTo(FieldType.EncryptMethod.tag());
+        assertThat(field.getValue().intValue()).as("value").isEqualTo(value);
+        assertThat(field.intValue()).as("value").isEqualTo(value);
     }
 
     @Test
-    public void testValueOfLength() {
+    void valueOfLength() {
         int value = new Random().nextInt(1000);
 
         IntField field = FieldFactory.valueOf(FieldType.BodyLength.tag(), String.valueOf(value).getBytes(US_ASCII));
 
-        assertEquals("tagnum", FieldType.BodyLength.tag(), field.getTagNum());
-        assertEquals("value", value, field.getValue().intValue());
-        assertEquals("value", value, field.intValue());
+        assertThat(field.getTagNum()).as("tagnum").isEqualTo(FieldType.BodyLength.tag());
+        assertThat(field.getValue().intValue()).as("value").isEqualTo(value);
+        assertThat(field.intValue()).as("value").isEqualTo(value);
     }
 
     @Test
-    public void testValueOfSeqNum() {
+    void valueOfSeqNum() {
         int value = new Random().nextInt(1000);
 
         IntField field = FieldFactory.valueOf(FieldType.RefSeqNum.tag(), String.valueOf(value).getBytes(US_ASCII));
 
-        assertEquals("tagnum", FieldType.RefSeqNum.tag(), field.getTagNum());
-        assertEquals("value", value, field.getValue().intValue());
-        assertEquals("value", value, field.intValue());
+        assertThat(field.getTagNum()).as("tagnum").isEqualTo(FieldType.RefSeqNum.tag());
+        assertThat(field.getValue().intValue()).as("value").isEqualTo(value);
+        assertThat(field.intValue()).as("value").isEqualTo(value);
     }
 
     @Test
-    public void testValueOfNumInGroup() {
+    void valueOfNumInGroup() {
         int value = new Random().nextInt(1000);
 
         IntField field = FieldFactory.valueOf(FieldType.NoMDEntries.tag(), String.valueOf(value).getBytes(US_ASCII));
 
-        assertEquals("tagnum", FieldType.NoMDEntries.tag(), field.getTagNum());
-        assertEquals("value", value, field.getValue().intValue());
-        assertEquals("value", value, field.intValue());
+        assertThat(field.getTagNum()).as("tagnum").isEqualTo(FieldType.NoMDEntries.tag());
+        assertThat(field.getValue().intValue()).as("value").isEqualTo(value);
+        assertThat(field.intValue()).as("value").isEqualTo(value);
     }
 
     @Test
-    public void testValueOfFloat() {
+    void valueOfFloat() {
         BigDecimal value = BigDecimal.valueOf(new Random().nextInt()).movePointLeft(5);
 
         FloatField field = FieldFactory.valueOf(FieldType.SettlCurrFxRate.tag(), value.toPlainString().getBytes(US_ASCII));
 
-        assertEquals("tagnum", FieldType.SettlCurrFxRate.tag(), field.getTagNum());
-        assertEquals("value", value.doubleValue(), field.getValue().doubleValue(), 0.0);
-        assertEquals("value", value.floatValue(), field.floatValue(), 0.0);
+        assertThat(field.getTagNum()).as("tagnum").isEqualTo(FieldType.SettlCurrFxRate.tag());
+        assertThat(field.getValue().doubleValue()).as("value").isCloseTo(value.doubleValue(), within(0.0));
+        assertThat(field.floatValue()).as("value").isCloseTo(value.floatValue(), Offset.offset(0.0f));
     }
 
     @Test
-    public void testValueOfQty() {
+    void valueOfQty() {
         BigDecimal value = BigDecimal.valueOf(new Random().nextInt()).movePointLeft(5);
 
         FloatField field = FieldFactory.valueOf(FieldType.OrderQty.tag(), value.toPlainString().getBytes(US_ASCII));
 
-        assertEquals("tagnum", FieldType.OrderQty.tag(), field.getTagNum());
-        assertEquals("value", value.doubleValue(), field.getValue().doubleValue(), 0.0);
-        assertEquals("value", value.floatValue(), field.floatValue(), 0.0);
+        assertThat(field.getTagNum()).as("tagnum").isEqualTo(FieldType.OrderQty.tag());
+        assertThat(field.getValue().doubleValue()).as("value").isCloseTo(value.doubleValue(), within(0.0));
+        assertThat(field.floatValue()).as("value").isCloseTo(value.floatValue(), within(0.0f));
     }
 
     @Test
-    public void testValueOfPrice() {
+    void valueOfPrice() {
         BigDecimal value = BigDecimal.valueOf(new Random().nextInt()).movePointLeft(5);
 
         FloatField field = FieldFactory.valueOf(FieldType.MktBidPx.tag(), value.toPlainString().getBytes(US_ASCII));
 
-        assertEquals("tagnum", FieldType.MktBidPx.tag(), field.getTagNum());
-        assertEquals("value", value.doubleValue(), field.getValue().doubleValue(), 0.0);
-        assertEquals("value", value.floatValue(), field.floatValue(), 0.0);
+        assertThat(field.getTagNum()).as("tagnum").isEqualTo(FieldType.MktBidPx.tag());
+        assertThat(field.getValue().doubleValue()).as("value").isCloseTo(value.doubleValue(), within(0.0));
+        assertThat(field.floatValue()).as("value").isCloseTo(value.floatValue(), within(0.0f));
     }
 
     @Test
-    public void testValueOfBooleanTrue() {
+    void valueOfBooleanTrue() {
         String value = "Y";
         BooleanField field = FieldFactory.valueOf(FieldType.PossDupFlag.tag(), value.getBytes(US_ASCII));
 
-        assertEquals("tagnum", FieldType.PossDupFlag.tag(), field.getTagNum());
-        assertSame("value", Boolean.TRUE, field.getValue());
-        assertTrue("value", field.booleanValue());
+        assertThat(field.getTagNum()).as("tagnum").isEqualTo(FieldType.PossDupFlag.tag());
+        assertThat(field.getValue()).as("value").isSameAs(Boolean.TRUE);
+        assertThat(field.booleanValue()).as("value").isTrue();
     }
 
     @Test
-    public void testValueOfBooleanFalse() {
+    void valueOfBooleanFalse() {
         String value = "N";
         BooleanField field = FieldFactory.valueOf(FieldType.PossDupFlag.tag(), value.getBytes(US_ASCII));
 
-        assertEquals("tagnum", FieldType.PossDupFlag.tag(), field.getTagNum());
-        assertSame("value", Boolean.FALSE, field.getValue());
-        assertFalse("value", field.booleanValue());
+        assertThat(field.getTagNum()).as("tagnum").isEqualTo(FieldType.PossDupFlag.tag());
+        assertThat(field.getValue()).as("value").isSameAs(Boolean.FALSE);
+        assertThat(field.booleanValue()).as("value").isFalse();
     }
 
-    @Test(expected = IllegalArgumentException.class)
-    @Parameters({"XXX", "", "-"})
-    public void testFailValueOfIncorrectBoolean(String value) {
-        FieldFactory.valueOf(FieldType.PossDupFlag.tag(), value.getBytes(US_ASCII));
+    @ParameterizedTest
+    @ValueSource(strings = {"XXX", "", "-"})
+    void failValueOfIncorrectBoolean(String value) {
+        assertThatExceptionOfType(IllegalArgumentException.class).isThrownBy(() ->
+                FieldFactory.valueOf(FieldType.PossDupFlag.tag(), value.getBytes(US_ASCII)));
     }
 
     @Test
-    public void testValueOfUtcTimestampWithMillis() {
+    void valueOfUtcTimestampWithMillis() {
         String value = "19980604-08:03:31.537";
         UTCTimestampField field = FieldFactory.valueOf(FieldType.OrigTime.tag(), value.getBytes(US_ASCII));
 
-        assertEquals("tagnum", FieldType.OrigTime.tag(), field.getTagNum());
-        assertEquals("value", ZonedDateTime.of(LocalDate.of(1998, 6, 4), LocalTime.of(8, 3, 31, (int) TimeUnit.MILLISECONDS.toNanos(537)), systemUTC().getZone()).toInstant().toEpochMilli(), field.getValue().toInstant().toEpochMilli());
+        assertThat(field.getTagNum()).as("tagnum").isEqualTo(FieldType.OrigTime.tag());
+        assertThat(field.getValue().toInstant().toEpochMilli()).as("value").isEqualTo(ZonedDateTime.of(LocalDate.of(1998, 6, 4), LocalTime.of(8, 3, 31, (int) TimeUnit.MILLISECONDS.toNanos(537)), systemUTC().getZone()).toInstant().toEpochMilli());
     }
 
     @Test
-    public void testValueOfUtcTimestampNoMillis() {
+    void valueOfUtcTimestampNoMillis() {
         String value = "19980604-08:03:31";
         UTCTimestampField field = FieldFactory.valueOf(FieldType.OrigTime.tag(), value.getBytes(US_ASCII));
 
-        assertEquals("tagnum", FieldType.OrigTime.tag(), field.getTagNum());
-        assertEquals("value", ZonedDateTime.of(LocalDate.of(1998, 6, 4), LocalTime.of(8, 3, 31), systemUTC().getZone()).toInstant().toEpochMilli(), field.getValue().toInstant().toEpochMilli());
+        assertThat(field.getTagNum()).as("tagnum").isEqualTo(FieldType.OrigTime.tag());
+        assertThat(field.getValue().toInstant().toEpochMilli()).as("value").isEqualTo(ZonedDateTime.of(LocalDate.of(1998, 6, 4), LocalTime.of(8, 3, 31), systemUTC().getZone()).toInstant().toEpochMilli());
     }
 
-    @Test
-    @Parameters({"200303", "20030320", "200303w2"})
-    public void testFromStringValueMonthYear(final String value) {
+    @ParameterizedTest
+    // JunitParamsRunnerToParameterized conversion not supported
+    @ValueSource(strings = {"200303", "20030320", "200303w2"})
+    void fromStringValueMonthYear(final String value) {
         final int tag = FieldType.MaturityMonthYear.tag();
         StringField field = FieldFactory.fromStringValue(DataType.MONTHYEAR, tag, value);
 
-        assertEquals("tagnum", tag, field.getTagNum());
-        assertEquals("value", value, field.getValue());
+        assertThat(field.getTagNum()).as("tagnum").isEqualTo(tag);
+        assertThat(field.getValue()).as("value").isEqualTo(value);
     }
 
-    @Test
-    @Parameters({"2003-09-10"})
-    public void testFromStringValueLocalMktDate(final String value) {
+    @ParameterizedTest
+    // JunitParamsRunnerToParameterized conversion not supported
+    @ValueSource(strings = {"2003-09-10"})
+    void fromStringValueLocalMktDate(final String value) {
         final int tag = FieldType.TradeOriginationDate.tag();
         StringField field = FieldFactory.fromStringValue(DataType.LOCALMKTDATE, tag, value);
 
-        assertEquals("tagnum", tag, field.getTagNum());
-        assertEquals("value", value, field.getValue());
+        assertThat(field.getTagNum()).as("tagnum").isEqualTo(tag);
+        assertThat(field.getValue()).as("value").isEqualTo(value);
     }
 
-    @Test
-    @Parameters({"Y", "true", "TRUE"})
-    public void testFromStringValueBooleanTrue(final String value) {
+    @ParameterizedTest
+    // JunitParamsRunnerToParameterized conversion not supported
+    @ValueSource(strings = {"Y", "true", "TRUE"})
+    void fromStringValueBooleanTrue(final String value) {
         final int tag = FieldType.PossDupFlag.tag();
         BooleanField field = FieldFactory.fromStringValue(DataType.BOOLEAN, tag, value);
 
-        assertEquals("tagnum", tag, field.getTagNum());
-        assertSame("value", Boolean.TRUE, field.getValue());
-        assertTrue("value", field.booleanValue());
+        assertThat(field.getTagNum()).as("tagnum").isEqualTo(tag);
+        assertThat(field.getValue()).as("value").isSameAs(Boolean.TRUE);
+        assertThat(field.booleanValue()).as("value").isTrue();
     }
 
-    @Test
-    @Parameters({"N", "false", "FALSE"})
-    public void testValueStringValueBooleanFalse(final String value) {
+    @ParameterizedTest
+    // JunitParamsRunnerToParameterized conversion not supported
+    @ValueSource(strings = {"N", "false", "FALSE"})
+    void valueStringValueBooleanFalse(final String value) {
         final int tag = FieldType.PossDupFlag.tag();
         BooleanField field = FieldFactory.fromStringValue(DataType.BOOLEAN, tag, value);
 
-        assertEquals("tagnum", tag, field.getTagNum());
-        assertSame("value", Boolean.FALSE, field.getValue());
-        assertFalse("value", field.booleanValue());
+        assertThat(field.getTagNum()).as("tagnum").isEqualTo(tag);
+        assertThat(field.getValue()).as("value").isSameAs(Boolean.FALSE);
+        assertThat(field.booleanValue()).as("value").isFalse();
     }
 }

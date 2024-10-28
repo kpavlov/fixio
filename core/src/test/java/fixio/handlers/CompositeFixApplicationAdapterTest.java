@@ -21,11 +21,12 @@ import fixio.fixprotocol.FixMessageBuilderImpl;
 import fixio.fixprotocol.FixMessageImpl;
 import fixio.validator.FixMessageValidator;
 import io.netty.channel.ChannelHandlerContext;
-import org.junit.Before;
-import org.junit.Test;
-import org.junit.runner.RunWith;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InOrder;
 import org.mockito.Mock;
+import org.mockito.junit.jupiter.MockitoExtension;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -34,8 +35,8 @@ import static org.mockito.Mockito.inOrder;
 import static org.mockito.Mockito.same;
 import static org.mockito.Mockito.when;
 
-@RunWith(org.mockito.junit.MockitoJUnitRunner.class)
-public class CompositeFixApplicationAdapterTest {
+@ExtendWith(MockitoExtension.class)
+class CompositeFixApplicationAdapterTest {
 
     private CompositeFixApplicationAdapter adapter;
     @Mock
@@ -52,8 +53,8 @@ public class CompositeFixApplicationAdapterTest {
     private ChannelHandlerContext ctx;
     private ArrayList<Object> out;
 
-    @Before
-    public void setUp() {
+    @BeforeEach
+    void setUp() {
         adapter = new CompositeFixApplicationAdapter(
                 Arrays.asList(messageValidator1, messageValidator2),
                 Arrays.asList(messageHandler1, messageHandler2, messageHandler3));
@@ -61,7 +62,7 @@ public class CompositeFixApplicationAdapterTest {
     }
 
     @Test
-    public void testOnMessage() throws Exception {
+    void onMessage() throws Exception {
         final FixMessage message = new FixMessageImpl();
 
         when(messageHandler1.handle(same(ctx), same(message))).thenReturn(true);
@@ -82,7 +83,7 @@ public class CompositeFixApplicationAdapterTest {
     }
 
     @Test
-    public void testBeforeSendMessage() {
+    void beforeSendMessage() {
         final FixMessageBuilder message = new FixMessageBuilderImpl();
 
 

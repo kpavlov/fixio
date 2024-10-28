@@ -1,20 +1,20 @@
 package fixio.fixprotocol.fields;
 
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
-import static org.junit.Assert.assertEquals;
+import static org.assertj.core.api.Assertions.assertThat;
 
-public class FixedPointNumberTest {
+class FixedPointNumberTest {
 
     @Test
-    public void testZeroToString() {
+    void zeroToString() {
         final FixedPointNumber fixedPointNumber = new FixedPointNumber(0, 0);
-        assertEquals("0", fixedPointNumber.toString());
+        assertThat(fixedPointNumber.toString()).isEqualTo("0");
     }
 
     @Test
-    public void testScaledZeroToString() {
+    void scaledZeroToString() {
         final FixedPointNumber fixedPointNumber = new FixedPointNumber(0, 20);
-        assertEquals("0", fixedPointNumber.toString());
+        assertThat(fixedPointNumber.toString()).isEqualTo("0");
     }
 }

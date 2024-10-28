@@ -15,15 +15,15 @@
  */
 package fixio.netty.pipeline.client;
 
-import org.junit.BeforeClass;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.Test;
 
 import java.util.Random;
 
 import static org.apache.commons.lang3.RandomStringUtils.randomAscii;
-import static org.junit.Assert.assertEquals;
+import static org.assertj.core.api.Assertions.assertThat;
 
-public class FixSessionSettingsProviderImplTest {
+class FixSessionSettingsProviderImplTest {
 
     private static FixSessionSettingsProviderImpl settingsProvider;
 
@@ -35,8 +35,8 @@ public class FixSessionSettingsProviderImplTest {
     private static boolean resetMsgSeqNum;
     private static int heartbeatInterval;
 
-    @BeforeClass
-    public static void setUp() {
+    @BeforeAll
+    static void setUp() {
         beginString = randomAscii(5);
         senderCompID = randomAscii(5);
         senderSubID = randomAscii(5);
@@ -58,37 +58,37 @@ public class FixSessionSettingsProviderImplTest {
     }
 
     @Test
-    public void testGetSenderCompID() {
-        assertEquals(senderCompID, settingsProvider.getSenderCompID());
+    void getSenderCompID() {
+        assertThat(settingsProvider.getSenderCompID()).isEqualTo(senderCompID);
     }
 
     @Test
-    public void testGetSenderSubID() {
-        assertEquals(senderSubID, settingsProvider.getSenderSubID());
+    void getSenderSubID() {
+        assertThat(settingsProvider.getSenderSubID()).isEqualTo(senderSubID);
     }
 
     @Test
-    public void testGetTargetCompID() {
-        assertEquals(targetCompID, settingsProvider.getTargetCompID());
+    void getTargetCompID() {
+        assertThat(settingsProvider.getTargetCompID()).isEqualTo(targetCompID);
     }
 
     @Test
-    public void testGetTargetSubID() {
-        assertEquals(targetSubID, settingsProvider.getTargetSubID());
+    void getTargetSubID() {
+        assertThat(settingsProvider.getTargetSubID()).isEqualTo(targetSubID);
     }
 
     @Test
-    public void testGetBeginString() {
-        assertEquals(beginString, settingsProvider.getBeginString());
+    void getBeginString() {
+        assertThat(settingsProvider.getBeginString()).isEqualTo(beginString);
     }
 
     @Test
-    public void testIsResetMsgSeqNum() {
-        assertEquals(resetMsgSeqNum, settingsProvider.isResetMsgSeqNum());
+    void isResetMsgSeqNum() {
+        assertThat(settingsProvider.isResetMsgSeqNum()).isEqualTo(resetMsgSeqNum);
     }
 
     @Test
-    public void testGetHeartbeatInterval() {
-        assertEquals(heartbeatInterval, settingsProvider.getHeartbeatInterval());
+    void getHeartbeatInterval() {
+        assertThat(settingsProvider.getHeartbeatInterval()).isEqualTo(heartbeatInterval);
     }
 }

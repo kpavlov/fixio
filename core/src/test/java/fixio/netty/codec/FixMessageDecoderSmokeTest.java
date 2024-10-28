@@ -1,10 +1,9 @@
 package fixio.netty.codec;
 
 import fixio.fixprotocol.FixMessageImpl;
-import org.junit.BeforeClass;
-import org.junit.Test;
-import org.junit.runner.RunWith;
-import org.junit.runners.Parameterized;
+import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.MethodSource;
 
 import java.io.IOException;
 import java.net.URISyntaxException;
@@ -15,17 +14,15 @@ import java.util.Objects;
 import static fixio.netty.codec.DecodingTestHelper.decodeOne;
 import static org.assertj.core.api.Assertions.assertThat;
 
-@RunWith(Parameterized.class)
 public class FixMessageDecoderSmokeTest {
 
     private static FixMessageDecoder decoder;
-    private final String message;
+    private String message;
 
-    public FixMessageDecoderSmokeTest(String message) {
+    public void initFixMessageDecoderSmokeTest(String message) {
         this.message = message;
     }
 
-    @Parameterized.Parameters(name = "msg: {0}")
     public static Object[] data() throws IOException, URISyntaxException {
         Path path = Path.of(Objects.requireNonNull(FixMessageDecoderSmokeTest.class.getClassLoader()
                 .getResource("example-messages.txt")).toURI());
@@ -35,13 +32,15 @@ public class FixMessageDecoderSmokeTest {
                 .toArray(String[]::new);
     }
 
-    @BeforeClass
-    public static void setUp() {
+    @BeforeAll
+    static void setUp() {
         decoder = new FixMessageDecoder();
     }
 
-    @Test
-    public void shouldDecode() {
+    @MethodSource("data")
+    @ParameterizedTest(name = "msg: {0}")
+    void shouldDecode(String message) {
+        initFixMessageDecoderSmokeTest(message);
         FixMessageImpl result = decodeOne(message, decoder);
         assertThat(result).isNotNull();
     }

@@ -15,22 +15,22 @@
  */
 package fixio.fixprotocol.fields;
 
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 
 import java.util.Random;
 
 import static java.nio.charset.StandardCharsets.US_ASCII;
 import static org.apache.commons.lang3.RandomStringUtils.randomAscii;
-import static org.junit.Assert.assertArrayEquals;
+import static org.assertj.core.api.Assertions.assertThat;
 
-public class StringFieldTest {
+class StringFieldTest {
 
     private String value;
     private StringField field;
 
-    @Before
-    public void setUp() {
+    @BeforeEach
+    void setUp() {
         int tag = new Random().nextInt();
         value = randomAscii(10);
 
@@ -38,9 +38,9 @@ public class StringFieldTest {
     }
 
     @Test
-    public void testGetBytes() {
+    void getBytes() {
         byte[] bytes = field.getBytes();
 
-        assertArrayEquals(value.getBytes(US_ASCII), bytes);
+        assertThat(bytes).containsExactly(value.getBytes(US_ASCII));
     }
 }

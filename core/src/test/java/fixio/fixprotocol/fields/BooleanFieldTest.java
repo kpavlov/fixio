@@ -15,35 +15,35 @@
  */
 package fixio.fixprotocol.fields;
 
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 
 import java.util.Random;
 
-import static org.junit.Assert.assertEquals;
+import static org.assertj.core.api.Assertions.assertThat;
 
-public class BooleanFieldTest {
+class BooleanFieldTest {
 
     private int tag;
 
-    @Before
-    public void setUp() {
+    @BeforeEach
+    void setUp() {
         tag = new Random().nextInt(10000);
     }
 
     @Test
-    public void testGetBytesTrue() {
+    void getBytesTrue() {
         BooleanField booleanField = new BooleanField(tag, true);
         byte[] bytes = booleanField.getBytes();
-        assertEquals(1, bytes.length);
-        assertEquals('Y', bytes[0]);
+        assertThat(bytes).hasSize(1);
+        assertThat(bytes[0]).isEqualTo((byte) 'Y');
     }
 
     @Test
-    public void testGetBytesFalse() {
+    void getBytesFalse() {
         BooleanField booleanField = new BooleanField(tag, false);
         byte[] bytes = booleanField.getBytes();
-        assertEquals(1, bytes.length);
-        assertEquals('N', bytes[0]);
+        assertThat(bytes).hasSize(1);
+        assertThat(bytes[0]).isEqualTo((byte) 'N');
     }
 }

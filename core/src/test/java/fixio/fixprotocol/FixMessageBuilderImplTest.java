@@ -15,29 +15,28 @@
  */
 package fixio.fixprotocol;
 
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 
 import java.util.List;
 import java.util.Random;
 
 import static org.apache.commons.lang3.RandomStringUtils.randomAscii;
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertSame;
+import static org.assertj.core.api.Assertions.assertThat;
 
-public class FixMessageBuilderImplTest {
+class FixMessageBuilderImplTest {
 
     private static final Random RANDOM = new Random();
 
     private FixMessageBuilderImpl fixMessage;
 
-    @Before
-    public void setUp() {
+    @BeforeEach
+    void setUp() {
         fixMessage = new FixMessageBuilderImpl();
     }
 
     @Test
-    public void testHeaderFields() {
+    void headerFields() {
         String beginString = randomAscii(2);
         String senderCompID = randomAscii(3);
         String targetCompID = randomAscii(4);
@@ -48,14 +47,14 @@ public class FixMessageBuilderImplTest {
         fixMessage.getHeader().setSenderCompID(senderCompID);
         fixMessage.getHeader().setTargetCompID(targetCompID);
 
-        assertEquals("beginString", beginString, fixMessage.getHeader().getBeginString());
-        assertEquals("msgType", msgType, fixMessage.getMessageType());
-        assertEquals("senderCompID", senderCompID, fixMessage.getHeader().getSenderCompID());
-        assertEquals("targetCompID", targetCompID, fixMessage.getHeader().getTargetCompID());
+        assertThat(fixMessage.getHeader().getBeginString()).as("beginString").isEqualTo(beginString);
+        assertThat(fixMessage.getMessageType()).as("msgType").isEqualTo(msgType);
+        assertThat(fixMessage.getHeader().getSenderCompID()).as("senderCompID").isEqualTo(senderCompID);
+        assertThat(fixMessage.getHeader().getTargetCompID()).as("targetCompID").isEqualTo(targetCompID);
     }
 
     @Test
-    public void testWithGroups() {
+    void withGroups() {
         String clientOrderId = randomAscii(4);
         String quoteRequestId = randomAscii(3);
 
@@ -76,42 +75,42 @@ public class FixMessageBuilderImplTest {
         // read
 
         List<Group> instruments = quoteRequest.getValue(FieldType.NoRelatedSym);
-        assertEquals(2, instruments.size());
+        assertThat(instruments.size()).isEqualTo(2);
 
-        assertSame(instrument1, instruments.get(0));
-        assertSame(instrument2, instruments.get(1));
+        assertThat(instruments.get(0)).isSameAs(instrument1);
+        assertThat(instruments.get(1)).isSameAs(instrument2);
     }
 
     @Test
-    public void testAddStringByTypeAndTag() {
+    void addStringByTypeAndTag() {
         String value = randomAscii(3);
         int tagNum = new Random().nextInt(100) + 100;
 
         FixMessageBuilderImpl messageBuilder = new FixMessageBuilderImpl();
-        assertSame(messageBuilder, messageBuilder.add(DataType.STRING, tagNum, value));
+        assertThat(messageBuilder.add(DataType.STRING, tagNum, value)).isSameAs(messageBuilder);
 
-        assertEquals(value, messageBuilder.getString(tagNum));
+        assertThat(messageBuilder.getString(tagNum)).isEqualTo(value);
     }
 
     @Test
-    public void testAddIntByTypeAndTag() {
+    void addIntByTypeAndTag() {
         int value = RANDOM.nextInt(1000);
         int tagNum = RANDOM.nextInt(100) + 100;
 
         FixMessageBuilderImpl messageBuilder = new FixMessageBuilderImpl();
-        assertSame(messageBuilder, messageBuilder.add(DataType.LENGTH, tagNum, value));
+        assertThat(messageBuilder.add(DataType.LENGTH, tagNum, value)).isSameAs(messageBuilder);
 
-        assertEquals((Integer) value, messageBuilder.getInt(tagNum));
+        assertThat(messageBuilder.getInt(tagNum)).isEqualTo((Integer) value);
     }
 
     @Test
-    public void testAddIntByTag() {
+    void addIntByTag() {
         int value = RANDOM.nextInt(1000);
         FieldType tag = FieldType.MsgSeqNum;
 
         FixMessageBuilderImpl messageBuilder = new FixMessageBuilderImpl();
-        assertSame(messageBuilder, messageBuilder.add(tag, value));
+        assertThat(messageBuilder.add(tag, value)).isSameAs(messageBuilder);
 
-        assertEquals((Integer) value, messageBuilder.getInt(tag));
+        assertThat(messageBuilder.getInt(tag)).isEqualTo((Integer) value);
     }
 }

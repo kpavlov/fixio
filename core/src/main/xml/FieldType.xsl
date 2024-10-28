@@ -57,28 +57,28 @@
         private static final Int2ObjectArrayMap&lt;FieldType&gt; TYPES = new Int2ObjectArrayMap&lt;&gt;(FieldType.values().length);
 
         static {
-            for (FieldType fieldType : FieldType.values()) {
-                if (fieldType.tag &gt; 0) {
-                    TYPES.put(fieldType.tag, fieldType);
-                }
-            }
+        for (FieldType fieldType : FieldType.values()) {
+        if (fieldType.tag &gt; 0) {
+        TYPES.put(fieldType.tag, fieldType);
+        }
+        }
         }
 
         public static FieldType forTag(int tag) {
-            FieldType fieldType = TYPES.get(tag);
-            return (fieldType != null) ? fieldType : UNKNOWN;
+        FieldType fieldType = TYPES.get(tag);
+        return (fieldType != null) ? fieldType : UNKNOWN;
         }
 
         private FieldType(int tag, DataType type) {
-            this.tag = tag;
-            this.type = type;
-            this.enumValues = null;
+        this.tag = tag;
+        this.type = type;
+        this.enumValues = null;
         }
 
         private FieldType(int tag, DataType type, String... enumValues) {
-            this.tag = tag;
-            this.type = type;
-            this.enumValues = enumValues;
+        this.tag = tag;
+        this.type = type;
+        this.enumValues = enumValues;
         }
 
         public int tag() {

@@ -19,35 +19,30 @@ package fixio.netty.codec;
 import fixio.fixprotocol.FixMessageImpl;
 import io.netty.buffer.Unpooled;
 import io.netty.handler.codec.DecoderException;
-import org.junit.BeforeClass;
-import org.junit.Test;
-import org.junit.runner.RunWith;
-import org.junit.runners.Parameterized;
+import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.MethodSource;
 
 import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertTrue;
+import static org.assertj.core.api.Assertions.assertThat;
 
-@RunWith(Parameterized.class)
 public class FixMessageDecoderChecksumTest {
 
     private static FixMessageDecoder decoder;
-    private final boolean checksumValid;
-    private final String fixMessage;
-    private final int expectedChecksum;
+    private boolean checksumValid;
+    private String fixMessage;
+    private int expectedChecksum;
 
-    public FixMessageDecoderChecksumTest(String fixMessage, int expectedChecksum, boolean checksumValid) {
+    public void initFixMessageDecoderChecksumTest(String fixMessage, int expectedChecksum, boolean checksumValid) {
         this.fixMessage = fixMessage;
         this.expectedChecksum = expectedChecksum;
         this.checksumValid = checksumValid;
     }
 
-    @Parameterized.Parameters(name = "{index}. {1} ChecksumValid: {2}")
     public static Iterable<Object[]> data() {
         return Arrays.asList(new Object[][]{
                 {"8=FIX.4.4|9=165|35=X|34=2|49=SERVER|52=20130724-09:55:21.707|56=local.1021|57=Quote|268=0|10=210|", 210, true},
@@ -57,8 +52,8 @@ public class FixMessageDecoderChecksumTest {
         });
     }
 
-    @BeforeClass
-    public static void beforeClass() {
+    @BeforeAll
+    static void beforeClass() {
         decoder = new FixMessageDecoder();
     }
 
@@ -72,15 +67,17 @@ public class FixMessageDecoderChecksumTest {
         return result;
     }
 
-    @Test
-    public void testChecksum() throws Exception {
+    @MethodSource("data")
+    @ParameterizedTest(name = "{index}. {1} ChecksumValid: {2}")
+    void checksum(String fixMessage, int expectedChecksum, boolean checksumValid) throws Exception {
+        initFixMessageDecoderChecksumTest(fixMessage, expectedChecksum, checksumValid);
         try {
             List<Object> result = decode(fixMessage);
-            assertTrue("Checksum is not valid, exception expected", checksumValid);
-            final FixMessageImpl fixMessage = (FixMessageImpl) result.get(0);
-            assertEquals(expectedChecksum, fixMessage.getChecksum());
+            assertThat(checksumValid).as("Checksum is not valid, exception expected").isTrue();
+            final FixMessageImpl msg = (FixMessageImpl) result.get(0);
+            assertThat(msg.getChecksum()).isEqualTo(expectedChecksum);
         } catch (DecoderException e) {
-            assertFalse("Checksum is valid, no exception expected, but got: " + e, checksumValid);
+            assertThat(checksumValid).as("Checksum is valid, no exception expected, but got: " + e).isFalse();
         }
     }
 

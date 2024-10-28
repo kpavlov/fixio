@@ -15,32 +15,18 @@
  */
 package fixio.fixprotocol.fields;
 
-import org.junit.Before;
-import org.junit.Test;
-import org.junit.runner.RunWith;
-import org.junit.runners.Parameterized;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.MethodSource;
 
 import java.util.Arrays;
 
-import static org.junit.Assert.assertEquals;
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.within;
 
-@RunWith(Parameterized.class)
 public class FixedPointNumberFromDoubleTest {
 
-    private final double source;
-    private final long expectedScaledValue;
-    private final int expectedScale;
-    private final String expectedToString;
     private FixedPointNumber value;
 
-    public FixedPointNumberFromDoubleTest(double d, long expectedScaledValue, int expectedScale, String expectedToString) {
-        this.source = d;
-        this.expectedScaledValue = expectedScaledValue;
-        this.expectedScale = expectedScale;
-        this.expectedToString = expectedToString;
-    }
-
-    @Parameterized.Parameters(name = "{index}: {0,number}")
     public static Iterable<Object[]> data() {
         return Arrays.asList(new Object[][]{
                 {123456789.0, 123456789L, 0, "123456789"},
@@ -54,33 +40,39 @@ public class FixedPointNumberFromDoubleTest {
         });
     }
 
-    @Before
-    public void setUp() {
+
+    @MethodSource("data")
+    @ParameterizedTest(name = "{index}: {0,number}")
+    void scaledValue(double source, long expectedScaledValue, int expectedScale, String expectedToString) {
         value = new FixedPointNumber(source, expectedScale);
+        assertThat(value.getScaledValue()).isEqualTo(expectedScaledValue);
     }
 
-    @Test
-    public void testScaledValue() {
-        assertEquals(expectedScaledValue, value.getScaledValue());
+    @MethodSource("data")
+    @ParameterizedTest(name = "{index}: {0,number}")
+    void scale(double source, long expectedScaledValue, int expectedScale, String expectedToString) {
+        value = new FixedPointNumber(source, expectedScale);
+        assertThat(value.getScale()).isEqualTo((byte) expectedScale);
     }
 
-    @Test
-    public void testScale() {
-        assertEquals(expectedScale, value.getScale());
+    @MethodSource("data")
+    @ParameterizedTest(name = "{index}: {0,number}")
+    void doubleValue(double source, long expectedScaledValue, int expectedScale, String expectedToString) {
+        value = new FixedPointNumber(source, expectedScale);
+        assertThat(value.doubleValue()).isCloseTo(source, within(0.0));
     }
 
-    @Test
-    public strictfp void testDoubleValue() {
-        assertEquals(source, value.doubleValue(), 0.0);
+    @MethodSource("data")
+    @ParameterizedTest(name = "{index}: {0,number}")
+    void longValue(double source, long expectedScaledValue, int expectedScale, String expectedToString) {
+        value = new FixedPointNumber(source, expectedScale);
+        assertThat(value.longValue()).isEqualTo((long) source);
     }
 
-    @Test
-    public void testLongValue() {
-        assertEquals((long) source, value.longValue());
-    }
-
-    @Test
-    public void testToString() {
-        assertEquals(expectedToString, value.toString());
+    @MethodSource("data")
+    @ParameterizedTest(name = "{index}: {0,number}")
+    void testToString(double source, long expectedScaledValue, int expectedScale, String expectedToString) {
+        value = new FixedPointNumber(source, expectedScale);
+        assertThat(value.toString()).isEqualTo(expectedToString);
     }
 }
