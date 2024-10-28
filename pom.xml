@@ -34,23 +34,22 @@
     </scm>
 
     <prerequisites>
-        <maven>3.5</maven>
+        <maven>3.9</maven>
     </prerequisites>
 
     <properties>
         <autoVersionSubmodules>true</autoVersionSubmodules>
-        <java.version>1.8</java.version>
+        <java.version>17</java.version>
         <maven.compiler.debug>true</maven.compiler.debug>
         <maven.compiler.optimize>true</maven.compiler.optimize>
-        <maven.compiler.source>${java.version}</maven.compiler.source>
-        <maven.compiler.target>${java.version}</maven.compiler.target>
+        <maven.compiler.release>${java.version}</maven.compiler.release>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <!-- Version -->
-        <fastutil.version>8.5.15</fastutil.version>
-        <mockito.version>2.12.0</mockito.version>
+        <mockito.version>3.1.0</mockito.version>      
+        <assertj.version>3.13.2</assertj.version>
+        <fastutil.version>8.5.15</fastutil.version>     
         <netty.version>4.1.114.Final</netty.version>
         <slf4j.version>1.7.36</slf4j.version>
-        <assertj.version>3.9.1</assertj.version>
     </properties>
 
     <modules>
@@ -98,7 +97,7 @@
                     <plugin>
                         <groupId>org.apache.maven.plugins</groupId>
                         <artifactId>maven-javadoc-plugin</artifactId>
-                        <version>2.10.4</version>
+                        <version>3.1.1</version>
                         <executions>
                             <execution>
                                 <id>attach-javadocs</id>
@@ -217,7 +216,6 @@
                 <version>${mockito.version}</version>
                 <scope>test</scope>
             </dependency>
-            <!-- https://mvnrepository.com/artifact/org.assertj/assertj-core -->
             <dependency>
                 <groupId>org.assertj</groupId>
                 <artifactId>assertj-core</artifactId>
