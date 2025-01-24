@@ -46,7 +46,7 @@
         <maven.compiler.release>${java.version}</maven.compiler.release>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <!-- Version -->
-        <mockito.version>5.14.2</mockito.version>
+        <mockito.version>5.15.2</mockito.version>
         <assertj.version>3.27.3</assertj.version>
         <fastutil.version>8.5.15</fastutil.version>
         <netty.version>4.1.117.Final</netty.version>
