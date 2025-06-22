@@ -48,7 +48,7 @@
         <!-- Version -->
         <mockito.version>5.18.0</mockito.version>
         <assertj.version>3.27.3</assertj.version>
-        <fastutil.version>8.5.15</fastutil.version>
+        <fastutil.version>8.5.16</fastutil.version>
         <netty.version>4.1.119.Final</netty.version>
         <slf4j.version>2.0.17</slf4j.version>
         <junit.version>5.13.1</junit.version>
