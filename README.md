@@ -63,8 +63,11 @@ You'll also need a slf4j API implementation at runtime, so please add appropriat
 You may find working example of [client][client-example]
 and [server][server-example] applications in module ["examples"][examples-module].
 
-I recommend running server with Concurrent Mark Sweep Collector enabled: `-XX:+UseConcMarkSweepGC`
-and increased Survivor spaces (`-XX:SurvivorRatio=4`).
+### JVM notes
+The examples build and run on modern JDKs (tested with Java 17).
+
+If you want to tune GC for low-latency scenarios, prefer modern collectors (e.g., G1 by default, or ZGC/Shenandoah depending on your JDK) rather than legacy CMS flags (CMS was removed in recent Java versions).
+
 
 ### Writing Simple FIX Client
 
