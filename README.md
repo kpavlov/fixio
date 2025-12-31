@@ -64,6 +64,7 @@ You may find working example of [client][client-example]
 and [server][server-example] applications in module ["examples"][examples-module].
 
 ### JVM notes
+
 The examples build and run on modern JDKs (tested with Java 17).
 
 If you want to tune GC for low-latency scenarios, prefer modern collectors (e.g., G1 by default, or ZGC/Shenandoah depending on your JDK) rather than legacy CMS flags (CMS was removed in recent Java versions).
